@@ -1,47 +1,58 @@
 # Claude Skills
 
-Personal collection of reusable Claude Code skills.
+Personal collection of reusable Claude Code skills, grouped by purpose.
 
-## Skills
+## Categories
 
-| Skill | Description |
-|-------|-------------|
-| `grill-me` | Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. |
-| `improve-codebase-architecture` | Explore a codebase to find opportunities for architectural improvement, focusing on making the codebase more testable by deepening shallow modules. |
-| `prd-to-issues` | Break a PRD into independently-grabbable GitHub issues using tracer-bullet vertical slices. |
-| `promote-feature` | Promote a deferred-features stub into a ralph-loop-ready scope — moves the doc out of docs/deferred/, optionally writes a PRD, creates GitHub issues with a feature/<slug> label, and initializes the plans/ directory. |
-| `tdd` | Test-driven development with red-green-refactor loop. |
-| `verify` | Generate and optionally execute E2E verification steps after completing a plan or implementation. |
-| `write-a-prd` | Create a PRD through user interview, codebase exploration, and module design, then submit as a GitHub issue. |
+| Folder | What's inside |
+|--------|---------------|
+| [`planning/`](./planning) | Shape work before code: interviews, PRDs, issue slicing, feature promotion. |
+| [`coding/`](./coding) | Write and refactor code: TDD loop, architecture improvement. |
+| [`quality/`](./quality) | Confirm work works: end-to-end verification. |
+| [`productivity/`](./productivity) | Manage your own working state: handoffs between conversations. |
+
+Each category folder has its own `README.md` listing the skills inside.
 
 ## Installation
 
-### Install a skill globally (all projects)
+Skills install into either `~/.claude/skills/` (global, available in every project) or `.claude/skills/` (only the current project). Use `install.sh` from the repo root.
+
+### Install one skill
 
 ```bash
-./install.sh <skill-name> --global
-# Example: ./install.sh grill-me --global
+# Into the current project
+./install.sh <category>/<skill-name>
+# Example:
+./install.sh coding/tdd
+
+# Globally
+./install.sh <category>/<skill-name> --global
+# Example:
+./install.sh planning/grill-me --global
 ```
 
-### Install a skill into the current project
+### Install everything
 
 ```bash
-./install.sh <skill-name>
-# Example: ./install.sh verify
-```
-
-### Install all skills globally
-
-```bash
-./install.sh --all --global
+./install.sh --all --global   # all skills, globally
+./install.sh --all            # all skills, current project
 ```
 
 ### Manual installation
 
 ```bash
 # Global
-cp -r <skill-name> ~/.claude/skills/<skill-name>
+cp -r <category>/<skill-name> ~/.claude/skills/<skill-name>
 
 # Project
-cp -r <skill-name> .claude/skills/<skill-name>
+cp -r <category>/<skill-name> .claude/skills/<skill-name>
 ```
+
+> Skills install by their leaf name (e.g. `tdd`, not `coding/tdd`) — the category folder is organizational only.
+
+## Conventions
+
+- Skill names use kebab-case.
+- Each skill lives in `<category>/<skill-name>/SKILL.md` with YAML frontmatter (`name`, `description`).
+- Each category folder has a `README.md` describing its skills.
+- New categories are free to add — `install.sh` discovers any `*/<skill>/SKILL.md`.
