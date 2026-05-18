@@ -5,7 +5,9 @@ description: Create a PRD through user interview, codebase exploration, and modu
 
 This skill will be invoked when the user wants to create a PRD. You may skip steps if you don't consider them necessary.
 
-1. Ask the user for a long, detailed description of the problem they want to solve and any potential ideas for solutions.
+If invoked with a **source doc** (e.g. via an arg like `--source docs/deferred/csv-import.md`, or chained from another skill that hands you a path), read the source doc FIRST and treat its contents as pre-loaded context. Skip step 1's "ask for a long description" — you already have one. Frame the interview in step 3 as "filling the gaps" rather than "starting from zero." This is the common case when promoting a deferred-features stub into a real PRD.
+
+1. Ask the user for a long, detailed description of the problem they want to solve and any potential ideas for solutions. (Skip if you have a source doc per the note above.)
 
 2. Explore the repo to verify their assertions and understand the current state of the codebase.
 

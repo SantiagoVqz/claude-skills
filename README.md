@@ -9,6 +9,7 @@ Personal collection of reusable Claude Code skills.
 | `grill-me` | Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. |
 | `improve-codebase-architecture` | Explore a codebase to find opportunities for architectural improvement, focusing on making the codebase more testable by deepening shallow modules. |
 | `prd-to-issues` | Break a PRD into independently-grabbable GitHub issues using tracer-bullet vertical slices. |
+| `promote-feature` | Promote a deferred-features stub into a ralph-loop-ready scope — moves the doc out of docs/deferred/, optionally writes a PRD, creates GitHub issues with a feature/<slug> label, and initializes the plans/ directory. |
 | `tdd` | Test-driven development with red-green-refactor loop. |
 | `verify` | Generate and optionally execute E2E verification steps after completing a plan or implementation. |
 | `write-a-prd` | Create a PRD through user interview, codebase exploration, and module design, then submit as a GitHub issue. |

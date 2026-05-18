@@ -11,9 +11,12 @@ Break a PRD into independently-grabbable GitHub issues using vertical slices (tr
 
 ### 1. Locate the PRD
 
-Ask the user for the PRD GitHub issue number (or URL).
+The PRD lives in one of two places. Ask the user (or accept either as input):
 
-If the PRD is not already in your context window, fetch it with `gh issue view <number>` (with comments).
+- **A GitHub issue.** Ask for the issue number or URL. Fetch with `gh issue view <number>` (with comments) if not already in context.
+- **A markdown doc in the repo.** Ask for the relative path (e.g. `docs/prds/feature-csv-import.md`). Read the file directly. Use this when the feature is small enough that no umbrella PRD issue was created.
+
+Whichever the source, capture which form it is — it changes the issue-body template in step 5 (`## Parent PRD #<num>` for issue source; `## Parent doc <path>` for doc source).
 
 ### 2. Explore the codebase (optional)
 
@@ -49,16 +52,36 @@ Ask the user:
 
 Iterate until the user approves the breakdown.
 
-### 5. Create the GitHub issues
+Also confirm the **GitHub label** to apply to every created issue. Conventions vary by project — common patterns are `phase-N`, `feature/<slug>`, `epic/<slug>`. Suggest a sensible default based on the PRD title or scope; let the user override.
 
-For each approved slice, create a GitHub issue using `gh issue create`. Use the issue body template below.
+### 5. Ensure the GitHub label exists
+
+Before filing any issues, make sure the target label exists. The label is what scope-keyed runners (e.g. ralph-loops) use to find work, so missing labels mean missing work.
+
+```bash
+# Check if the label exists. If not, create it.
+gh label list --repo <owner/repo> --json name -q '.[].name' | grep -qx "<label>" \
+  || gh label create "<label>" --repo <owner/repo> --color "<hex>" --description "<short>"
+```
+
+Pick a color that's distinct from existing labels in the repo (run `gh label list` to see them). This step is idempotent — running it twice is safe.
+
+### 6. Create the GitHub issues
+
+For each approved slice, create a GitHub issue using `gh issue create --label <label>`. Use the issue body template below, choosing the parent header that matches step 1's source form.
 
 Create issues in dependency order (blockers first) so you can reference real issue numbers in the "Blocked by" field.
 
 <issue-template>
-## Parent PRD
+## Parent PRD     <!-- use this header if step 1 source was an issue -->
 
 #<prd-issue-number>
+
+<!-- OR -->
+
+## Parent doc    <!-- use this header if step 1 source was a markdown doc -->
+
+<repo-relative-path-to-doc>
 
 ## What to build
 

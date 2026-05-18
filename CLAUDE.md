@@ -17,6 +17,7 @@ Each skill lives in its own top-level directory with a `SKILL.md` file (and opti
 - **grill-me** — Stress-test a plan or design through relentless interviewing
 - **write-a-prd** — Create a PRD through interview, codebase exploration, and module design
 - **prd-to-issues** — Break a PRD into vertical-slice GitHub issues
+- **promote-feature** — Turn a deferred-features stub into a ralph-loop-ready scope (moves doc, files issues with `feature/<slug>` label, initializes `plans/`)
 - **tdd** — Test-driven development with red-green-refactor loop
 - **improve-codebase-architecture** — Find architectural improvement opportunities via deep modules
 - **verify** — Generate and execute E2E verification steps post-implementation
