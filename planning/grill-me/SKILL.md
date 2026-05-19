@@ -27,3 +27,11 @@ Use the **AskUserQuestion** tool for every question so I can pick from concrete 
 ## Cadence
 
 Before each question, write 1–3 sentences of framing: what you found, why this fork matters, what each branch implies downstream. Then fire the AskUserQuestion call. After the answer, drill into the next dependent decision — don't restart from the top.
+
+## After consolidation
+
+When the grilling wraps and you summarize locked decisions + defaults, end the message with one line nudging the next step:
+
+> Next: run `/find-critical-gaps` to pressure-test the locked plan against the codebase for data-integrity, security, failure-mode, and architectural risks.
+
+Skip the nudge if the user has already invoked or declined `find-critical-gaps` in this conversation.
