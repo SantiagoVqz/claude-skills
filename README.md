@@ -7,8 +7,7 @@ Personal collection of reusable Claude Code skills, grouped by purpose.
 | Folder | What's inside |
 |--------|---------------|
 | [`planning/`](./planning) | Shape work before code: interviews, PRDs, issue slicing, feature promotion. |
-| [`coding/`](./coding) | Write and refactor code: TDD loop, architecture improvement. |
-| [`quality/`](./quality) | Confirm work works: end-to-end verification. |
+| [`coding/`](./coding) | Write and refactor code: TDD loop, architecture improvement, burning a PRD scope down to PRs, and reconciling those PRs as the base moves. |
 | [`productivity/`](./productivity) | Manage your own working state: handoffs between conversations. |
 
 Each category folder has its own `README.md` listing the skills inside.

@@ -16,9 +16,8 @@ Skills are grouped by purpose into category folders. Each skill lives in `<categ
 
 ## Categories
 
-- **planning/** — `grill-me`, `write-a-prd`, `prd-to-issues`, `promote-feature`
-- **coding/** — `tdd`, `improve-codebase-architecture`
-- **quality/** — `verify`
+- **planning/** — `grill-me`, `write-a-prd`, `prd-to-issues`
+- **coding/** — `tdd`, `improve-codebase-architecture`, `reconcile-branch`
 - **productivity/** — `handoff`
 
 New categories are free to add — `install.sh` discovers any `*/<skill>/SKILL.md`.
