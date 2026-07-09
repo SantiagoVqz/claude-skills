@@ -1,33 +1,41 @@
 # Claude Skills
 
-Personal collection of reusable Claude Code skills, grouped by purpose.
+Personal collection of reusable Claude Code skills, grouped by purpose. Many are adapted from [`mattpocock/skills`](https://github.com/mattpocock/skills) (v1.1) and nudged to taste; some are my own.
 
 ## Categories
 
 | Folder | What's inside |
 |--------|---------------|
-| [`planning/`](./planning) | Shape work before code: interviews, PRDs, issue slicing, feature promotion. |
-| [`coding/`](./coding) | Write and refactor code: TDD loop, architecture improvement, burning a PRD scope down to PRs, and reconciling those PRs as the base moves. |
-| [`productivity/`](./productivity) | Manage your own working state: handoffs between conversations. |
+| [`engineering/`](./engineering) | The build pipeline: grill → spec → tickets → implement, plus code review, TDD, refactoring, research, domain modeling, and branch reconciliation. |
+| [`productivity/`](./productivity) | Manage your own working state: conversation handoffs and skill authoring. |
+| [`design/`](./design) | UI/UX design and review intelligence. |
 
 Each category folder has its own `README.md` listing the skills inside.
 
+## The engineering flow
+
+Most engineering skills compose into one pipeline (run `setup-skills` once per repo first):
+
+```
+idea ──/grilling──► /to-spec ──► /to-tickets ──► /implement ──► /code-review
+                                     ▲
+        big effort, many sessions ──/wayfinder
+```
+
+`grilling` is the shared interview primitive; `grill-with-docs` is the same interview that also writes ADRs + glossary. `research`, `prototype`, `domain-modeling`, `codebase-design`, and `triage` are reached as needed.
+
 ## Installation
 
-Skills install into either `~/.claude/skills/` (global, available in every project) or `.claude/skills/` (only the current project). Use `install.sh` from the repo root.
+Skills install into either `~/.claude/skills/` (global, every project) or `.claude/skills/` (current project only). Use `install.sh` from the repo root.
 
 ### Install one skill
 
 ```bash
-# Into the current project
-./install.sh <category>/<skill-name>
-# Example:
-./install.sh coding/tdd
+./install.sh <category>/<skill-name>            # into current project
+./install.sh engineering/tdd                     # example
 
-# Globally
-./install.sh <category>/<skill-name> --global
-# Example:
-./install.sh planning/grill-me --global
+./install.sh <category>/<skill-name> --global    # globally
+./install.sh engineering/grilling --global       # example
 ```
 
 ### Install everything
@@ -37,17 +45,15 @@ Skills install into either `~/.claude/skills/` (global, available in every proje
 ./install.sh --all            # all skills, current project
 ```
 
-### Manual installation
+### Fresh machine / backup restore
+
+This repo is the source of truth. To restore everything on a new machine:
 
 ```bash
-# Global
-cp -r <category>/<skill-name> ~/.claude/skills/<skill-name>
-
-# Project
-cp -r <category>/<skill-name> .claude/skills/<skill-name>
+git clone <this-repo> && cd claude-skills && ./install.sh --all --global
 ```
 
-> Skills install by their leaf name (e.g. `tdd`, not `coding/tdd`) — the category folder is organizational only.
+> Skills install by their leaf name (e.g. `tdd`, not `engineering/tdd`) — the category folder is organizational only.
 
 ## Conventions
 
