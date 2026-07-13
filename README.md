@@ -9,6 +9,7 @@ Personal collection of reusable Claude Code skills, grouped by purpose. Many are
 | [`engineering/`](./engineering) | The build pipeline: grill → spec → tickets → implement, plus code review, TDD, refactoring, research, domain modeling, and branch reconciliation. |
 | [`productivity/`](./productivity) | Manage your own working state: conversation handoffs and skill authoring. |
 | [`design/`](./design) | UI/UX design and review intelligence. |
+| [`marketing/`](./marketing) | Getting pages found, ranked, and cited: SEO + GEO auditing. |
 
 Each category folder has its own `README.md` listing the skills inside.
 
