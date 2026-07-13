@@ -8,7 +8,7 @@ Personal collection of reusable Claude Code skills, grouped by purpose. Many are
 |--------|---------------|
 | [`engineering/`](./engineering) | The build pipeline: grill → spec → tickets → implement, plus code review, TDD, refactoring, research, domain modeling, and branch reconciliation. |
 | [`productivity/`](./productivity) | Manage your own working state: conversation handoffs and skill authoring. |
-| [`design/`](./design) | UI/UX design and review intelligence. |
+| [`design/`](./design) | Review, polish, and harden existing frontend interfaces. |
 | [`marketing/`](./marketing) | Getting pages found, ranked, and cited: SEO + GEO auditing. |
 
 Each category folder has its own `README.md` listing the skills inside.
@@ -32,11 +32,11 @@ Skills install into either `~/.claude/skills/` (global, every project) or `.clau
 ### Install one skill
 
 ```bash
-./install.sh <category>/<skill-name>            # into current project
-./install.sh engineering/tdd                     # example
+./install.sh <path/to/skill>                     # into current project
+./install.sh engineering/build/tdd               # example
 
-./install.sh <category>/<skill-name> --global    # globally
-./install.sh engineering/grilling --global       # example
+./install.sh <path/to/skill> --global            # globally
+./install.sh engineering/plan/grilling --global  # example
 ```
 
 ### Install everything
@@ -54,11 +54,11 @@ This repo is the source of truth. To restore everything on a new machine:
 git clone <this-repo> && cd claude-skills && ./install.sh --all --global
 ```
 
-> Skills install by their leaf name (e.g. `tdd`, not `engineering/tdd`) — the category folder is organizational only.
+> Skills install by their leaf name (e.g. `tdd`, not `engineering/build/tdd`) — the folders above it are organizational only.
 
 ## Conventions
 
 - Skill names use kebab-case.
-- Each skill lives in `<category>/<skill-name>/SKILL.md` with YAML frontmatter (`name`, `description`).
+- Each skill lives in a `<skill-name>/SKILL.md` folder with YAML frontmatter (`name`, `description`). Nesting depth is free — a skill can sit under `<category>/` or a deeper `<category>/<sub-category>/` (as the busy `engineering/` tree does).
 - Each category folder has a `README.md` describing its skills.
-- New categories are free to add — `install.sh` discovers any `*/<skill>/SKILL.md`.
+- New categories and sub-categories are free to add — `install.sh` discovers any `SKILL.md` at any depth.
