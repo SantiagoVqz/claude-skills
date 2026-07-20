@@ -16,6 +16,11 @@ The issue tracker and triage label vocabulary should have been provided to you �
 
 Work from whatever is already in the conversation context. If the user passes a reference (a spec path, an issue number or URL) as an argument, fetch it and read its full body and comments.
 
+Identify the **parent** before drafting:
+
+- If the source is an existing tracker issue — including a PRD just published by `/to-spec` — that issue is the parent.
+- If the source is only a conversation or local file, there is no tracker parent. Do not invent one; tell the user the tickets will be top-level unless they provide or publish a parent first.
+
 ### 2. Explore the codebase (optional)
 
 If you have not already explored the codebase, do so to understand the current state of the code. Ticket titles and descriptions should use the project's domain glossary vocabulary, and respect ADRs in the area you're touching.
@@ -57,14 +62,23 @@ Iterate until the user approves the breakdown.
 
 ### 5. Publish the tickets to the configured tracker
 
-Publish the approved tickets. **How** depends on the tracker `/setup-skills` configured — the tickets are the same either way, only the shape of the blocking edges changes:
+Publish the approved tickets. **How** depends on the tracker `/setup-skills` configured:
 
 - **Local files** → write one file per ticket under `.scratch/<feature-slug>/issues/<NN>-<slug>.md`, numbered from `01` in dependency order (blockers first). Each file's "Blocked by" lists the numbers/titles it depends on. Use the per-ticket file template below — one ticket per file, never a single combined file.
-- **A real issue tracker (GitHub, Linear, …)** → publish one issue per ticket in dependency order (blockers first) so each ticket's blocking edges can reference real identifiers. Use the platform's native blocking / sub-issue relationship where it has one; otherwise set each ticket's "Blocked by" to the blocking issues. Apply the `ready-for-agent` triage label unless instructed otherwise — the tickets are agent-grabbable by construction.
+- **A real issue tracker (GitHub, Linear, …)** → follow the mandatory two-pass workflow below.
+
+#### Real-tracker publishing workflow
+
+1. **Create and attach:** create one issue per ticket in dependency order. When a parent exists, attach every new issue to it using the tracker's native parent/sub-issue relationship. A `Parent` heading, `Part of` line, URL, or task-list reference in the body is supplementary and **does not count as attachment**.
+2. **Wire blocking edges:** after every ticket has a real identifier, add the tracker's native blocking relationships in a second pass. Use body-text `Blocked by` references only when the configured tracker documentation explicitly says native dependencies are unavailable.
+3. **Verify:** re-fetch the parent and tickets through the tracker integration. Confirm every ticket appears as a native child of the expected parent and every blocking edge is present. Report any failed link; do not silently downgrade a failed native operation to body text.
+4. Apply the `ready-for-agent` triage label unless instructed otherwise.
+
+If the tracker supports native parentage but the configured tracker documentation does not explain how to create it, stop before publishing and ask for that operation to be added to `docs/agents/issue-tracker.md`.
 
 Work the **frontier**: any ticket whose blockers are all done. For a purely linear chain that means top to bottom.
 
-Do NOT close or modify any parent issue.
+Do NOT close the parent or edit its title, body, labels, or state. Attaching native children is expected.
 
 <local-ticket-template>
 
@@ -85,7 +99,7 @@ Do NOT close or modify any parent issue.
 
 ## Parent
 
-A reference to the parent issue on the tracker (if the source was an existing issue, otherwise omit this section).
+A reference to the native parent issue on the tracker (if one exists; otherwise omit this section). This reference does not replace the native parent/sub-issue relationship.
 
 ## What to build
 
