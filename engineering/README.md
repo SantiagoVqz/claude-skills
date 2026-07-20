@@ -36,6 +36,7 @@ Skills install by their leaf name, so the sub-folders below are organizational o
 | Skill | Purpose |
 |-------|---------|
 | [`implement`](./build/implement) | Implement a piece of work from a spec or set of tickets, driving TDD and code review. |
+| [`phase-done`](./build/phase-done) | Per-phase closer for multi-phase work: simplify, run the repo's own checks, commit, then a cold-read review by a fresh agent. (Mine — no upstream.) |
 | [`tdd`](./build/tdd) | Test-driven development — the red → green loop, reference-only. |
 
 ## review/ — check and maintain the code

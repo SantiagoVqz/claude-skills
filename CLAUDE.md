@@ -20,7 +20,7 @@ Skills are grouped by purpose into category folders. Each skill lives in a `<ski
 - **engineering/** — the build pipeline, grouped by phase:
   - `plan/` — `grilling`, `grill-with-docs`, `wayfinder`, `research`, `prototype`, `domain-modeling`, `codebase-design`
   - `spec/` — `to-spec`, `to-tickets`
-  - `build/` — `implement`, `tdd`
+  - `build/` — `implement`, `phase-done`, `tdd`
   - `review/` — `code-review`, `improve-codebase-architecture`, `reconcile-branch`, `ship`, `worktree-cleanup`, `triage`
   - `setup/` — `setup-skills`
 - **productivity/** — `handoff`, `writing-great-skills`
