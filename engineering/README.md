@@ -45,6 +45,7 @@ Skills install by their leaf name, so the sub-folders below are organizational o
 | [`code-review`](./review/code-review) | Review changes on two axes: repo Standards + a Fowler code-smell baseline. |
 | [`improve-codebase-architecture`](./review/improve-codebase-architecture) | Scan for module-deepening opportunities, report visually, then grill through the one you pick. |
 | [`reconcile-branch`](./review/reconcile-branch) | Bring a branch up to date with its base and confirm the surviving diff is exactly intended. (Mine — no upstream.) |
+| [`worktree-cleanup`](./review/worktree-cleanup) | Post-merge teardown of a git worktree: remove it, delete the branch, prune, refresh main. (Mine — no upstream.) |
 | [`triage`](./review/triage) | Move issues and external PRs through a state machine of triage roles. |
 
 ## setup/ — one-time per-repo config

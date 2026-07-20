@@ -56,9 +56,10 @@ install_skill() {
     local dest=".claude/skills/$skill_name"
   fi
 
-  mkdir -p "$dest"
-  cp -r "$src"/* "$dest"/
-  echo "Installed $skill_name → $dest"
+  mkdir -p "$(dirname "$dest")"
+  rm -rf "$dest"           # drop any prior copy or stale symlink
+  ln -s "$src" "$dest"     # symlink → edits in the repo are live, no re-install
+  echo "Linked $skill_name → $dest"
 }
 
 if [[ "$ALL" == true ]]; then
