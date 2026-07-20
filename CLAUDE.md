@@ -21,14 +21,14 @@ Skills are grouped by purpose into category folders. Each skill lives in a `<ski
   - `plan/` — `grilling`, `grill-with-docs`, `wayfinder`, `research`, `prototype`, `domain-modeling`, `codebase-design`
   - `spec/` — `to-spec`, `to-tickets`
   - `build/` — `implement`, `phase-done`, `tdd`
-  - `review/` — `code-review`, `improve-codebase-architecture`, `reconcile-branch`, `ship`, `worktree-cleanup`, `triage`
+  - `review/` — `code-review`, `improve-codebase-architecture`, `reconcile-branch`, `ship`, `cleanup`, `triage`
   - `setup/` — `setup-skills`
 - **productivity/** — `handoff`, `writing-great-skills`
 - **design/** — `ui-ux-pro-max`, `impeccable`
 - **marketing/** — `seo-geo-audit`
 - **general/** — `ask` (a router over every skill in this repo)
 
-Most engineering skills are adapted from [`mattpocock/skills`](https://github.com/mattpocock/skills) and nudged to taste; `reconcile-branch`, `worktree-cleanup`, and the `design/` skills are mine. Run `setup-skills` once per repo before the tracker-backed skills.
+Most engineering skills are adapted from [`mattpocock/skills`](https://github.com/mattpocock/skills) and nudged to taste; `reconcile-branch`, `cleanup`, and the `design/` skills are mine. Run `setup-skills` once per repo before the tracker-backed skills.
 
 New categories and sub-categories are free to add — `install.sh` discovers any `SKILL.md` at any depth.
 

@@ -62,7 +62,7 @@ Completion: exactly one open PR for head, targeting base.
 
 ## Never
 
-- **Never merge the PR** — `ship` lands the branch for review; the merge stays the human's call. Post-merge teardown is `/worktree-cleanup`.
+- **Never merge the PR** — `ship` lands the branch for review; the merge stays the human's call. Post-merge teardown is `/cleanup`.
 - **Never `git push --force`** — only `--force-with-lease`, and only after a rebase.
 - **Never ship a dirty tree** — send unfinished work back to `/implement`.
 - **Never rebase a branch under review** — it discards approvals and review context; that's why the reviewed-branch default is merge.
