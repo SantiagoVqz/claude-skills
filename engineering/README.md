@@ -5,7 +5,7 @@ The build pipeline and the code skills around it, grouped by pipeline phase. Run
 ## The flow
 
 ```
-idea ──/grilling──► /to-spec ──► /to-tickets ──► /implement ──► /code-review
+idea ──/grilling──► /to-spec ──► /to-tickets ──► /implement ──► /ship
                                      ▲
         big effort, many sessions ──/wayfinder
 ```
@@ -45,6 +45,7 @@ Skills install by their leaf name, so the sub-folders below are organizational o
 | [`code-review`](./review/code-review) | Review changes on two axes: repo Standards + a Fowler code-smell baseline. |
 | [`improve-codebase-architecture`](./review/improve-codebase-architecture) | Scan for module-deepening opportunities, report visually, then grill through the one you pick. |
 | [`reconcile-branch`](./review/reconcile-branch) | Bring a branch up to date with its base and confirm the surviving diff is exactly intended. (Mine — no upstream.) |
+| [`ship`](./review/ship) | Push the current branch and open (or report) its PR — the external-git half of the lifecycle after `/implement`. (Mine — no upstream.) |
 | [`worktree-cleanup`](./review/worktree-cleanup) | Post-merge teardown of a git worktree: remove it, delete the branch, prune, refresh main. (Mine — no upstream.) |
 | [`triage`](./review/triage) | Move issues and external PRs through a state machine of triage roles. |
 

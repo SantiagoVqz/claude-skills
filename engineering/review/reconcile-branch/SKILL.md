@@ -29,7 +29,7 @@ Snapshot what the branch means to do, so you can tell later whether the diff sti
 
 ## Phase 3 — Integrate the base and resolve conflicts
 
-- **Method: CLAUDE.md is law** (rebase vs merge). When the repo is silent, default to **merge base into head** for a branch already under review (non-destructive, preserves review threads and existing approvals); **rebase** only a branch not yet reviewed.
+- **Method: an explicit directive wins, then CLAUDE.md is law** (rebase vs merge). A caller or user asking for a **rebase** — e.g. `/ship` reconciling a new, unreviewed branch — overrides everything below. When no one asks and the repo is silent, default to **merge base into head** for a branch already under review (non-destructive, preserves review threads and existing approvals); **rebase** only a branch not yet reviewed.
 - Resolve each conflict **conservatively, preserving the intent of BOTH sides** — the base change and the branch change. Never resolve a conflict by silently reverting a base change or dropping the branch's work to make the merge trivial.
 - If schema/migration/seed state changed on the base, reset the local DB to the integrated branch before any DB-backed test — a DB ahead of the code produces phantom failures.
 - **Stop and flag** (do not auto-resolve) when a conflict is **semantic, not textual** — both sides changed the same behavior in incompatible ways and picking one silently changes the product. Surface it; let the human decide.
