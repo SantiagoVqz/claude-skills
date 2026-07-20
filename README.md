@@ -1,6 +1,6 @@
 # Claude Skills
 
-Personal collection of reusable Claude Code skills, grouped by purpose. Many are adapted from [`mattpocock/skills`](https://github.com/mattpocock/skills) (v1.1) and nudged to taste; some are my own.
+Personal collection of reusable Claude Code skills, grouped by purpose. Many are adapted from [`mattpocock/skills`](https://github.com/mattpocock/skills) (v1.1) and nudged to taste; some are my own. Please check his work out!
 
 ## Categories
 
@@ -10,6 +10,7 @@ Personal collection of reusable Claude Code skills, grouped by purpose. Many are
 | [`productivity/`](./productivity) | Manage your own working state: conversation handoffs and skill authoring. |
 | [`design/`](./design) | UI/UX design and review intelligence. |
 | [`marketing/`](./marketing) | Getting pages found, ranked, and cited: SEO + GEO auditing. |
+| [`general/`](./general) | Cross-cutting skills: `ask`, a router over every skill in this repo. |
 
 Each category folder has its own `README.md` listing the skills inside.
 
