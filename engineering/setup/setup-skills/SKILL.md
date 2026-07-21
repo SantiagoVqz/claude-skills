@@ -1,6 +1,6 @@
 ---
 name: setup-skills
-description: Configure this repo for the engineering skills — set up its issue tracker, triage label vocabulary, and domain doc layout. Run once before first use of the other engineering skills.
+description: Configure this repo for the engineering skills — set up its issue tracker, triage label vocabulary, domain doc layout, and optional worktree provisioner. Run once before first use of the other engineering skills.
 disable-model-invocation: true
 ---
 
@@ -11,6 +11,7 @@ Scaffold the per-repo configuration that the engineering skills assume:
 - **Issue tracker** — where issues live (GitHub by default; local markdown is also supported out of the box)
 - **Triage labels** — the strings used for the five canonical triage roles
 - **Domain docs** — where `CONTEXT.md` and ADRs live, and the consumer rules for reading them
+- **Worktree provisioning** — an optional `scripts/provision.sh` that `implement` runs to set up a fresh worktree (env, dev-server ports, per-worktree DB); skipped for repos with no dev servers or DB
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm with the user, then write.
 
@@ -26,10 +27,11 @@ Look at the current repo to understand its starting state. Read whatever exists;
 - `docs/adr/` and any `src/*/docs/adr/` directories
 - `docs/agents/` — does this skill's prior output already exist?
 - `.scratch/` — sign that a local-markdown issue tracker convention is already in use
+- `scripts/provision.sh` — does the worktree provisioner already exist? The repo's shape for Section D: a `frontend`/`backend` split, the env vars carrying each server's URL to the other, a `DATABASE_URL` in a backend env file, a migration tool (Alembic `migrations/`, Prisma, etc.)
 
 ### 2. Present findings and ask
 
-Summarise what's present and what's missing. Then walk the user through the three decisions **one at a time** — present a section, get the user's answer, then move to the next. Don't dump all three at once.
+Summarise what's present and what's missing. Then walk the user through the four decisions **one at a time** — present a section, get the user's answer, then move to the next. Don't dump them all at once. Section D may be skipped outright for repos with no dev servers and no dev DB.
 
 Assume the user does not know what these terms mean. Each section starts with a short explainer (what it is, why these skills need it, what changes if they pick differently). Then show the choices and the default.
 
@@ -73,12 +75,22 @@ Confirm the layout:
 - **Single-context** — one `CONTEXT.md` + `docs/adr/` at the repo root. Most repos are this.
 - **Multi-context** — `CONTEXT-MAP.md` at the root pointing to per-context `CONTEXT.md` files (typically a monorepo).
 
+**Section D — Worktree provisioning.**
+
+> Explainer: When you run several branches in parallel git worktrees (e.g. the multi-agent view's `.claude/worktrees/`), each fresh worktree lacks the gitignored env files a checkout needs, and two of them running dev servers or sharing one dev DB will collide. The `implement` skill's preflight already looks for a repo-local `scripts/provision.sh` and runs it to set the worktree up — this section writes that script from a seed. Skip it for a repo with no dev servers and no dev DB: there a fresh worktree needs only its env files, which `implement`'s fallback already copies.
+
+The seed is [provision.sh](./provision.sh) — a fixed engine (worktree detect, primary guard, env copy, free-port scan) plus a small CONFIG block that is the only per-repo edit. Detect the repo's shape from step 1 (or ask when unsure), then fill that block — the seed's own `PORTING TO A NEW REPO` header names its three touch points:
+
+- **Dev-server ports** — needs a `frontend`/`backend` split and the env vars carrying each server's URL to the other. Set the two `*_PORT_BASE` values and `stamp_ports()`; leave the bases empty if the repo runs no dev servers.
+- **Per-worktree DB** — needs a `DATABASE_URL` in a backend env file plus a migration tool. Present ⇒ fill `clone_db()` (its DB engine and migrate-to-head command); absent ⇒ delete the whole function.
+
 ### 3. Confirm and edit
 
 Show the user a draft of:
 
 - The `## Agent skills` block to add to whichever of `CLAUDE.md` / `AGENTS.md` is being edited (see step 4 for selection rules)
 - The contents of `docs/agents/issue-tracker.md`, `docs/agents/triage-labels.md`, `docs/agents/domain.md`
+- If Section D applies, the filled CONFIG block of `scripts/provision.sh`
 
 Let them edit before writing.
 
@@ -122,6 +134,8 @@ Then write the three docs files using the seed templates in this skill folder as
 
 For "other" issue trackers, write `docs/agents/issue-tracker.md` from scratch using the user's description.
 
+**Worktree provisioner (Section D).** If it applies, copy the seed to `<repo>/scripts/provision.sh`, fill its CONFIG block for this repo, `chmod +x`, and confirm `bash -n` is clean. It needs no `## Agent skills` entry — `implement` discovers it by path. Completion: the script parses clean and its CONFIG names this repo's actual env files, ports, and (if any) DB — or, for a repo with no dev servers/DB, no script was written and you told the user why.
+
 ### 5. Done
 
-Tell the user the setup is complete and which engineering skills will now read from these files. Mention they can edit `docs/agents/*.md` directly later — re-running this skill is only necessary if they want to switch issue trackers or restart from scratch.
+Tell the user the setup is complete and which engineering skills will now read from these files — and, if Section D ran, that `implement` will run `scripts/provision.sh` whenever it works in a worktree. Mention they can edit `docs/agents/*.md` and `scripts/provision.sh` directly later — re-running this skill is only necessary if they want to switch issue trackers or restart from scratch.
