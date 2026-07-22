@@ -12,8 +12,8 @@ Implement the work described by the user in the spec or tickets.
 
 Use /tdd where possible, at pre-agreed seams.
 
-Run typechecking regularly, single test files regularly, and the full test suite once at the end.
+Close out in proportion to what you built:
 
-Once done, use /code-review to review the work.
-
-Commit your work to the current branch.
+- **A single slice** — run the repo's checks, then commit.
+- **A phase of a multi-phase build** — /phase-done after each one; it owns the checks, the commit, and the cold-read.
+- **The whole branch, once the last phase lands** — /two-axis-review against its base.

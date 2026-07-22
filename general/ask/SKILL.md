@@ -23,9 +23,11 @@ The route most work travels. You have an idea and want it built.
    - **Yes** → **`/to-spec`** (turn the thread into a spec), then **`/to-tickets`** to split it into tracer-bullet tickets, each declaring its **blocking edges**. On a local tracker that's one file per ticket under `.scratch/<feature>/issues/`, worked blockers-first by hand; on a real tracker the edges become native blocking links, so any ticket whose blockers are done can be grabbed — kick off **`/implement`** per ticket, **clearing context between each one**.
    - **No** → **`/implement`** right here, in the same context window.
 
-   Either way, **`/implement`** builds each issue by driving **`/tdd`** internally — one red-green slice at a time — then closes out with **`/code-review`**, a two-axis review (Standards + Spec) of the diff, and commits. **`/ship`** then does the external-git half: reconcile onto base, push, open the PR — it never merges, that stays your call. Once the PR is merged, **`/cleanup`** tears down the ticket — the worktree (or plain branch), its local + remote branch, and any per-branch DB.
+   Either way, **`/implement`** builds each issue by driving **`/tdd`** internally — one red-green slice at a time — and closes each phase with **`/phase-done`**: simplify, the repo's own checks, commit, and a cold-read for that phase's **residue**. When the last phase lands, **`/two-axis-review`** reviews the whole branch (Standards + Spec). **`/ship`** then does the external-git half: reconcile onto base, push, open the PR — it never merges, that stays your call. Once the PR is merged, **`/cleanup`** tears down the ticket — the worktree (or plain branch), its local + remote branch, and any per-branch DB.
 
-   Reach for **`/tdd`** on its own to build a concrete behaviour test-first without a full spec; **`/code-review`** on its own to review a branch or PR against a fixed point; and **`/reconcile-branch`** when a branch has drifted from its base and you want the diff verified clean *without* shipping.
+   Three review lenses, easily confused: **`/phase-done`** closes *one phase* and looks for the edit's residue; **`/two-axis-review`** judges the *whole branch* against standards and spec; the built-in **`/code-review`** is the *bug* lens — neither `/simplify` nor `/two-axis-review` hunts defects.
+
+   Reach for **`/tdd`** on its own to build a concrete behaviour test-first without a full spec; **`/two-axis-review`** on its own to review a branch or PR against a fixed point; and **`/reconcile-branch`** when a branch has drifted from its base and you want the diff verified clean *without* shipping.
 
 ### Context hygiene
 
