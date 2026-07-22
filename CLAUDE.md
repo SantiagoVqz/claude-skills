@@ -21,7 +21,7 @@ Skills are grouped by purpose into category folders. Each skill lives in a `<ski
   - `plan/` — `grilling`, `grill-with-docs`, `wayfinder`, `research`, `prototype`, `domain-modeling`, `codebase-design`
   - `spec/` — `to-spec`, `to-tickets`
   - `build/` — `implement`, `phase-done`, `tdd`
-  - `review/` — `code-review`, `improve-codebase-architecture`, `reconcile-branch`, `ship`, `cleanup`, `triage`
+  - `review/` — `two-axis-review`, `improve-codebase-architecture`, `reconcile-branch`, `ship`, `cleanup`, `triage`
   - `setup/` — `setup-skills`
 - **productivity/** — `handoff`, `writing-great-skills`
 - **design/** — `ui-ux-pro-max`, `impeccable`

@@ -19,7 +19,7 @@ Each category folder has its own `README.md` listing the skills inside.
 Most engineering skills compose into one pipeline (run `setup-skills` once per repo first):
 
 ```
-idea ──/grilling──► /to-spec ──► /to-tickets ──► /implement ──► /code-review
+idea ──/grilling──► /to-spec ──► /to-tickets ──► /implement ──► /two-axis-review
                                      ▲
         big effort, many sessions ──/wayfinder
 ```

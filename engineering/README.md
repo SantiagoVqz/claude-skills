@@ -36,14 +36,14 @@ Skills install by their leaf name, so the sub-folders below are organizational o
 | Skill | Purpose |
 |-------|---------|
 | [`implement`](./build/implement) | Implement a piece of work from a spec or set of tickets, driving TDD and code review. |
-| [`phase-done`](./build/phase-done) | Per-phase closer for multi-phase work: simplify, run the repo's own checks, commit, then a cold-read review by a fresh agent. (Mine — no upstream.) |
+| [`phase-done`](./build/phase-done) | Per-phase closer for multi-phase work: simplify, run the repo's own checks, commit, then a cold-read for the edit's residue. (Mine — no upstream.) |
 | [`tdd`](./build/tdd) | Test-driven development — the red → green loop, reference-only. |
 
 ## review/ — check and maintain the code
 
 | Skill | Purpose |
 |-------|---------|
-| [`code-review`](./review/code-review) | Review changes on two axes: repo Standards + a Fowler code-smell baseline. |
+| [`two-axis-review`](./review/two-axis-review) | Review a branch on two axes: repo Standards (+ a Fowler code-smell baseline) and Spec fidelity. |
 | [`improve-codebase-architecture`](./review/improve-codebase-architecture) | Scan for module-deepening opportunities, report visually, then grill through the one you pick. |
 | [`reconcile-branch`](./review/reconcile-branch) | Bring a branch up to date with its base and confirm the surviving diff is exactly intended. (Mine — no upstream.) |
 | [`ship`](./review/ship) | Push the current branch and open (or report) its PR — the external-git half of the lifecycle after `/implement`. (Mine — no upstream.) |
