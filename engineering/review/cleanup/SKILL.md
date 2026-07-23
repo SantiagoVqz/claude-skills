@@ -1,6 +1,6 @@
 ---
 name: cleanup
-description: Post-merge teardown for a finished ticket - confirm the PR merged, then reclaim whatever the work left on your machine: the worktree (if any), the local + remote branch, any per-branch scratch DB, stale metadata, and a refreshed main. Works whether the ticket lived in a worktree or on a plain branch in the primary checkout. Triggers on "cleanup", "clean up this ticket", "teardown worktree", "post-merge cleanup", "remove this worktree and branch", "reclaim the worktree", "done with this ticket".
+description: Post-merge teardown for a finished ticket - confirm the PR merged, then reclaim whatever the work left on your machine: the worktree (if any), the local + remote branch, any per-branch scratch DB, Docker leftovers, stale metadata, and a refreshed main. Works whether the ticket lived in a worktree or on a plain branch in the primary checkout. Triggers on "cleanup", "clean up this ticket", "teardown worktree", "post-merge cleanup", "remove this worktree and branch", "reclaim the worktree", "done with this ticket".
 argument-hint: [worktree-path | branch | ticket]
 ---
 
@@ -73,11 +73,12 @@ The work may have provisioned more than a branch — a scratch DB, generated art
 
 - **Scratch database** — a per-branch dev DB (`myapp_<suffix>`) cloned at setup. Drop it, since its name usually lives in the branch's `.env`: `psql -d postgres -c 'DROP DATABASE IF EXISTS <name> WITH (FORCE);'` (`FORCE` terminates lingering connections so the drop doesn't block). For a worktree ticket the `.env` sits in the worktree — read the DB name *before* removing the worktree, or you'll lose the pointer.
 - **Cleanup script** — if the repo ships one (`scripts/cleanup*.sh`, a `make teardown` target), prefer it over hand-rolled steps.
-- **Other per-branch artifacts** — generated volumes, containers, temp files keyed to the branch/ticket. Remove what the setup created; leave shared infrastructure alone.
+- **Docker stack** — if the repo ships a compose file, run the [Docker teardown](docker.md): sort artifacts into **keyed** (this ticket's, destroy) and **dangling** (untagged images, anonymous volumes — report, then reclaim on the user's go-ahead). Almost nothing is keyed by default, so this hook is mostly the dangling pass; a keyed stack must come down *before* the worktree is removed.
+- **Other per-branch artifacts** — temp files and generated output keyed to the branch/ticket. Remove what the setup created; leave shared infrastructure alone.
 - **Post-merge migration on primary** — if the merged branch added a schema migration and the primary dev DB never applied it, apply it now so the next session doesn't break on a missing column. Report failures, don't force-fix.
 
 If you find no such setup, say so — skipping a hook the repo doesn't use is the right outcome, not an omission.
 
 ## Report
 
-Ticket shape (worktree / plain branch) · worktree removed (path) or n/a · PR merged-state · branches deleted (local / remote, or "remote already gone") · DB / hooks dropped or skipped-why · primary refreshed (new HEAD). Call out anything skipped — PR still open, dirty worktree, non-ff main — so nothing is silently left behind.
+Ticket shape (worktree / plain branch) · worktree removed (path) or n/a · PR merged-state · branches deleted (local / remote, or "remote already gone") · DB / hooks dropped or skipped-why · Docker: keyed stack torn down or n/a, dangling reclaimed (size) or awaiting go-ahead · primary refreshed (new HEAD). Call out anything skipped — PR still open, dirty worktree, non-ff main — so nothing is silently left behind.
