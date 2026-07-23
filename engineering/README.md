@@ -47,7 +47,7 @@ Skills install by their leaf name, so the sub-folders below are organizational o
 | [`improve-codebase-architecture`](./review/improve-codebase-architecture) | Scan for module-deepening opportunities, report visually, then grill through the one you pick. |
 | [`reconcile-branch`](./review/reconcile-branch) | Bring a branch up to date with its base and confirm the surviving diff is exactly intended. (Mine — no upstream.) |
 | [`ship`](./review/ship) | Push the current branch and open (or report) its PR — the external-git half of the lifecycle after `/implement`. (Mine — no upstream.) |
-| [`cleanup`](./review/cleanup) | Post-merge teardown of a finished ticket — worktree or plain branch: remove the worktree, delete the local + remote branch, drop any per-branch DB, prune, refresh main. (Mine — no upstream.) |
+| [`cleanup`](./review/cleanup) | Post-merge teardown of a finished ticket — worktree or plain branch: remove the worktree, delete the local + remote branch, drop any per-branch DB, reclaim Docker leftovers, prune, refresh main. (Mine — no upstream.) |
 | [`triage`](./review/triage) | Move issues and external PRs through a state machine of triage roles. |
 
 ## setup/ — one-time per-repo config
