@@ -22,11 +22,20 @@ docker ps -a --format '{{.Names}}\t{{.Label "com.docker.compose.project"}}\t{{.L
 docker volume ls --format '{{.Name}}\t{{.Label "com.docker.compose.project"}}'
 ```
 
-- **Keyed** — the project name contains the branch or ticket, or `working_dir` points inside the worktree you're removing. Tear the stack down *before* `git worktree remove`; compose needs its config file to resolve the project:
+- **Keyed** — the project name contains the branch or ticket. Yours end to end. Tear the stack down *before* `git worktree remove`; compose needs its config file to resolve the project:
   ```bash
   docker compose -p <project> down --volumes --remove-orphans --rmi local
   ```
 - **Shared** — the project name is a plain directory basename that the primary checkout and other worktrees also drive. Leave containers, named volumes and the network alone: dropping `<project>_pgdata` destroys the shared dev DB every other branch is using. Only the dangling pile below is yours.
+- **Worktree-local under a shared name** — the overlap the two bullets above miss, and the usual case: the project name is shared (`backend`) but the *container's* `working_dir` points inside the worktree you're about to remove (check `com.docker.compose.project.working_dir`). Its `config_files` is the worktree's `docker-compose.yml`, which vanishes with the worktree — so it must come down *before* `git worktree remove`, or it strands (see recovery below). But the named volume is shared, so **do not** pass `--volumes`. Stop and drop the worktree's containers only:
+  ```bash
+  docker compose -p <project> stop && docker compose -p <project> rm -f   # run from inside the worktree, no -v
+  ```
+
+**Always, before `git worktree remove`:** list containers whose `working_dir` is inside the worktree and bring them down first — a stopped-but-present container strands just as a running one does.
+```bash
+docker ps -a --filter "label=com.docker.compose.project.working_dir=<worktree>/backend" --format '{{.Names}}'
+```
 
 ## The dangling pass
 
@@ -47,3 +56,20 @@ docker builder prune --filter until=168h -f
 ```
 
 Reclaim only what the report named. `docker system prune -a --volumes` deletes named volumes and every image not backing a running container — it takes the shared dev DB with it.
+
+## Orphaned-stack recovery
+
+If the worktree was already removed while a container from it survived, that container's compose project still points `config_files` at a `docker-compose.yml` that no longer exists. Any `docker compose` call against the project then fails with:
+
+```
+open .../worktrees/<name>/backend/docker-compose.yml: no such file or directory
+```
+
+Compose can't clean this up — it needs the missing file to resolve the project. Remove the container directly instead (stop first if it's running), never `docker compose down`:
+
+```bash
+docker ps -a --format '{{.Names}}\t{{.Label "com.docker.compose.project.config_files"}}'  # find the one pointing at a gone path
+docker rm -f <container>                                                                    # e.g. backend-db-1
+```
+
+Do **not** add `-v` — the named volume (`<project>_pgdata`) is the shared dev DB. Removing the last container clears the stale entry from `docker compose ls -a` on its own.
