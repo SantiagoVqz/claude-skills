@@ -57,8 +57,6 @@ Not feature work — upkeep.
 
 Off the build pipeline — for the surface of the product.
 
-- **`/ui-ux-pro-max`** — a searchable design database (styles, palettes, font pairings, chart types, stacks). Reach for it when you need **concrete design decisions**: pick a palette, a font pairing, a component style for a given stack.
-- **`/impeccable`** — the design *craft* pass: shape, audit, polish, or harden a frontend interface — visual hierarchy, accessibility, motion, copy, tokens. Reach for it when the interface exists and needs to become impeccable.
 - **`/seo-geo-audit`** — audit one page for **SEO** (search crawlers) and **GEO** (AI answer engines), cross-checking the live page against its source, and hand back impact-ranked, source-pointed fixes.
 
 ## Vocabulary underneath

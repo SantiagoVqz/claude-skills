@@ -17,7 +17,7 @@ usage() {
   echo "Examples:"
   echo "  ./install.sh engineering/build/tdd            # Install to current project"
   echo "  ./install.sh engineering/plan/grilling --global  # Install globally"
-  echo "  ./install.sh design/impeccable --global       # Un-nested category also works"
+  echo "  ./install.sh marketing/seo-geo-audit --global # Un-nested category also works"
   echo "  ./install.sh --all --global                   # Install all skills globally"
   exit 1
 }
