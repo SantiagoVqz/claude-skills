@@ -4,40 +4,47 @@ Personal collection of reusable Claude Code skills.
 
 ## Structure
 
-Skills are grouped by purpose into category folders. Each skill lives in a `<skill-name>/SKILL.md` folder (plus optional reference docs). Nesting depth is free — a category may hold skills directly, or split them into sub-categories (as `engineering/` does):
+Skills live under `v1.1/`, split by **how each skill is reached** rather than by topic. Each skill is a `<skill-name>/SKILL.md` folder plus optional reference docs:
 
 ```
-<category>/
-  README.md              # Lists the skills in this category
-  [<sub-category>/]       # Optional grouping (e.g. engineering/plan)
+v1.1/
+  README.md              # Lists every skill with a one-line description
+  user-invoked/          # disable-model-invocation: true — only reachable by typing
     <skill-name>/
-      SKILL.md           # Skill definition (frontmatter + instructions)
-      *.md               # Optional reference docs
+      SKILL.md
+      *.md               # Optional reference docs, reached by a pointer from SKILL.md
+  model-invoked/         # Model- or user-reachable; other skills can call these
+    <skill-name>/
+      SKILL.md
 ```
 
-## Categories
+The split is the load trade-off: a model-invoked description sits in context every turn, so it buys autonomous reach; a user-invoked skill costs nothing but has to be remembered — which is what the `ask` router is for.
 
-- **engineering/** — the build pipeline, grouped by phase:
-  - `plan/` — `grilling`, `grill-with-docs`, `wayfinder`, `research`, `prototype`, `domain-modeling`, `codebase-design`
-  - `spec/` — `to-spec`, `to-tickets`
-  - `build/` — `implement`, `phase-done`, `tdd`
-  - `review/` — `two-axis-review`, `improve-codebase-architecture`, `reconcile-branch`, `ship`, `cleanup`, `triage`
-  - `setup/` — `setup-skills`
-- **productivity/** — `handoff`, `writing-great-skills`
-- **marketing/** — `seo-geo-audit`
-- **general/** — `ask` (a router over every skill in this repo)
+## The pipeline
 
-Most engineering skills are adapted from [`mattpocock/skills`](https://github.com/mattpocock/skills) and nudged to taste; `reconcile-branch` and `cleanup` are mine. Run `setup-skills` once per repo before the tracker-backed skills.
+```
+/setup-skills  →  /grill-with-docs  →  /to-spec  →  /to-tickets  →  fan out
+                                                                      ↓
+                              /cleanup  ←  merge  ←  /ship  ←  /phase-done  ←  /implement
+```
 
-New categories and sub-categories are free to add — `install.sh` discovers any `SKILL.md` at any depth.
+`/to-tickets` emits a blocking DAG that drives the fan-out. Two units:
+
+- **worktree** — horizontal. One isolated checkout per independent ticket, worked in parallel.
+- **phase** — vertical. One step of a multi-phase build; a **stack layer** where stacked PRs are enabled, so each phase ships as its own PR.
+
+A stack lives in one worktree: a cascading rebase must move every branch in the chain, and git refuses to touch a branch checked out elsewhere. Phase branches are named `<type>/<feature>-phase-<n>`.
+
+Most skills are adapted from [`mattpocock/skills`](https://github.com/mattpocock/skills); `phase-done`, `ship`, and `cleanup` are mine. The stacked path needs `gh extension install github/gh-stack`, and falls back to solo-branch mode where stacked PRs aren't enabled.
 
 ## Installation
 
-Use `install.sh` to install skills globally (`~/.claude/skills/`) or into a project (`.claude/skills/`). Skills are referenced by their folder path (e.g. `engineering/build/tdd`) but install under their leaf name only. Fresh-machine restore: clone the repo and run `./install.sh --all --global`. `./install.sh --pipeline [--prefix <p>]` copies (not symlinks) the engineering pipeline + its transitive callees into a project for team sharing, optionally renamed `<prefix>_<skill>` with cross-references rewritten; the list is `PIPELINE_SKILLS` in `install.sh`.
+`install.sh` symlinks skills globally (`~/.claude/skills/`) or into a project (`.claude/skills/`), so repo edits are live with no re-install. Skills are referenced by folder path (e.g. `v1.1/model-invoked/tdd`) but install under their **leaf name** only — so two skills anywhere in the tree must never share a leaf name. Fresh-machine restore: clone and run `./install.sh --all --global`.
 
 ## Conventions
 
-- Skill names use kebab-case
-- Each SKILL.md has YAML frontmatter with `name` and `description`
-- Each category folder has a `README.md` describing its skills
-- The root README.md and category READMEs should be kept in sync with actual skills
+- Skill names use kebab-case, and the frontmatter `name` must match the folder name.
+- User-invoked skills set `disable-model-invocation: true` and get a short human-facing description; model-invoked ones carry rich trigger phrasing instead.
+- Steps end on a checkable completion criterion; skills that run a sequence end with a terse pipe-delimited `Report` line.
+- Push reference material only some runs need into a sibling `.md`, reached by a pointer from `SKILL.md`.
+- Keep the root README, `v1.1/README.md`, and the `ask` router in sync with the actual skill set — `ask` is the index, so a stale entry there is worse than a missing one.
