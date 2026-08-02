@@ -46,6 +46,15 @@ Skills install into either `~/.claude/skills/` (global, every project) or `.clau
 ./install.sh --all            # all skills, current project
 ```
 
+### Install the pipeline (team repos)
+
+```bash
+./install.sh --pipeline                # prompts for a name prefix
+./install.sh --pipeline --prefix knot  # non-interactive → knot_grilling, knot_implement, ...
+```
+
+Copies (not symlinks) the engineering pipeline into the current project's `.claude/skills/`, so it can be committed and shared with a team: the main skills (`grilling`, `grill-with-docs`, `wayfinder`, `implement`, `phase-done`, `cleanup`) plus everything they call transitively (`domain-modeling`, `prototype`, `research`, `setup-skills`, `tdd`, `two-axis-review`, `ship`). With a prefix, folder names, frontmatter `name:`, and all `/<skill>` cross-references between pipeline skills are rewritten to `<prefix>_<skill>`, so the copied pipeline stays internally connected. The list lives in `PIPELINE_SKILLS` in `install.sh`.
+
 ### Fresh machine / backup restore
 
 This repo is the source of truth. To restore everything on a new machine:

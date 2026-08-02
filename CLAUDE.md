@@ -33,7 +33,7 @@ New categories and sub-categories are free to add — `install.sh` discovers any
 
 ## Installation
 
-Use `install.sh` to install skills globally (`~/.claude/skills/`) or into a project (`.claude/skills/`). Skills are referenced by their folder path (e.g. `engineering/build/tdd`) but install under their leaf name only. Fresh-machine restore: clone the repo and run `./install.sh --all --global`.
+Use `install.sh` to install skills globally (`~/.claude/skills/`) or into a project (`.claude/skills/`). Skills are referenced by their folder path (e.g. `engineering/build/tdd`) but install under their leaf name only. Fresh-machine restore: clone the repo and run `./install.sh --all --global`. `./install.sh --pipeline [--prefix <p>]` copies (not symlinks) the engineering pipeline + its transitive callees into a project for team sharing, optionally renamed `<prefix>_<skill>` with cross-references rewritten; the list is `PIPELINE_SKILLS` in `install.sh`.
 
 ## Conventions
 
