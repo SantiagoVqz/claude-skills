@@ -1,73 +1,57 @@
 # Claude Skills
 
-Personal collection of reusable Claude Code skills, grouped by purpose. Many are adapted from [`mattpocock/skills`](https://github.com/mattpocock/skills) (v1.1) and nudged to taste; some are my own. Please check his work out!
+Personal collection of reusable Claude Code skills. Many are adapted from [`mattpocock/skills`](https://github.com/mattpocock/skills) and nudged to taste; the delivery lifecycle (`phase-done`, `ship`, `cleanup`) is mine. Please check his work out!
 
-## Categories
+Everything lives in [`v1.1/`](./v1.1), split by how each skill is reached:
 
 | Folder | What's inside |
 |--------|---------------|
-| [`engineering/`](./engineering) | The build pipeline: grill → spec → tickets → implement, plus code review, TDD, refactoring, research, domain modeling, branch reconciliation, and worktree teardown. |
-| [`productivity/`](./productivity) | Manage your own working state: conversation handoffs and skill authoring. |
-| [`marketing/`](./marketing) | Getting pages found, ranked, and cited: SEO + GEO auditing. |
-| [`general/`](./general) | Cross-cutting skills: `ask`, a router over every skill in this repo. |
+| [`v1.1/user-invoked/`](./v1.1/user-invoked) | Reachable only when you type them. The pipeline: `setup-skills`, `grill-with-docs`, `to-spec`, `to-tickets`, `implement`, `phase-done`, `ship`, `cleanup`, plus `wayfinder`, `triage`, `handoff` and the `ask` router. |
+| [`v1.1/model-invoked/`](./v1.1/model-invoked) | Model- or user-reachable, so other skills can call them: `grilling`, `tdd`, `prototype`, `research`, `diagnosing-bugs`, `resolving-merge-conflicts`, `code-review`, `domain-modeling`, `codebase-design`. |
 
-Each category folder has its own `README.md` listing the skills inside.
+[`v1.1/README.md`](./v1.1/README.md) lists every skill with a one-line description.
 
-## The engineering flow
-
-Most engineering skills compose into one pipeline (run `setup-skills` once per repo first):
+## The flow
 
 ```
-idea ──/grilling──► /to-spec ──► /to-tickets ──► /implement ──► /two-axis-review
-                                     ▲
-        big effort, many sessions ──/wayfinder
+/setup-skills   (once per repo)
+
+/grill-with-docs ──► /to-spec ──► /to-tickets ──► fan out ──► /implement
+        ▲                                                          │
+  big effort ──/wayfinder                          /phase-done ◄────┘
+                                                         │
+                                                      /ship ──► merge ──► /cleanup
 ```
 
-`grilling` is the shared interview primitive; `grill-with-docs` is the same interview that also writes ADRs + glossary. `research`, `prototype`, `domain-modeling`, `codebase-design`, and `triage` are reached as needed.
+`/to-tickets` emits a blocking DAG, and that DAG is the fan-out plan: tickets with no blocking edge get their own **worktree** worked in parallel; a chain of blocking tickets becomes one **stack** in a single worktree, one PR per phase.
+
+A stack lives in one worktree — a cascading rebase has to move every branch in the chain, and git won't touch a branch checked out elsewhere.
+
+Requires [`gh stack`](https://github.com/github/gh-stack) (`gh extension install github/gh-stack`) for the stacked path; the skills fall back to solo-branch mode where stacked PRs aren't enabled.
 
 ## Installation
 
-Skills install into either `~/.claude/skills/` (global, every project) or `.claude/skills/` (current project only). Use `install.sh` from the repo root.
-
-### Install one skill
+Skills install into either `~/.claude/skills/` (global, every project) or `.claude/skills/` (current project only), symlinked — so edits in this repo are live with no re-install.
 
 ```bash
-./install.sh <path/to/skill>                     # into current project
-./install.sh engineering/build/tdd               # example
-
-./install.sh <path/to/skill> --global            # globally
-./install.sh engineering/plan/grilling --global  # example
+./install.sh v1.1/user-invoked/ship             # one skill, current project
+./install.sh v1.1/model-invoked/tdd --global    # one skill, globally
+./install.sh --all --global                     # everything, globally
+./install.sh --all                              # everything, current project
 ```
 
-### Install everything
-
-```bash
-./install.sh --all --global   # all skills, globally
-./install.sh --all            # all skills, current project
-```
-
-### Install the pipeline (team repos)
-
-```bash
-./install.sh --pipeline                # prompts for a name prefix
-./install.sh --pipeline --prefix knot  # non-interactive → knot_grilling, knot_implement, ...
-```
-
-Copies (not symlinks) the engineering pipeline into the current project's `.claude/skills/`, so it can be committed and shared with a team: the main skills (`grilling`, `grill-with-docs`, `wayfinder`, `implement`, `phase-done`, `cleanup`) plus everything they call transitively (`domain-modeling`, `prototype`, `research`, `setup-skills`, `tdd`, `two-axis-review`, `ship`). With a prefix, folder names, frontmatter `name:`, and all `/<skill>` cross-references between pipeline skills are rewritten to `<prefix>_<skill>`, so the copied pipeline stays internally connected. The list lives in `PIPELINE_SKILLS` in `install.sh`.
-
-### Fresh machine / backup restore
-
-This repo is the source of truth. To restore everything on a new machine:
+Fresh machine restore:
 
 ```bash
 git clone <this-repo> && cd claude-skills && ./install.sh --all --global
 ```
 
-> Skills install by their leaf name (e.g. `tdd`, not `engineering/build/tdd`) — the folders above it are organizational only.
+> Skills install by their leaf name (e.g. `tdd`, not `v1.1/model-invoked/tdd`) — the folders above it are organizational only.
 
 ## Conventions
 
 - Skill names use kebab-case.
-- Each skill lives in a `<skill-name>/SKILL.md` folder with YAML frontmatter (`name`, `description`). Nesting depth is free — a skill can sit under `<category>/` or a deeper `<category>/<sub-category>/` (as the busy `engineering/` tree does).
-- Each category folder has a `README.md` describing its skills.
-- New categories and sub-categories are free to add — `install.sh` discovers any `SKILL.md` at any depth.
+- Each skill lives in a `<skill-name>/SKILL.md` folder with YAML frontmatter (`name`, `description`). The frontmatter `name` must match the folder name.
+- User-invoked skills set `disable-model-invocation: true`; model-invoked ones carry rich trigger phrasing in their description instead.
+- Reference material that only some runs need lives in a sibling `.md` file, reached by a pointer from `SKILL.md`.
+- `install.sh` discovers any `SKILL.md` at any depth, so nesting is free.
