@@ -12,8 +12,9 @@ Implement the work described by the user in the spec or tickets.
 
 Use /tdd where possible, at pre-agreed seams.
 
-Close out in proportion to what you built:
+Build in **phases** — one PR-sized chunk each, the largest piece someone can review in one sitting. Most tickets are a single phase; reach for more only when one PR would genuinely be unpleasant to review. Agree the phases with the user before building, and don't manufacture them to look thorough.
 
-- **A single slice** — run the repo's checks, then commit.
-- **A phase of a multi-phase build** — /phase-done after each one; it owns the simplify, the checks, the commit, the cold-read, and opening the next phase.
-- **The whole branch or stack, once the last phase lands** — /ship.
+Close out:
+
+- **After each phase** — /phase-done. It owns the simplify, the repo's own checks, the commit, the cold-read, and opening the next phase. A single-phase ticket runs it once.
+- **Once the last phase lands** — /ship.
