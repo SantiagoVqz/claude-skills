@@ -6,11 +6,15 @@ disable-model-invocation: true
 
 # phase-done — close out a phase
 
-The per-phase closer inside a multi-phase `/implement`: run it after each phase, then continue to the next — or hand to `/ship` once the last phase is done.
+Run this **once per phase**, then continue to the next — or hand to `/ship` when there is no next.
 
-A **phase** is the vertical unit of work. Where the repo has stacked PRs enabled, a phase is also a **stack layer** — its own branch, its own PR, reviewable the moment it closes instead of waiting for the whole feature to finish. The ritual is the same either way; only Step 5 differs.
+A **phase** is one PR-sized chunk of work: the largest piece someone can review in one sitting. Most tickets are a single phase, and that's the common case — run this once, then `/ship`. Split into more phases only when one PR would genuinely be unpleasant to review; **don't invent phases to have phases.** Where the repo has stacked PRs enabled, each phase becomes its own **stack layer** with its own PR, reviewable the moment it closes.
+
+Either way this is the last gate before work leaves the machine, so it always runs — a one-phase ticket gets the same verification a five-phase one does.
 
 It is a **ritual** — pre-approved, run start to finish. Do NOT ask for permission between steps; skipping the asking is the reason it exists.
+
+**It is also a context checkpoint.** Every step below either runs against a bounded diff or hands off to a fresh sub-agent, so the ritual costs the main window very little — and once it completes, the phase is committed, verified, and (stacked) already a PR. That's durable state outside your context. Approaching the smart zone mid-ticket? Clear or `/handoff` right after this skill returns, and pick up the next phase from the branch.
 
 ## Steps
 
