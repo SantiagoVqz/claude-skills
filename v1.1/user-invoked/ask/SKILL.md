@@ -21,40 +21,39 @@ The route most work travels. You have an idea and want it built.
    - **`/handoff`** back what you learned, and reference it from the original idea thread.
 3. **Branch — is this a multi-session build?**
    - **Yes** → **`/to-spec`** (turn the thread into a spec), then **`/to-tickets`** to split it into tracer-bullet tickets, each declaring its **blocking edges** and the **user stories** it satisfies. On a local tracker that's one file per ticket under `.scratch/<feature>/issues/`, worked blockers-first by hand; on a real tracker the edges become native blocking links. Either way the edges set the **ticket order**, and a **traceability table** goes back into the spec issue — kick off **`/implement`**, which builds the tickets one at a time, **clearing context between each one**.
-   - **No** → **`/implement`** right here, in the same context window. Work too small for a spec takes **light mode**: one task branch straight off the trunk, then `/ticket-done` opens its PR to the trunk and stops — you merge; no worktree, no `/spec-done`, no `/cleanup`.
+   - **No** → **`/implement`** right here, in the same context window. Work too small for a spec takes **light mode**: `/implement` runs its slice loop on one branch off the trunk, opens its PR to the trunk, and stops — you merge; no worktree, no `/spec-done`, no `/cleanup`.
 
    Either way, **`/implement`** builds each issue by driving **`/tdd`** internally — one red-green slice at a time. Reach for **`/tdd`** on its own when you just want to build a concrete behaviour test-first without a full spec, and **`/code-review`** on its own whenever you want to review a branch or PR against a fixed point.
 
-4. **Land it** — see Landing the work below. `/implement` stops at committed code; getting it onto the remote and off your machine is three more skills.
+4. **Land it** — see Landing the work below. `/implement` stops at committed code; getting it onto the remote and off your machine is two more skills.
 
 ## Landing the work
 
-**One spec → one worktree → one feature branch → one PR per ticket.** Three units:
+**One spec → one worktree → one feature branch → one gated commit per ticket.** Two units:
 
 - **worktree** — horizontal. One per **spec**, worked in parallel with other specs. Provisioned once (env, ports, DB) and shared by every ticket in it.
-- **feature branch** — the integration branch inside the worktree, cut once off the trunk. Everything merges here.
-- **task branch** — vertical, one per **ticket**: cut from the feature branch, its own PR, squash-merged back.
+- **feature branch** — the only branch, cut once off the trunk. Every ticket lands on it as one commit through `/implement`'s slice gate; it first reaches origin when `/spec-done` opens its PR.
 
-The blocking edges from `/to-tickets` are consumed once, to order the tickets; after that git holds the dependency, since ticket N+1 is cut from a feature branch that already contains ticket N. Nothing has to be unlocked and no rebase cascades.
+The blocking edges from `/to-tickets` are consumed once, to order the tickets; after that git holds the dependency, since ticket N+1 starts on a feature branch that already contains ticket N's commit. Nothing has to be unlocked and no rebase cascades.
 
-**Why a PR per ticket when you're solo.** Because the AI wrote the code and you haven't read it — the ticket PR is your post-merge first read, the audit trail. That's a stronger reason than a human team has.
+**Why one commit per ticket when you're solo.** Because the AI wrote the code and you haven't read it — the clean per-ticket commits and the spec PR are your first read, the audit trail. That's a stronger reason than a human team has.
 
 **Three closures, three altitudes.** A unit's state tracks the thing that unit controls:
 
 | Unit | Closes when | Closed by |
 |---|---|---|
-| **Ticket** — unit of work | its PR squash-merges into the feature branch | `/ticket-done` |
+| **Ticket** — unit of work | its gated commit lands on the feature branch | `/implement`'s slice loop |
 | **Spec** — unit of delivery | the feature branch merges to the trunk | `/cleanup` |
 | **Release** — unit of value | deployed to production | your project's own release skill |
 
 Two gates, sized differently. Running one gate at both sizes is what makes a build feel slow:
 
-- **`/ticket-done`** — the **tight** per-ticket ritual, all three passes fired in *one* turn: a **cold-read** by a zero-context agent hunting the edit's residue, **`/simplify`** scoped to this ticket's diff, and checks scoped to the diff's blast radius. Then commit, open the PR **into the feature branch**, squash-merge it, close the issue, cut the next task branch. Pre-approved start to finish. Clear context after it returns.
-- **`/spec-done`** — the **conformance** gate, once, when the last ticket merges: walk the **traceability table** (every story has a merged ticket, every ticket has a story), rebase onto the trunk, full suite, cross-ticket `/simplify` (duplication *between* tickets — the only part one ticket couldn't see), `/code-review` against the spec, then **open the feature branch's PR to the trunk and stop**.
+- **The slice gate** — inside `/implement`, per ticket, all three passes fired in *one* turn: a **cold-read** by a zero-context agent hunting the edit's residue, **`/simplify`** scoped to this slice's diff, and checks scoped to the diff's blast radius. Then one commit with a full body (stories, decisions, ticket ref), close the issue, clear context, next ticket.
+- **`/spec-done`** — the **conformance** gate, once, when the last ticket lands: walk the **traceability table** (every story has a landed ticket, every ticket has a story), rebase onto the trunk, full suite, cross-ticket `/simplify` (duplication *between* tickets — the only part one slice couldn't see), `/code-review` against the spec, then **push, open the feature branch's PR to the trunk, and stop**. You verify in the still-standing worktree, push tweaks, and merge by hand.
 - **`/resolving-merge-conflicts`** — fires whenever an integration stops on a conflict. Resolves by tracing each side's intent to its primary source, then verifies the surviving diff is exactly the intended change.
 - **`/cleanup`** — after the PR merges, close the spec issue and reclaim the machine: remove the worktree, delete the branches, drop the per-worktree scratch DB, reclaim Docker leftovers, refresh the trunk. Once per spec — tickets need no teardown.
 
-**No skill ever merges to the trunk.** `/ticket-done` merges task branches into the feature branch, which is not the trunk and has shipped nothing. Landing the feature is always yours. Deploying is a project-local release skill — the global pipeline stops at "merged to trunk".
+**No skill ever merges to the trunk.** `/spec-done` opens the feature's PR and stops. Landing the feature is always yours. Deploying is a project-local release skill — the global pipeline stops at "merged to trunk".
 
 ### Context hygiene
 
@@ -92,7 +91,7 @@ Two model-invoked references that run *beneath* the other skills — each the si
 ## Crossing sessions
 
 - **`/handoff`** — when a thread is full or you need to branch off (e.g. into a `/prototype` session), this compacts the conversation into a markdown file. You don't continue in place — you **open a new session and reference that file** to carry the context across. It's the bridge between context windows, in either direction. Use it when you want a **fresh session** but need the **current conversation preserved**.
-- **`/compact`** (built-in) — stay in the **same conversation**, letting the earlier turns be summarized. Use it at the break `/ticket-done` opens, when you don't mind losing the verbatim history. Don't compact mid-ticket — the agent can lose its way. `/handoff` forks; `/compact` continues.
+- **`/compact`** (built-in) — stay in the **same conversation**, letting the earlier turns be summarized. Use it at the break each slice's commit opens, when you don't mind losing the verbatim history. Don't compact mid-ticket — the agent can lose its way. `/handoff` forks; `/compact` continues.
 
 ## Standalone
 

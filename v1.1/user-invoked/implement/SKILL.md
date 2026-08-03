@@ -1,20 +1,19 @@
 ---
 name: implement
-description: "Implement a piece of work based on a spec or set of tickets."
+description: "Implement a spec or set of tickets — each ticket built as a gated slice and committed straight to the feature branch."
 disable-model-invocation: true
 ---
 
 Implement the work described by the user in the spec or tickets.
 
-A spec's tickets are worked in a single worktree. **One spec → one worktree → one feature branch → one PR per ticket.**
+**One spec → one worktree → one feature branch → one gated commit per ticket.** Two units:
 
 - **worktree** — the parallel unit. One per spec, worked alongside other specs.
-- **feature branch** — the integration branch inside it, cut once off the trunk. Every ticket merges here.
-- **task branch** — the serial unit. One per ticket, cut from the feature branch, squash-merged back into it by `/ticket-done`.
+- **feature branch** — the only branch. Cut once off the trunk; every ticket lands on it as one commit through the slice gate below. It first reaches origin when `/spec-done` opens its PR — nothing is pushed before that.
 
-The feature branch accumulates; task branches are short-lived. Ticket N+1 is cut from the feature branch *after* ticket N merged into it, so the blocking edges from `/to-tickets` are held by the branch graph — nothing has to be unlocked, and no rebase cascades.
+Ticket N+1 starts after ticket N's commit landed, so the blocking edges from `/to-tickets` are held by the commit history — nothing has to be unlocked, and no rebase cascades.
 
-**Light mode — work too small for a spec.** A single well-scoped ticket skips the topology: cut one task branch (`<type>/<slug>`) straight off the trunk in the primary checkout, build it, then have the user run `/ticket-done` in light mode — it opens the PR against the trunk and stops. No worktree, no feature branch, no `/spec-done`, no `/cleanup`.
+**Light mode — work too small for a spec.** Skip the worktree: cut one branch (`<type>/<slug>`) off the trunk in the primary checkout, run the same slice loop, then end it yourself — `git push -u origin <branch> && gh pr create --base <trunk>` — and **stop**; merging is the user's call. No `/spec-done`, no `/cleanup`.
 
 ## Step 0 — Enter the spec
 
@@ -25,14 +24,13 @@ Done **once per spec**, not per ticket. It leaves you standing in a provisioned 
   ```bash
   git fetch origin
   git worktree add ../<repo>-<feature> -b <type>/<feature> origin/<trunk>
-  cd ../<repo>-<feature> && git push -u origin <type>/<feature>
   ```
 
-  Fetch first so the branch cuts from the current trunk, and push immediately — `/ticket-done`'s PRs need the feature branch to exist on origin. (No remote → skip the fetch and push; `/ticket-done` merges locally.) The feature branch starts empty and is never committed to directly — every commit on it arrives by squash-merge from a task branch.
+  Fetch first so the branch cuts from the current trunk. Don't push — the branch stays local until `/spec-done`.
 
-- **Worktree exists** — `git worktree list` names it. Move there; `git log <trunk>..<type>/<feature>` shows which tickets already merged.
+- **Worktree exists** — `git worktree list` names it. Move there; `git log <trunk>..<type>/<feature>` shows which tickets already landed.
 
-**Provision — once, here.** A fresh checkout lacks what a worktree needs, and everything provisioned at this step is **shared by every ticket in the spec**: env files, dev-server ports, dev DB. `/ticket-done` provisions nothing and tears down nothing; `/cleanup` reclaims it all at the end.
+**Provision — once, here.** A fresh checkout lacks what a worktree needs, and everything provisioned at this step is **shared by every ticket in the spec**: env files, dev-server ports, dev DB. `/cleanup` reclaims it all at the end.
 
 **Prefer the repo's provisioner:** if `scripts/provision.sh` exists, run it — it owns this repo's worktree setup and is expected to be idempotent. **Otherwise** copy every gitignored env file from the primary checkout (the `git worktree list` entry whose `.git` is a directory, not a file) into the same path here — `.env`, `.env.*`, and any nested ones.
 
@@ -40,25 +38,47 @@ Done **once per spec**, not per ticket. It leaves you standing in a provisioned 
 
 Completion: you are standing in the spec's worktree, provisioned, with the feature branch cut off the trunk.
 
-## Step 1 — Build the ticket
+## Step 1 — The slice loop
 
-Cut a task branch from the feature branch:
+Run once per ticket, directly on the feature branch. It is a **ritual** — pre-approved, run start to finish without asking permission between steps.
 
-```bash
-git switch <type>/<feature> && git switch -c <type>/<feature>-<NN>-<ticket-slug>
-```
+Build **one ticket per pass** — the ticket is already sized for one fresh context window, so don't subdivide. If a ticket turns out genuinely too large for one reviewable commit, split the *ticket* on the tracker, rather than quietly stretching one commit to cover both.
 
-e.g. `feat/checkout-01-cart-schema`, `feat/checkout-02-payment-api` — the shared stem groups them, the number makes the order obvious.
+1. **Build** — use /tdd where possible, at the seams the spec pre-agreed.
+   Completion: every acceptance criterion on the ticket demonstrably works.
 
-Use /tdd where possible, at the seams the spec pre-agreed.
+2. **Gate — fire all three passes from a SINGLE turn.** The slice's diff is the uncommitted working tree (`git diff` / `git diff --name-only`); gather the check commands first — **mirror the repo's own checks, don't invent them** (`.github/workflows/*` first, then manifest scripts, run through the package manager the lockfile names), scoped to the diff's **blast radius**: the files this ticket touched plus their callers. Then dispatch the `Explore` sub-agent and every check command together — they run in the background — and invoke `/simplify` inline in the same turn while they execute:
 
-Build **one ticket per task branch** — the ticket is already sized for it, so don't subdivide. If a ticket turns out to be genuinely too large for one reviewable PR, split the *ticket* on the tracker and give each half its own task branch, rather than quietly stretching one branch to cover both.
+   - **Cold-read** — a fresh `Explore` agent with NO context beyond the changed-file list. Its brief is the **residue** of the edit — what the change left behind, not the code's overall quality: naming drift, half-applied renames, discriminants collapsed to `string`, dead fallbacks, orphaned callers.
+   - **Simplify** — `/simplify` scoped to the slice's diff. Quality, not residue: reuse, needless indirection, wrong altitude. It cannot see duplication *against other tickets* — that stays `/spec-done`'s job. The full suite is also `/spec-done`'s — one run, at the boundary that can act on it.
+   - **Checks** — the scoped commands.
 
-Completion: every acceptance criterion on the ticket demonstrably works. Verification and landing belong to `/ticket-done` — don't start them here.
+   Completion: all three have reported, dispatched from one turn.
+
+3. **Triage** — fix the real cold-read flags and apply the simplify cleanups; dismiss false positives with a reason. Fix check failures **this ticket caused**; pre-existing failures get reported, never fixed silently. If a fix touched logic, re-run the checks that cover it.
+   Completion: every flag fixed or dismissed with a reason, every check green or attributed (this-ticket → fixed, pre-existing → reported).
+
+4. **Commit — one commit, full body.** With no per-ticket PR, the commit message *is* the ticket's record; `/spec-done` walks it for traceability and assembles the spec PR from it. Summary line in the repo's log style, then:
+
+   ```
+   <short present-tense summary>
+
+   Stories: <the spec's user-story numbers this ticket satisfies>
+   Decisions: <judgement calls a reader can't recover from the diff — a seam
+   chosen, an alternative rejected, a constraint discovered. Omit if none.>
+
+   Ticket: #<issue>
+   ```
+
+   Completion: working tree clean, one commit for the ticket on the feature branch.
+
+5. **Close the ticket issue** — the tracker `/setup-skills` recorded is the single source of truth; update it and nothing else. GitHub/Linear/Jira: take `ready-for-agent` off, then `gh issue close <n> --reason completed --comment "Landed on <feature-branch> in <commit>."` Local markdown: tick the acceptance-criteria checkboxes, set **Status** to `done`. The ticket closes **here**, at the commit — the moment its work is available to build on, which is what resolves the blocking edge; shipping is the spec's closure (`/cleanup`), a different altitude.
+   Completion: the tracker shows this ticket closed, updated in exactly one place.
+
+6. **Report** — one line: ticket · check results · cold-read findings and disposition · simplify cleanups · commit hash · issue closed · next ticket, or "last ticket → /spec-done".
+
+Then **clear context** (or `/handoff`) and start the next ticket's slice loop fresh.
 
 ## Close out
 
-Both closers are user-invoked — you can't fire them, so **prompt the user** at each handoff:
-
-- **After each ticket** — prompt the user to run **/ticket-done**. It owns the scoped checks, the cold-read, the per-ticket simplify, the commit, the ticket's PR into the feature branch, the squash-merge, and closing the issue. Then **clear context** and cut the next task branch.
-- **Once the last ticket merges** — prompt the user to run **/spec-done**, which reviews the whole feature branch against the spec and opens its PR to the trunk.
+`/spec-done` is user-invoked — you can't fire it. When the last ticket's commit lands, **prompt the user to run /spec-done**: it walks traceability, rebases onto the trunk, runs the full suite and cross-ticket simplify, reviews against the spec, then pushes the branch and opens its PR — where the user verifies in the worktree and merges by hand.

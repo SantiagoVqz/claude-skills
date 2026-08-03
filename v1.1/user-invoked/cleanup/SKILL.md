@@ -9,7 +9,7 @@ argument-hint: [worktree-path | feature-branch | spec]
 
 Run this **once per spec**, after its feature branch's PR is merged, to reclaim everything the work left behind: the worktree it lived in, the feature branch, the per-worktree scratch DB, and a primary checkout left sitting on a fresh trunk. It also closes the spec issue — the last of the three closures.
 
-**Spec-scoped, not ticket-scoped.** Tickets need no teardown: `/ticket-done` already squash-merged each task branch and deleted it, and nothing was ever provisioned per ticket. The worktree, the env, the ports, and the DB were all provisioned **once** by `/implement` Step 0 and shared by every ticket in the spec, so they are reclaimed **once**, here.
+**Spec-scoped, not ticket-scoped.** Tickets need no teardown: each landed as a commit on the feature branch, and nothing was ever provisioned per ticket. The worktree, the env, the ports, and the DB were all provisioned **once** by `/implement` Step 0 and shared by every ticket in the spec, so they are reclaimed **once**, here.
 
 Destructive — it removes a worktree and deletes branches — so the merged-state gate below is mandatory. When the PR is still open, this skill stops.
 
@@ -22,7 +22,7 @@ You cannot remove a worktree you are standing in, and you cannot delete a branch
 - **Target** from `$ARGUMENTS` — a worktree path, a feature branch, or a spec that maps to one. Else infer from context (the worktree you were just working in, or the current branch).
 - List worktrees: `git worktree list`. Record the **primary checkout** (the non-worktree entry, usually sitting on the trunk).
 - **Trunk** — read it from the delivery shape `/setup-skills` recorded.
-- **Feature branch** — the `<type>/<feature>` stem. Its task branches (`<type>/<feature>-<NN>-*`) should already be gone; `git branch --list '<type>/<feature>-[0-9][0-9]-*'` catching any survivor means a `/ticket-done` didn't finish (the `[0-9][0-9]` keeps a sibling feature sharing the stem out of the match). Surface it rather than deleting silently.
+- **Feature branch** — `<type>/<feature>`, the spec's only branch; its tickets are commits on it, so there are no task branches to sweep.
 
 Completion: you can name the feature branch, the worktree holding it and its path, the primary checkout, and the trunk — before touching anything.
 
@@ -50,9 +50,9 @@ gh issue view <n> --json number,state
 
 Close anything still open — `gh issue close <n> --reason completed` — and **name it in the report**. `Closes #<n>` fires automatically only when the PR merges into the repository's **default branch**, so on a git-flow repo (trunk `develop`, default `main`) *nothing* the pipeline merges ever closes an issue by keyword. Treat closing by hand here as the normal path, not an exception.
 
-Ticket issues should already be closed by `/ticket-done`. Any still open is a signal a ticket never finished — surface it rather than closing it silently.
+Ticket issues should already be closed by `/implement`'s slice loop at each commit. Any still open is a signal a ticket never finished — surface it rather than closing it silently.
 
-On a **local markdown** tracker there is nothing to reconcile: `/ticket-done` set each ticket file's Status to `done`; set the spec file's Status to `done` here.
+On a **local markdown** tracker there is nothing to reconcile: the slice loop set each ticket file's Status to `done`; set the spec file's Status to `done` here.
 
 Completion: the spec issue is closed, and any ticket issue that survived to here is named in the report.
 
@@ -70,7 +70,6 @@ If git refuses (uncommitted changes or untracked files left behind), **stop and 
 ```bash
 git -C <primary> branch -D <feature-branch>
 ```
-Also sweep any surviving task branch you flagged during scoping.
 
 **3. Delete the remote branch** if it still exists (many repos auto-delete on merge):
 ```bash
@@ -102,4 +101,4 @@ If you find no such setup, say so — skipping a hook the repo doesn't use is th
 
 ## Report
 
-Trunk · PR merged-state · spec issue closed (and any ticket issue that shouldn't have survived) · worktree removed (path) · branches deleted (local / remote, or "remote already gone") · surviving task branches, if any · DB / hooks dropped or skipped-why · Docker: keyed stack torn down or n/a, dangling reclaimed (size) or awaiting go-ahead · primary refreshed to `<trunk>` (new HEAD). Call out anything skipped — PR still open, dirty worktree, non-ff trunk — so nothing is silently left behind.
+Trunk · PR merged-state · spec issue closed (and any ticket issue that shouldn't have survived) · worktree removed (path) · branches deleted (local / remote, or "remote already gone") · DB / hooks dropped or skipped-why · Docker: keyed stack torn down or n/a, dangling reclaimed (size) or awaiting go-ahead · primary refreshed to `<trunk>` (new HEAD). Call out anything skipped — PR still open, dirty worktree, non-ff trunk — so nothing is silently left behind.
