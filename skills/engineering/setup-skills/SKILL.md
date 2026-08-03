@@ -11,6 +11,7 @@ Scaffold the per-repo configuration that the engineering skills assume:
 - **Issue tracker** — where issues live (GitHub by default; local markdown is also supported out of the box)
 - **Triage labels** — the strings used for the five canonical triage roles
 - **Domain docs** — where `CONTEXT.md` and ADRs live, and the consumer rules for reading them
+- **Worktree provisioning** — an optional `scripts/provision.sh` run to set up a fresh worktree (env, dev-server ports, per-worktree DB); skipped for repos with no dev servers or DB
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm with the user, then write.
 
@@ -28,6 +29,7 @@ Look at the current repo to understand its starting state. Read whatever exists;
 - `.scratch/` — sign that a local-markdown issue tracker convention is already in use
 - Is the `triage` skill installed? (a `triage` skill folder alongside this one, or `triage` in your available skills.) This decides whether Section B runs at all.
 - Monorepo signals — a `pnpm-workspace.yaml`, a `workspaces` field in `package.json`, or a populated `packages/*` with its own `src/`. Present only in a genuinely large multi-package repo; their absence means single-context, which is almost every repo.
+- `scripts/provision.sh` — does the worktree provisioner already exist? Note the repo's shape for Section D: a `frontend`/`backend` split, the env vars carrying each server's URL to the other, a `DATABASE_URL` in a backend env file, a migration tool (Alembic `migrations/`, Prisma, etc.).
 
 ### 2. Present findings and ask
 
@@ -59,6 +61,8 @@ The defaults are the five canonical roles, each label string equal to its name: 
 **Section C — Domain docs.** Default to **single-context** — one `CONTEXT.md` + `docs/adr/` at the repo root. This fits almost every repo; write it without asking.
 
 Offer **multi-context** — a root `CONTEXT-MAP.md` pointing to per-context `CONTEXT.md` files — only when exploration found monorepo signals. Then confirm which layout they want.
+
+**Section D — Worktree provisioning.** Skip this section outright for a repo with no dev servers and no dev DB — there is nothing to provision. Otherwise offer `scripts/provision.sh`, adapted from the copy in this skill folder: it copies gitignored env files into a fresh worktree, stamps a non-colliding dev-server port pair, and (on `provision.sh db`) clones the dev DB per worktree so divergent migrations can't corrupt the shared schema. Only its CONFIG block needs editing — port bases, the port-dependent env vars, and the DB clone. Run it inside each fresh worktree as the worktree is set up.
 
 ### 3. Confirm and edit
 
@@ -108,6 +112,7 @@ Then write the docs files using the seed templates in this skill folder as a sta
 - [issue-tracker-local.md](./issue-tracker-local.md) — local-markdown issue tracker
 - [triage-labels.md](./triage-labels.md) — label mapping (only if `triage` is installed)
 - [domain.md](./domain.md) — domain doc consumer rules + layout
+- [provision.sh](./provision.sh) — worktree provisioner, copied to `scripts/provision.sh` (only if Section D ran)
 
 For "other" issue trackers, write `docs/agents/issue-tracker.md` from scratch using the user's description.
 
