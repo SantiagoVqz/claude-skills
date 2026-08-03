@@ -30,12 +30,14 @@ Break the work into **tracer bullet** tickets.
 
 - Each slice cuts a narrow but COMPLETE path through every layer (schema, API, UI, tests) — vertical, NOT a horizontal slice of one layer
 - A completed slice is demoable or verifiable on its own
-- Each slice is sized to fit in a single fresh context window
+- Each slice is sized to fit in a single fresh context window, which is also the size of a PR one person reviews in one sitting — where stacked PRs are enabled, **one ticket becomes one layer becomes one PR**, so this sizing is what makes the review bearable
 - Any prefactoring should be done first
 
 </vertical-slice-rules>
 
 Give each ticket its **blocking edges** — the other tickets that must complete before it can start. A ticket with no blockers can start immediately.
+
+**The edges decide layer order, then git holds them.** A feature's tickets are built as a stack in one worktree, so ticket N's branch is based on ticket N-1's — the dependency lives in the branch graph, not in a label anyone has to check. This means the stack **serializes** the DAG: tickets that could genuinely run in parallel won't. When two tracks of a feature are truly independent and worth working at the same time, that's a signal they want separate specs, so each gets its own worktree and its own stack.
 
 **Wide refactors are the exception to vertical slicing.** A **wide refactor** is one mechanical change — rename a column, retype a shared symbol — whose **blast radius** fans across the whole codebase, so a single edit breaks thousands of call sites at once and no vertical slice can land green. Don't force it into a tracer bullet; sequence it as **expand–contract**. First expand: add the new form beside the old so nothing breaks. Then migrate the call sites over in batches sized by blast radius (per package, per directory), each batch its own ticket blocked by the expand, keeping CI green batch to batch because the old form still exists. Finally contract: delete the old form once no caller remains, in a ticket blocked by every migrate batch. When even the batches can't stay green alone, keep the sequence but let them share an integration branch that all block a final integrate-and-verify ticket — green is promised only there.
 
@@ -62,7 +64,7 @@ Publish the approved tickets. **How** depends on the tracker `/setup-skills` con
 - **Local files** → write one file per ticket under `.scratch/<feature-slug>/issues/<NN>-<slug>.md`, numbered from `01` in dependency order (blockers first). Each file's "Blocked by" lists the numbers/titles it depends on. Use the per-ticket file template below — one ticket per file, never a single combined file.
 - **A real issue tracker (GitHub, Linear, …)** → publish one issue per ticket in dependency order (blockers first) so each ticket's blocking edges can reference real identifiers. Use the platform's native blocking / sub-issue relationship where it has one; otherwise set each ticket's "Blocked by" to the blocking issues. Apply the `ready-for-agent` triage label unless instructed otherwise — the tickets are agent-grabbable by construction.
 
-Work the **frontier**: any ticket whose blockers are all done. For a purely linear chain that means top to bottom.
+Work the **frontier**: any ticket whose blockers have **sealed** — which `/ticket-done` decides, a layer's PR opening (stacked) or a commit landing on the feature branch (solo). Sealing, not merging: a whole feature's PRs merge at the end, so waiting on merge would stall the build. The work beneath is already there to build on, and stacked, review feedback on it cascades up through `gh stack sync`.
 
 Do NOT close or modify any parent issue.
 
