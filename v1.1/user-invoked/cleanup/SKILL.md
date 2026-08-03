@@ -41,6 +41,24 @@ For a **stack**, run this for **every** branch in it — a stack is torn down al
 - Every PR merged → proceed.
 - Any PR still **open** (or no merged PR exists) → stop and report which. Only override on explicit user instruction (e.g. branch abandoned, intentionally never merged) — and say so in the report.
 
+## Reconcile the tracker
+
+The work has landed, so every issue behind it should be closed. Read the `Closes #<n>` references out of each merged PR body and check them:
+
+```bash
+gh pr view <n> --json body --jq '.body | scan("[Cc]loses #[0-9]+")'
+gh issue view <n> --json number,state
+```
+
+Close any still open — `gh issue close <n> --reason completed` — and **name them in the report**. Two ways one survives to here, both silent:
+
+- **Solo shape** — the tickets were never closed per-ticket by design; the feature's single PR carries every `Closes`, and only the ones it actually names get closed.
+- **A closing keyword that never fired** — GitHub honours `Closes #<n>` only when the PR merges into the repository's **default branch**. A stacked layer merged while its base was still the layer below it silently closes nothing. Merging bottom-up avoids this, since GitHub retargets each layer to the trunk as the one under it merges and its branch is deleted — but nothing enforces the order, so verify rather than assume.
+
+On a **local markdown** tracker there is nothing to reconcile: `/ticket-done` already set each file's Status to `done`.
+
+Completion: every issue referenced by the merged PRs is closed, and any you had to close by hand is named in the report.
+
 ## Teardown
 
 Order matters: a branch can't be deleted while a worktree has it checked out (or while it's the current branch), so free it first.
@@ -95,4 +113,4 @@ If you find no such setup, say so — skipping a hook the repo doesn't use is th
 
 ## Report
 
-Shape (stack of N / worktree / plain branch) · stack unstacked and pruned or n/a · worktree removed (path) or n/a · PR merged-state (every layer, for a stack) · branches deleted (local / remote, or "remote already gone") · DB / hooks dropped or skipped-why · Docker: keyed stack torn down or n/a, dangling reclaimed (size) or awaiting go-ahead · primary refreshed (new HEAD). Call out anything skipped — PR still open, dirty worktree, non-ff main — so nothing is silently left behind.
+Shape (stack of N / worktree / plain branch) · stack unstacked and pruned or n/a · worktree removed (path) or n/a · PR merged-state (every layer, for a stack) · issues reconciled (already closed, or closed by hand — list them) · branches deleted (local / remote, or "remote already gone") · DB / hooks dropped or skipped-why · Docker: keyed stack torn down or n/a, dangling reclaimed (size) or awaiting go-ahead · primary refreshed (new HEAD). Call out anything skipped — PR still open, dirty worktree, non-ff main — so nothing is silently left behind.

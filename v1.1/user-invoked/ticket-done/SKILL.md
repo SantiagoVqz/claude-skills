@@ -70,10 +70,20 @@ It is a **ritual** — pre-approved, run start to finish. Do NOT ask for permiss
 
 6. **Mark the ticket done on the configured tracker** — whichever `/setup-skills` recorded is the single source of truth; update it and nothing else.
 
-   - **GitHub / Linear / Jira** — take `ready-for-agent` off the issue so nothing grabs it twice. In the stacked shape `Closes #<issue>` already links the PR on the issue, which is what "in review" looks like — no status label to add, and the issue closes itself on merge. Don't also write a local file.
-   - **Local markdown** — tick the ticket file's acceptance-criteria checkboxes and set its **Status** to `done`. There is no issue to close, so this file *is* the record.
+   **GitHub / Linear / Jira** — take `ready-for-agent` off the issue first, in either shape, so nothing grabs it twice. Don't also write a local file. Then:
 
-   Completion: the configured tracker shows this ticket as no longer grabbable, updated in exactly one place.
+   - **Stack** — **close the issue**, linking the layer's PR from the closing comment. On GitHub: `gh issue close <n> --reason completed --comment "Built in <PR url>."` The layer is sealed, so the ticket is *built*; that is the state worth tracking here.
+   - **Solo** — **leave it open.** There is no per-ticket PR yet, so nothing about this ticket is reviewable or separately revertible. The feature's single PR closes them all at the end.
+
+   **Local markdown** — tick the ticket file's acceptance-criteria checkboxes and set its **Status** to `done`. There is no issue to close, so this file *is* the record.
+
+   **Why the stacked shape closes early.** There are two "done"s and a tracker gives you one bit. A ticket is **built** when its layer seals, and **landed** when it merges — and stacking pulls those far apart, because nothing merges until the whole stack lands bottom-up after `/ship`. Track *landed* and the board shows nothing for the entire build, then flips every issue at once. Track *built* and it moves with the work.
+
+   It also makes the blocking edges honest. Layer N+1 sits on layer N's commits, so the next ticket is buildable the moment this one seals — closing here is what makes a native blocked-by edge read as **buildable** rather than merely *merged*.
+
+   Keep `Closes #<issue>` in the PR body regardless (step 5). Against an already-closed issue it is a no-op, and it is the recovery path if a layer gets rejected and its issue reopened.
+
+   Completion: the configured tracker shows this ticket as no longer grabbable — closed where stacked, open-but-unlabelled where solo — updated in exactly one place.
 
 7. **Open the next ticket.**
 
