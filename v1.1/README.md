@@ -18,7 +18,7 @@ Reachable only when you type them (`disable-model-invocation: true`). Start at [
 - **[ticket-done](./user-invoked/ticket-done/SKILL.md)** — tight per-ticket gate: cold-read and scoped checks in parallel, commit, publish this layer's PR, open the next.
 - **[feature-done](./user-invoked/feature-done/SKILL.md)** — conformance gate, once per feature: simplify the full diff, full suite, `/code-review` against the spec, then hand to ship.
 - **[ship](./user-invoked/ship/SKILL.md)** — integrate, push, PR. Solo branch or whole stack. Never merges.
-- **[cleanup](./user-invoked/cleanup/SKILL.md)** — post-merge teardown: unstack, remove the worktree, delete branches, drop the scratch DB, reclaim Docker, refresh main.
+- **[cleanup](./user-invoked/cleanup/SKILL.md)** — post-merge teardown: unstack, remove the worktree, delete branches, drop the scratch DB, reclaim Docker, refresh the trunk.
 - **[triage](./user-invoked/triage/SKILL.md)** — move incoming issues through a state machine of triage roles.
 - **[improve-codebase-architecture](./user-invoked/improve-codebase-architecture/SKILL.md)** — scan for deepening opportunities, report visually, then grill through the one you pick.
 - **[handoff](./user-invoked/handoff/SKILL.md)** — compact the conversation into a file a fresh session can pick up.

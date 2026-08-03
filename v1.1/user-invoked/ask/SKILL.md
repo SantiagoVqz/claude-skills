@@ -41,7 +41,7 @@ Two gates, sized differently. Running one gate on both sizes is what makes a bui
 - **`/feature-done`** — the **conformance** gate, once, when the last ticket seals: `/simplify` over the whole feature diff, the full suite, then `/code-review` against the spec. Everything that scales with the feature rather than the diff lives here, which is why it doesn't run per ticket.
 - **`/ship`** — the external-git half: integrate, push, PR. Solo branch → one PR. Stack → `gh stack sync` then `gh stack submit`, refreshing every layer's PR against the synced trunk. It never merges; that stays yours.
 - **`/resolving-merge-conflicts`** — fires whenever an integration stops on a conflict, including a `gh stack rebase` that exits **3**. Resolves by tracing each side's intent to its primary source, then verifies the surviving diff is exactly the intended change.
-- **`/cleanup`** — after the PRs merge, reclaim the machine: unstack, remove the worktree, delete the branches, drop any per-branch scratch DB, reclaim Docker leftovers, refresh `main`.
+- **`/cleanup`** — after the PRs merge, reclaim the machine: unstack, remove the worktree, delete the branches, drop any per-branch scratch DB, reclaim Docker leftovers, refresh the trunk.
 
 ### Context hygiene
 

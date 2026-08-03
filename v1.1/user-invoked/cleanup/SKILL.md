@@ -1,13 +1,15 @@
 ---
 name: cleanup
-description: "Post-merge teardown for finished work — confirm every PR merged, then reclaim what it left on your machine: the stack, the worktree, the local + remote branches, any per-branch scratch DB, Docker leftovers, stale metadata, and a refreshed main."
+description: "Post-merge teardown for finished work — confirm every PR merged, then reclaim what it left on your machine: the stack, the worktree, the local + remote branches, any per-branch scratch DB, Docker leftovers, stale metadata, and a refreshed trunk."
 disable-model-invocation: true
 argument-hint: [worktree-path | branch | ticket]
 ---
 
 # cleanup — post-merge ticket teardown
 
-Run this **after a ticket's PR is merged** to reclaim everything the work left behind: the worktree it lived in (if it used one), the branch it carried, any per-branch scratch DB, and a primary checkout left sitting on a fresh `main`. Destructive — it removes a worktree and deletes branches — so the merged-state gate below is mandatory, not optional. When the PR is still open, this skill stops; keep working instead.
+Run this **after a ticket's PR is merged** to reclaim everything the work left behind: the worktree it lived in (if it used one), the branch it carried, any per-branch scratch DB, and a primary checkout left sitting on a fresh trunk. Destructive — it removes a worktree and deletes branches — so the merged-state gate below is mandatory, not optional. When the PR is still open, this skill stops; keep working instead.
+
+**Trunk** = the branch this repo merges into, recorded by `/setup-skills` under delivery shape (`develop` on a git-flow repo, `main` otherwise). Fall back to the default branch (`git symbolic-ref refs/remotes/origin/HEAD`) only when nothing is recorded. Every step below that refreshes or parks the primary checkout uses **that** branch — teardown that hardcodes `main` on a `develop` repo leaves the primary stale and the next feature worktree branched off the wrong base.
 
 The work may have lived in one of three shapes; detect which before touching anything:
 
@@ -15,18 +17,19 @@ The work may have lived in one of three shapes; detect which before touching any
 - **Worktree ticket** — a single branch checked out in a dedicated `git worktree`. Full teardown: remove the worktree, then the branch, DB, metadata.
 - **Plain-branch ticket** — the branch was worked directly in the primary checkout (no worktree). No worktree to remove; still delete the local + remote branch and any per-branch DB.
 
-You cannot remove a worktree you are standing in, and you cannot delete a branch that is currently checked out. Run every git command with `-C <primary>` (the main checkout), or `cd` there first. If you're inside the target worktree or on the target branch, move the primary to `main` (see [Refresh](#refresh-the-primary-checkout)) before deleting.
+You cannot remove a worktree you are standing in, and you cannot delete a branch that is currently checked out. Run every git command with `-C <primary>` (the primary checkout), or `cd` there first. If you're inside the target worktree or on the target branch, move the primary to `<trunk>` (see [Refresh](#refresh-the-primary-checkout)) before deleting.
 
 ## Identify scope
 
 - **Target** from `$ARGUMENTS` — a worktree path, a branch name, or a ticket that maps to one. Else infer from context (the worktree you were just working in, or the current branch).
-- List worktrees: `git worktree list`. Record the **primary checkout** (the non-worktree entry, usually on `main`).
+- List worktrees: `git worktree list`. Record the **primary checkout** (the non-worktree entry, usually sitting on the trunk).
+- **Trunk** — read it from the delivery shape `/setup-skills` recorded; fall back to the default branch only if nothing is recorded.
 - **Decide the shape**, in order:
   - `gh stack view --json` succeeds → **stack**. Record every branch in it and the worktree holding them. (Exit **2** or **9** → not a stack; fall through.)
   - A worktree entry holds the target branch → **worktree ticket**. Record the worktree path and its branch.
   - Neither → **plain-branch ticket**. Record just the branch; there is no worktree to remove.
 
-Completion: you can name the target branch (or every branch in the stack), whether a worktree holds it and its path, and the primary checkout — before touching anything.
+Completion: you can name the target branch (or every branch in the stack), whether a worktree holds it and its path, the primary checkout, and the trunk — before touching anything.
 
 ## Gate: confirm the work is MERGED
 
@@ -54,6 +57,7 @@ Close any still open — `gh issue close <n> --reason completed` — and **name 
 
 - **Solo shape** — the tickets were never closed per-ticket by design; the feature's single PR carries every `Closes`, and only the ones it actually names get closed.
 - **A closing keyword that never fired** — GitHub honours `Closes #<n>` only when the PR merges into the repository's **default branch**. A stacked layer merged while its base was still the layer below it silently closes nothing. Merging bottom-up avoids this, since GitHub retargets each layer to the trunk as the one under it merges and its branch is deleted — but nothing enforces the order, so verify rather than assume.
+- **A trunk that isn't the default branch** — on a git-flow repo the trunk is `develop` while the default branch is `main`, so *no* PR merged by this pipeline ever fires a closing keyword; issues only close when `develop` is promoted. Where trunk ≠ default branch, treat closing every issue by hand here as the normal path, not an exception.
 
 On a **local markdown** tracker there is nothing to reconcile: `/ticket-done` already set each file's Status to `done`.
 
@@ -78,7 +82,7 @@ git -C <primary> worktree remove <worktree-path>
 ```
 If git refuses (uncommitted changes or untracked files left behind), **stop and surface it** — don't reach for `--force`; the user may have unsaved work there.
 
-**2. Delete the local branch** — *skip whatever step 0 already pruned.* For a plain-branch ticket, first make sure the primary isn't sitting on it — checkout `main` there (see [Refresh](#refresh-the-primary-checkout)) or the delete will refuse. Squash-merge rewrites history, so `git branch -d` reports "not fully merged" and refuses; the merged-state gate already confirmed the PR landed, so force-delete is the correct call here:
+**2. Delete the local branch** — *skip whatever step 0 already pruned.* For a plain-branch ticket, first make sure the primary isn't sitting on it — checkout `<trunk>` there (see [Refresh](#refresh-the-primary-checkout)) or the delete will refuse. Squash-merge rewrites history, so `git branch -d` reports "not fully merged" and refuses; the merged-state gate already confirmed the PR landed, so force-delete is the correct call here:
 ```bash
 git -C <primary> branch -D <branch>
 ```
@@ -93,9 +97,9 @@ git -C <primary> ls-remote --exit-code --heads origin <branch> >/dev/null 2>&1 \
 
 ## Refresh the primary checkout
 
-Leave the primary sitting on the merged `main`, ready for the next branch:
+Leave the primary sitting on the merged trunk, ready for the next feature worktree to branch off it:
 ```bash
-git -C <primary> checkout main && git -C <primary> pull --ff-only
+git -C <primary> checkout <trunk> && git -C <primary> pull --ff-only
 ```
 `--ff-only` keeps it honest — if the primary has local divergence it errors instead of forging a merge commit; surface that rather than papering over it.
 
@@ -113,4 +117,4 @@ If you find no such setup, say so — skipping a hook the repo doesn't use is th
 
 ## Report
 
-Shape (stack of N / worktree / plain branch) · stack unstacked and pruned or n/a · worktree removed (path) or n/a · PR merged-state (every layer, for a stack) · issues reconciled (already closed, or closed by hand — list them) · branches deleted (local / remote, or "remote already gone") · DB / hooks dropped or skipped-why · Docker: keyed stack torn down or n/a, dangling reclaimed (size) or awaiting go-ahead · primary refreshed (new HEAD). Call out anything skipped — PR still open, dirty worktree, non-ff main — so nothing is silently left behind.
+Shape (stack of N / worktree / plain branch) · trunk · stack unstacked and pruned or n/a · worktree removed (path) or n/a · PR merged-state (every layer, for a stack) · issues reconciled (already closed, or closed by hand — list them) · branches deleted (local / remote, or "remote already gone") · DB / hooks dropped or skipped-why · Docker: keyed stack torn down or n/a, dangling reclaimed (size) or awaiting go-ahead · primary refreshed to `<trunk>` (new HEAD). Call out anything skipped — PR still open, dirty worktree, non-ff trunk — so nothing is silently left behind.
