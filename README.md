@@ -1,18 +1,20 @@
 # Claude Skills
 
-Personal collection of reusable Claude Code skills. The engineering and productivity sets are copied from [`mattpocock/skills`](https://github.com/mattpocock/skills) — please check his work out! — with exactly one local delta: `ask-matt` and `setup-matt-pocock-skills` are renamed to `ask` and `setup-skills` (and cross-references updated). One local skill (`cleanup`) rides alongside.
+Personal collection of reusable Claude Code skills. The engineering and productivity sets are copied from [`mattpocock/skills`](https://github.com/mattpocock/skills) — please check his work out! — with exactly two local deltas: `ask-matt` and `setup-matt-pocock-skills` are renamed to `ask` and `setup-skills` (and cross-references updated), and `setup-skills` carries a restored **Section D — Worktree provisioning** (`provision.sh` template + exploration bullet + seed-template entry) for parallel-worktree work. One local skill (`cleanup`) rides alongside.
 
 | Folder | What's inside |
 |--------|---------------|
 | [`skills/engineering/`](./skills/engineering) | Upstream: `ask` (the router), `setup-skills`, `grill-with-docs`, `to-spec`, `to-tickets`, `implement`, `wayfinder`, `triage`, `improve-codebase-architecture`, `code-review`, `tdd`, `prototype`, `research`, `diagnosing-bugs`, `resolving-merge-conflicts`, `domain-modeling`, `codebase-design`. |
 | [`skills/productivity/`](./skills/productivity) | Upstream: `grilling`, `grill-me`, `handoff`, `teach`, `writing-great-skills`. |
-| [`skills/own/`](./skills/own) | Mine: `cleanup` — post-merge teardown of a spec's worktree, branches, scratch DB, Docker leftovers, and a trunk refresh. |
+| [`skills/own/`](./skills/own) | Mine: `ship` — rebase onto trunk, full suite, push, PR; `cleanup` — post-merge teardown of a ticket's worktree, branches, scratch DB, Docker leftovers, and a trunk refresh. |
 
 ## The flow
 
-Run `/setup-skills` once per repo, then: `/grill-with-docs` → `/to-spec` → `/to-tickets` → `/implement` (drives `/tdd`, reviews with `/code-review`, commits to the current branch). `/ask` routes when you don't remember which skill you want. Landing the work — push, PR, merge — is yours; `/cleanup` reclaims the machine afterwards when the work lived in a worktree.
+Run `/setup-skills` once per repo, then plan: `/grill-with-docs` → `/to-spec` → `/to-tickets` (tracer-bullet vertical slices with blocking edges — each ticket independently demoable, so each can land on the trunk by itself).
 
-To resync with upstream: re-copy `skills/engineering` and `skills/productivity` from a fresh clone, then re-apply the rename (`ask-matt` → `ask`, `setup-matt-pocock-skills` → `setup-skills`, plus cross-references) — the only local edit they carry.
+Then **per ticket, trunk-based**: worktree + branch off the trunk (provision per Section D) → `/implement <ticket>` in it (drives `/tdd`, reviews with `/code-review`, commits to the current branch) → `/ship` (rebase onto trunk, full suite, push, PR carrying `Closes #<ticket>`) → **you merge** → `/cleanup` (verify issue closed, tear down worktree/branch/DB, refresh trunk). Frontier tickets can run in parallel, one worktree + terminal pane each. `/ask` routes when you don't remember which skill you want.
+
+To resync with upstream: re-copy `skills/engineering` and `skills/productivity` from a fresh clone, then re-apply both deltas: (1) the rename (`ask-matt` → `ask`, `setup-matt-pocock-skills` → `setup-skills`, plus cross-references); (2) `setup-skills` Section D — restore `provision.sh` into the skill folder and the three Section D edits in its `SKILL.md` (scaffold bullet, exploration bullet, Section D itself, seed-template entry) from git history.
 
 ## Installation
 
@@ -36,4 +38,4 @@ git clone <this-repo> && cd claude-skills && ./install.sh --all --global
 ## Conventions
 
 - `install.sh` discovers any `SKILL.md` at any depth, so nesting is free; two skills must never share a leaf name.
-- Upstream folders stay byte-identical to upstream — local changes go in `skills/own/`.
+- Upstream folders stay byte-identical to upstream except the two documented deltas above — all other local changes go in `skills/own/`.
