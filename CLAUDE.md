@@ -38,7 +38,7 @@ The split is the load trade-off: a model-invoked description sits in context eve
 
 `/to-tickets` emits a blocking DAG whose edges set the ticket order; after that git holds the dependency, since ticket N+1 is cut from a feature branch that already contains N. Nothing needs unlocking and no rebase cascades. The cost is that this serializes the DAG — genuinely parallel tracks want their own spec and worktree.
 
-A per-ticket PR earns its keep even solo: the AI wrote the code and you haven't read it, so that PR is your genuine first read, not a formality.
+A per-ticket PR earns its keep even solo: the AI wrote the code and you haven't read it, so that PR is your post-merge first read — the audit trail, not a formality. Work too small for a spec takes **light mode**: one task branch off the trunk, `/ticket-done` opens its PR to the trunk and stops.
 
 **Three closures, three altitudes.** A unit's state tracks what that unit controls:
 

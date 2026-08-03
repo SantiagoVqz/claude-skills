@@ -32,7 +32,7 @@ It is a **ritual** — pre-approved, run start to finish. Do NOT ask for permiss
    git fetch origin && git rebase origin/<trunk>
    ```
 
-   Conflicts → **/resolving-merge-conflicts**, then `git rebase --continue`. The branch has no open PR yet, so rebasing is free — no approvals to preserve, no force-push against a reviewer.
+   Conflicts → **/resolving-merge-conflicts**, then `git rebase --continue`. The branch has no open PR yet, so rebasing is free — no approvals to preserve; the force-push in step 7 overwrites only your own ticket history on origin, never a reviewer's.
 
    Completion: `git rev-list --count <feature-branch>..origin/<trunk>` is 0.
 
@@ -54,9 +54,11 @@ It is a **ritual** — pre-approved, run start to finish. Do NOT ask for permiss
 7. **Open the PR to the trunk** — and stop.
 
    ```bash
-   git push -u origin <feature-branch>
+   git push --force-with-lease -u origin <feature-branch>
    gh pr create --base <trunk> --head <feature-branch>
    ```
+
+   `--force-with-lease` because the remote feature branch predates the step-2 rebase (the ticket PRs merged into it there); a plain push is rejected as non-fast-forward. On GitLab use `glab mr create` per the tracker doc. No remote → nothing to push: report and stop; the user merges the feature branch into the trunk locally.
 
    The body summarises the **spec**, not the tickets — the per-ticket PRs already carry the blow-by-blow:
 

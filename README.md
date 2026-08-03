@@ -27,7 +27,9 @@ Everything lives in [`v1.1/`](./v1.1), split by how each skill is reached:
 
 **One spec → one worktree → one feature branch → one PR per ticket.** The worktree is the parallel unit (fan out across specs, provisioned once and shared by every ticket in it). The feature branch is the integration branch inside it. Each ticket is a short-lived task branch, squash-merged into the feature branch by `/ticket-done` — which is what makes ticket N+1 buildable, since it's cut from a feature branch that already contains N. No stacking, no cascading rebase, no extension required.
 
-A PR per ticket is worth it even solo: the AI wrote the code and you haven't read it, so that PR is your genuine first read rather than a formality.
+A PR per ticket is worth it even solo: the AI wrote the code and you haven't read it, so that PR is your post-merge first read — the audit trail, not a formality.
+
+Work too small for a spec takes **light mode**: one task branch off the trunk, `/ticket-done` opens its PR to the trunk and stops — you merge; no worktree, no `/spec-done`, no `/cleanup`.
 
 **Three closures, three altitudes.** The ticket closes when its PR squash-merges into the feature branch (unblocking the next). The spec closes when the feature branch merges to the trunk — `/cleanup` does that, so an open spec issue always means work built but not shipped. The release closes when it deploys, via a project-local skill outside this pipeline.
 
@@ -53,6 +55,8 @@ git clone <this-repo> && cd claude-skills && ./install.sh --all --global
 ```
 
 > Skills install by their leaf name (e.g. `tdd`, not `v1.1/model-invoked/tdd`) — the folders above it are organizational only.
+
+**Dependencies:** the pipeline fires two Claude Code built-ins — the `/simplify` skill and the `Explore` agent type (`ticket-done` and `spec-done` use both). Note that installing `code-review` shadows Claude Code's built-in `/code-review` — intentional; remove the symlink to get the built-in back.
 
 ## Conventions
 

@@ -14,6 +14,8 @@ A spec's tickets are worked in a single worktree. **One spec → one worktree �
 
 The feature branch accumulates; task branches are short-lived. Ticket N+1 is cut from the feature branch *after* ticket N merged into it, so the blocking edges from `/to-tickets` are held by the branch graph — nothing has to be unlocked, and no rebase cascades.
 
+**Light mode — work too small for a spec.** A single well-scoped ticket skips the topology: cut one task branch (`<type>/<slug>`) straight off the trunk in the primary checkout, build it, then have the user run `/ticket-done` in light mode — it opens the PR against the trunk and stops. No worktree, no feature branch, no `/spec-done`, no `/cleanup`.
+
 ## Step 0 — Enter the spec
 
 Done **once per spec**, not per ticket. It leaves you standing in a provisioned worktree on a fresh feature branch.
@@ -21,10 +23,12 @@ Done **once per spec**, not per ticket. It leaves you standing in a provisioned 
 - **No worktree yet** — create one off the trunk, on the feature branch:
 
   ```bash
-  git worktree add ../<repo>-<feature> -b <type>/<feature> <trunk>
+  git fetch origin
+  git worktree add ../<repo>-<feature> -b <type>/<feature> origin/<trunk>
+  cd ../<repo>-<feature> && git push -u origin <type>/<feature>
   ```
 
-  The feature branch starts empty and is never committed to directly — every commit on it arrives by squash-merge from a task branch.
+  Fetch first so the branch cuts from the current trunk, and push immediately — `/ticket-done`'s PRs need the feature branch to exist on origin. (No remote → skip the fetch and push; `/ticket-done` merges locally.) The feature branch starts empty and is never committed to directly — every commit on it arrives by squash-merge from a task branch.
 
 - **Worktree exists** — `git worktree list` names it. Move there; `git log <trunk>..<type>/<feature>` shows which tickets already merged.
 
@@ -44,11 +48,17 @@ Cut a task branch from the feature branch:
 git switch <type>/<feature> && git switch -c <type>/<feature>-<NN>-<ticket-slug>
 ```
 
+e.g. `feat/checkout-01-cart-schema`, `feat/checkout-02-payment-api` — the shared stem groups them, the number makes the order obvious.
+
 Use /tdd where possible, at the seams the spec pre-agreed.
 
 Build **one ticket per task branch** — the ticket is already sized for it, so don't subdivide. If a ticket turns out to be genuinely too large for one reviewable PR, split the *ticket* on the tracker and give each half its own task branch, rather than quietly stretching one branch to cover both.
 
+Completion: every acceptance criterion on the ticket demonstrably works. Verification and landing belong to `/ticket-done` — don't start them here.
+
 ## Close out
 
-- **After each ticket** — /ticket-done. It owns the scoped checks, the cold-read, the per-ticket simplify, the commit, the ticket's PR into the feature branch, the squash-merge, and closing the issue. Then **clear context** and cut the next task branch.
-- **Once the last ticket merges** — /spec-done, which reviews the whole feature branch against the spec and opens its PR to the trunk.
+Both closers are user-invoked — you can't fire them, so **prompt the user** at each handoff:
+
+- **After each ticket** — prompt the user to run **/ticket-done**. It owns the scoped checks, the cold-read, the per-ticket simplify, the commit, the ticket's PR into the feature branch, the squash-merge, and closing the issue. Then **clear context** and cut the next task branch.
+- **Once the last ticket merges** — prompt the user to run **/spec-done**, which reviews the whole feature branch against the spec and opens its PR to the trunk.

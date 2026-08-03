@@ -101,9 +101,7 @@ Uncovered stories: none. / Stories 7, 9 — out of scope, see Out of Scope.
 
 </traceability-section>
 
-This is the **only** modification to make to the spec issue. Do NOT close it, do not relabel it, do not touch anything else — it stays open until its feature branch merges to the trunk, and `/cleanup` closes it there.
-
-Do NOT close or modify any other parent issue.
+This is the **only** modification to make to the spec issue — it stays open, labels untouched, until its feature branch merges to the trunk, where `/cleanup` closes it. The same goes for any other parent issue: leave it as it is.
 
 ### 8. Working the tickets
 

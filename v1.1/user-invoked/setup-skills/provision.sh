@@ -27,11 +27,15 @@ say()  { printf '\033[1;36m▸\033[0m %s\n' "$*"; }
 warn() { printf '\033[1;33m! %s\033[0m\n' "$*" >&2; }
 die()  { printf '\033[1;31m✗ %s\033[0m\n' "$*" >&2; exit 1; }
 
+sedi() {  # portable in-place sed (GNU vs BSD/macOS)
+  if sed --version >/dev/null 2>&1; then sed -i "$@"; else sed -i '' "$@"; fi
+}
+
 set_env() {   # set KEY="VAL" in an env file: replace an uncommented line or append
   local file="$1" key="$2" val="$3"
   mkdir -p "$(dirname "$file")"; touch "$file"
   if grep -qE "^[[:space:]]*${key}=" "$file"; then
-    sed -i '' -E "s|^[[:space:]]*${key}=.*|${key}=\"${val}\"|" "$file"
+    sedi -E "s|^[[:space:]]*${key}=.*|${key}=\"${val}\"|" "$file"
   else
     printf '%s="%s"\n' "$key" "$val" >>"$file"
   fi
@@ -84,7 +88,7 @@ PY
     createdb "$dest"
     pg_dump "$SRC_DB" | psql -q -d "$dest"
   fi
-  sed -i '' -E "s#/${SRC_DB}([?\"'[:space:]]|\$)#/${dest}\1#" "$be_env"
+  sedi -E "s#/${SRC_DB}([?\"'[:space:]]|\$)#/${dest}\1#" "$be_env"
   say "Bringing $dest to head"
   ( cd "$WT/backend" && uv run alembic upgrade head )                # ← your migrate-to-head command
   DB_NAME="$dest"

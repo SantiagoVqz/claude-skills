@@ -22,7 +22,7 @@ You cannot remove a worktree you are standing in, and you cannot delete a branch
 - **Target** from `$ARGUMENTS` — a worktree path, a feature branch, or a spec that maps to one. Else infer from context (the worktree you were just working in, or the current branch).
 - List worktrees: `git worktree list`. Record the **primary checkout** (the non-worktree entry, usually sitting on the trunk).
 - **Trunk** — read it from the delivery shape `/setup-skills` recorded.
-- **Feature branch** — the `<type>/<feature>` stem. Its task branches (`<type>/<feature>-<NN>-*`) should already be gone; `git branch --list '<type>/<feature>-*'` catching any survivor means a `/ticket-done` didn't finish. Surface it rather than deleting silently.
+- **Feature branch** — the `<type>/<feature>` stem. Its task branches (`<type>/<feature>-<NN>-*`) should already be gone; `git branch --list '<type>/<feature>-[0-9][0-9]-*'` catching any survivor means a `/ticket-done` didn't finish (the `[0-9][0-9]` keeps a sibling feature sharing the stem out of the match). Surface it rather than deleting silently.
 
 Completion: you can name the feature branch, the worktree holding it and its path, the primary checkout, and the trunk — before touching anything.
 
@@ -33,6 +33,8 @@ Do **not** destroy anything until the feature branch has landed:
 ```bash
 gh pr list --head <feature-branch> --state merged --json number,url,mergedAt
 ```
+
+(GitLab: `glab mr list` equivalents per the tracker doc, here and throughout. No remote → squash-merges defeat `git branch --merged`, so ask the user to confirm the feature branch landed on the trunk; their confirmation is the gate.)
 
 - Merged → proceed.
 - Still **open** (or no merged PR exists) → stop and say so. Only override on explicit user instruction (e.g. branch abandoned, intentionally never merged) — and say so in the report.
