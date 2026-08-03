@@ -20,7 +20,7 @@ The route most work travels. You have an idea and want it built.
    - **`/prototype`** to answer the question with throwaway code,
    - **`/handoff`** back what you learned, and reference it from the original idea thread.
 3. **Branch — is this a multi-session build?**
-   - **Yes** → **`/to-spec`** (turn the thread into a spec), then **`/to-tickets`** to split it into tracer-bullet tickets, each declaring its **blocking edges**. On a local tracker that's one file per ticket under `.scratch/<feature>/issues/`, worked blockers-first by hand; on a real tracker the edges become native blocking links, so any ticket whose blockers are done can be grabbed — kick off **`/implement`** per ticket, **clearing context between each one**.
+   - **Yes** → **`/to-spec`** (turn the thread into a spec), then **`/to-tickets`** to split it into tracer-bullet tickets, each declaring its **blocking edges**. On a local tracker that's one file per ticket under `.scratch/<feature>/issues/`, worked blockers-first by hand; on a real tracker the edges become native blocking links. Either way the edges set the **layer order** for one stack — kick off **`/implement`**, which builds the tickets one layer at a time, **clearing context between each one**.
    - **No** → **`/implement`** right here, in the same context window.
 
    Either way, **`/implement`** builds each issue by driving **`/tdd`** internally — one red-green slice at a time. Reach for **`/tdd`** on its own when you just want to build a concrete behaviour test-first without a full spec, and **`/code-review`** on its own whenever you want to review a branch or PR against a fixed point.
@@ -29,10 +29,17 @@ The route most work travels. You have an idea and want it built.
 
 ## Landing the work
 
-The two units. A **worktree** is the horizontal unit — one isolated checkout per independent ticket, worked in parallel. A **phase** is the vertical unit — one step of a multi-phase build. Where the repo has stacked PRs enabled, a phase is also a **stack layer**: its own branch, its own PR, reviewable the moment it closes. A stack lives in **one** worktree; a cascading rebase has to move every branch in the chain, and git won't touch a branch checked out somewhere else.
+The two units. A **worktree** is the horizontal unit — one per **feature**, worked in parallel with other features. A **layer** is the vertical unit — one per **ticket**, its own branch and its own PR, reviewable the moment it seals. A stack lives in **one** worktree; a cascading rebase has to move every branch in the chain, and git won't touch a branch checked out somewhere else.
 
-- **`/phase-done`** — the per-phase ritual, run after each phase: `/simplify`, the repo's own checks, commit, a **cold-read** by a zero-context agent hunting the edit's residue, then open the next phase (`gh stack add` when stacked). Pre-approved start to finish — it doesn't stop to ask.
-- **`/ship`** — the external-git half: integrate, push, PR. Solo branch → one PR. Stack → `gh stack sync` then `gh stack submit`, one PR per layer. It never merges; that stays yours.
+That makes the whole shape: **one spec → one worktree → one stack → one PR per ticket.** The blocking edges from `/to-tickets` are consumed once, to order the layers; after that the dependency lives in the branch graph, so nothing has to be unlocked — layer N literally can't exist without N-1 underneath it.
+
+Where stacked PRs aren't enabled, the shape collapses to **solo**: the feature is one branch, tickets are commits on it, and `/ship` opens its single PR at the end. The gates below run identically; you just review the feature whole instead of ticket by ticket. Reviewing ticket by ticket is precisely what stacking buys — if you want it, enable stacked PRs rather than working around solo.
+
+Two gates, sized differently. Running one gate on both sizes is what makes a build feel slow:
+
+- **`/ticket-done`** — the **tight** per-ticket ritual: a **cold-read** by a zero-context agent hunting the edit's residue, running *in parallel* with checks scoped to the diff's blast radius, then commit, publish this layer's PR (Decisions in the body, `Closes #N`), and `gh stack add` the next. Pre-approved start to finish — it doesn't stop to ask. Clear context after it returns.
+- **`/feature-done`** — the **conformance** gate, once, when the last ticket seals: `/simplify` over the whole feature diff, the full suite, then `/code-review` against the spec. Everything that scales with the feature rather than the diff lives here, which is why it doesn't run per ticket.
+- **`/ship`** — the external-git half: integrate, push, PR. Solo branch → one PR. Stack → `gh stack sync` then `gh stack submit`, refreshing every layer's PR against the synced trunk. It never merges; that stays yours.
 - **`/resolving-merge-conflicts`** — fires whenever an integration stops on a conflict, including a `gh stack rebase` that exits **3**. Resolves by tracing each side's intent to its primary source, then verifies the surviving diff is exactly the intended change.
 - **`/cleanup`** — after the PRs merge, reclaim the machine: unstack, remove the worktree, delete the branches, drop any per-branch scratch DB, reclaim Docker leftovers, refresh `main`.
 
@@ -72,7 +79,7 @@ Two model-invoked references that run *beneath* the other skills — each the si
 ## Crossing sessions
 
 - **`/handoff`** — when a thread is full or you need to branch off (e.g. into a `/prototype` session), this compacts the conversation into a markdown file. You don't continue in place — you **open a new session and reference that file** to carry the context across. It's the bridge between context windows, in either direction. Use it when you want a **fresh session** but need the **current conversation preserved**.
-- **`/compact`** (built-in) — stay in the **same conversation**, letting the earlier turns be summarized. Use it at **intentional breaks between phases**, when you don't mind losing the verbatim history. Don't compact mid-phase — the agent can lose its way. `/handoff` forks; `/compact` continues.
+- **`/compact`** (built-in) — stay in the **same conversation**, letting the earlier turns be summarized. Use it at the break `/ticket-done` opens, when you don't mind losing the verbatim history. Don't compact mid-ticket — the agent can lose its way. `/handoff` forks; `/compact` continues.
 
 ## Standalone
 

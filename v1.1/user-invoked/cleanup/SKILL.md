@@ -11,7 +11,7 @@ Run this **after a ticket's PR is merged** to reclaim everything the work left b
 
 The work may have lived in one of three shapes; detect which before touching anything:
 
-- **Stack** — a chain of phase branches in one worktree, each with its own PR. Every PR must be merged before teardown; `gh stack` reclaims the branches, this skill reclaims everything else.
+- **Stack** — a chain of layer branches in one worktree, one per ticket, each with its own PR. Every PR must be merged before teardown; `gh stack` reclaims the branches, this skill reclaims everything else.
 - **Worktree ticket** — a single branch checked out in a dedicated `git worktree`. Full teardown: remove the worktree, then the branch, DB, metadata.
 - **Plain-branch ticket** — the branch was worked directly in the primary checkout (no worktree). No worktree to remove; still delete the local + remote branch and any per-branch DB.
 

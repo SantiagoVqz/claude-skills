@@ -23,19 +23,27 @@ The split is the load trade-off: a model-invoked description sits in context eve
 ## The pipeline
 
 ```
-/setup-skills  →  /grill-with-docs  →  /to-spec  →  /to-tickets  →  fan out
-                                                                      ↓
-                              /cleanup  ←  merge  ←  /ship  ←  /phase-done  ←  /implement
+/setup-skills  →  /grill-with-docs  →  /to-spec  →  /to-tickets  →  /implement
+                                                                        ↓
+                                                    /ticket-done  (per ticket, tight)
+                                                                        ↓
+                              /cleanup  ←  merge  ←  /ship  ←  /feature-done  (once)
 ```
 
-`/to-tickets` emits a blocking DAG that drives the fan-out. Two units:
+**One spec → one worktree → one stack → one PR per ticket.** Two units:
 
-- **worktree** — horizontal. One isolated checkout per independent ticket, worked in parallel.
-- **phase** — vertical. One step of a multi-phase build; a **stack layer** where stacked PRs are enabled, so each phase ships as its own PR.
+- **worktree** — horizontal. One per **feature**, worked in parallel with other features.
+- **layer** — vertical. One per **ticket**: its own branch, its own PR, reviewable the moment it seals. Named `<type>/<feature>-<NN>-<ticket-slug>`.
 
-A stack lives in one worktree: a cascading rebase must move every branch in the chain, and git refuses to touch a branch checked out elsewhere. Phase branches are named `<type>/<feature>-phase-<n>`.
+`/to-tickets` emits a blocking DAG whose edges set the layer order; after that git holds the dependency, since ticket N's branch is based on N-1's. Nothing needs unlocking, and a ticket is unblocked when its blocker's PR **opens**, not merges. The cost is that a stack serializes the DAG — genuinely parallel tracks want their own spec and worktree.
 
-Most skills are adapted from [`mattpocock/skills`](https://github.com/mattpocock/skills); `phase-done`, `ship`, and `cleanup` are mine. The stacked path needs `gh extension install github/gh-stack`, and falls back to solo-branch mode where stacked PRs aren't enabled.
+A stack lives in one worktree: a cascading rebase must move every branch in the chain, and git refuses to touch a branch checked out elsewhere.
+
+**Two gates, sized differently.** `/ticket-done` is tight — cold-read and checks scoped to the diff, run in parallel — and fires on every ticket. `/feature-done` carries everything that scales with the feature — full suite, `/simplify` over the whole diff, `/code-review` against the spec — and fires once. Running one gate at both sizes is what makes a build feel slow.
+
+Most skills are adapted from [`mattpocock/skills`](https://github.com/mattpocock/skills); `ticket-done`, `feature-done`, `ship`, and `cleanup` are mine. The stacked path needs `gh extension install github/gh-stack`. Without it the shape collapses to **solo** — one feature branch, tickets as commits, one PR at the end — and both gates run unchanged; only per-ticket review is lost.
+
+Ticket state lives in **one** place: the tracker `/setup-skills` configured. On GitHub/Linear/Jira that's the issue (`Closes #N` on the PR, `ready-for-agent` removed); on a local-markdown tracker it's the ticket file's checkboxes and Status. Never both.
 
 ## Installation
 

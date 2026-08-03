@@ -1,12 +1,12 @@
 # Claude Skills
 
-Personal collection of reusable Claude Code skills. Many are adapted from [`mattpocock/skills`](https://github.com/mattpocock/skills) and nudged to taste; the delivery lifecycle (`phase-done`, `ship`, `cleanup`) is mine. Please check his work out!
+Personal collection of reusable Claude Code skills. Many are adapted from [`mattpocock/skills`](https://github.com/mattpocock/skills) and nudged to taste; the delivery lifecycle (`ticket-done`, `feature-done`, `ship`, `cleanup`) is mine. Please check his work out!
 
 Everything lives in [`v1.1/`](./v1.1), split by how each skill is reached:
 
 | Folder | What's inside |
 |--------|---------------|
-| [`v1.1/user-invoked/`](./v1.1/user-invoked) | Reachable only when you type them. The pipeline: `setup-skills`, `grill-with-docs`, `to-spec`, `to-tickets`, `implement`, `phase-done`, `ship`, `cleanup`, plus `wayfinder`, `triage`, `handoff` and the `ask` router. |
+| [`v1.1/user-invoked/`](./v1.1/user-invoked) | Reachable only when you type them. The pipeline: `setup-skills`, `grill-with-docs`, `to-spec`, `to-tickets`, `implement`, `ticket-done`, `feature-done`, `ship`, `cleanup`, plus `wayfinder`, `triage`, `handoff` and the `ask` router. |
 | [`v1.1/model-invoked/`](./v1.1/model-invoked) | Model- or user-reachable, so other skills can call them: `grilling`, `tdd`, `prototype`, `research`, `diagnosing-bugs`, `resolving-merge-conflicts`, `code-review`, `domain-modeling`, `codebase-design`. |
 
 [`v1.1/README.md`](./v1.1/README.md) lists every skill with a one-line description.
@@ -16,16 +16,20 @@ Everything lives in [`v1.1/`](./v1.1), split by how each skill is reached:
 ```
 /setup-skills   (once per repo)
 
-/grill-with-docs ──► /to-spec ──► /to-tickets ──► fan out ──► /implement
-        ▲                                                          │
-  big effort ──/wayfinder                          /phase-done ◄────┘
-                                                         │
-                                                      /ship ──► merge ──► /cleanup
+/grill-with-docs ──► /to-spec ──► /to-tickets ──► /implement ──┐
+        ▲                                             ▲        │
+  big effort ──/wayfinder                             └─ /ticket-done   (per ticket)
+                                                               │
+                                          /feature-done ◄───────┘   (once)
+                                                 │
+                                              /ship ──► merge ──► /cleanup
 ```
 
-`/to-tickets` emits a blocking DAG, and that DAG is the fan-out plan: tickets with no blocking edge get their own **worktree** worked in parallel; a chain of blocking tickets becomes one **stack** in a single worktree, one PR per phase.
+**One spec → one worktree → one stack → one PR per ticket.** The worktree is the parallel unit (fan out across features); the layer is the serial unit (one per ticket, inside the feature). `/to-tickets` emits a blocking DAG, and those edges order the layers — after that git holds the dependency, since ticket N's branch is based on N-1's.
 
-A stack lives in one worktree — a cascading rebase has to move every branch in the chain, and git won't touch a branch checked out elsewhere.
+A stack lives in one worktree — a cascading rebase has to move every branch in the chain, and git won't touch a branch checked out elsewhere. So the DAG gets serialized inside a feature; genuinely parallel tracks want their own spec and their own worktree.
+
+Two gates, sized differently, which is what keeps the loop fast: `/ticket-done` stays scoped to the diff and runs on every ticket, while everything that scales with the *feature* — the full suite, `/simplify`, spec conformance — waits for `/feature-done`.
 
 Requires [`gh stack`](https://github.com/github/gh-stack) (`gh extension install github/gh-stack`) for the stacked path; the skills fall back to solo-branch mode where stacked PRs aren't enabled.
 
