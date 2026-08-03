@@ -57,12 +57,23 @@ install_skill() {
   fi
 
   mkdir -p "$(dirname "$dest")"
-  rm -rf "$dest"           # drop any prior copy or stale symlink
+  if [[ -e "$dest" && ! -L "$dest" ]]; then
+    echo "Error: $dest exists and is not a symlink — refusing to overwrite. Remove it manually."
+    exit 1
+  fi
+  rm -rf "$dest"           # drop any prior symlink
   ln -s "$src" "$dest"     # symlink → edits in the repo are live, no re-install
   echo "Linked $skill_name → $dest"
 }
 
 if [[ "$ALL" == true ]]; then
+  # Skills install by leaf name, so two skills sharing one is a silent overwrite — refuse.
+  dupes="$(list_skills | awk -F/ '{print $NF}' | sort | uniq -d)"
+  if [[ -n "$dupes" ]]; then
+    echo "Error: duplicate skill leaf names:"
+    echo "$dupes"
+    exit 1
+  fi
   while IFS= read -r skill_md; do
     install_skill "$(dirname "$skill_md")"
   done < <(find "$SCRIPT_DIR" -name SKILL.md -not -path '*/.git/*')

@@ -51,7 +51,7 @@ specs ────────┼─ worktree B ─ feat/b ← [01 PR] ← [02 P
 
 The blocking edges from `to-tickets` order the tickets, then git holds them — ticket N+1 is cut from a feature branch that already contains N, so nothing needs unlocking and no rebase cascades. The cost: the DAG is serialized inside a spec, so tickets worth running at the same time want separate specs.
 
-A per-ticket PR is worth it even solo: the AI wrote the code and you haven't read it, so that PR is your genuine first read.
+A per-ticket PR is worth it even solo: the AI wrote the code and you haven't read it, so that PR is your post-merge first read — the audit trail. Work too small for a spec takes **light mode**: one task branch off the trunk, `/ticket-done` opens its PR to the trunk and stops.
 
 **Three closures.** Ticket closes when its PR squash-merges into the feature branch (unblocking the next). Spec closes when the feature branch merges to the trunk. Release closes when it deploys — a project-local skill, outside this pipeline.
 

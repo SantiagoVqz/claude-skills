@@ -21,7 +21,7 @@ The route most work travels. You have an idea and want it built.
    - **`/handoff`** back what you learned, and reference it from the original idea thread.
 3. **Branch — is this a multi-session build?**
    - **Yes** → **`/to-spec`** (turn the thread into a spec), then **`/to-tickets`** to split it into tracer-bullet tickets, each declaring its **blocking edges** and the **user stories** it satisfies. On a local tracker that's one file per ticket under `.scratch/<feature>/issues/`, worked blockers-first by hand; on a real tracker the edges become native blocking links. Either way the edges set the **ticket order**, and a **traceability table** goes back into the spec issue — kick off **`/implement`**, which builds the tickets one at a time, **clearing context between each one**.
-   - **No** → **`/implement`** right here, in the same context window.
+   - **No** → **`/implement`** right here, in the same context window. Work too small for a spec takes **light mode**: one task branch straight off the trunk, then `/ticket-done` opens its PR to the trunk and stops — you merge; no worktree, no `/spec-done`, no `/cleanup`.
 
    Either way, **`/implement`** builds each issue by driving **`/tdd`** internally — one red-green slice at a time. Reach for **`/tdd`** on its own when you just want to build a concrete behaviour test-first without a full spec, and **`/code-review`** on its own whenever you want to review a branch or PR against a fixed point.
 
@@ -37,7 +37,7 @@ The route most work travels. You have an idea and want it built.
 
 The blocking edges from `/to-tickets` are consumed once, to order the tickets; after that git holds the dependency, since ticket N+1 is cut from a feature branch that already contains ticket N. Nothing has to be unlocked and no rebase cascades.
 
-**Why a PR per ticket when you're solo.** Because the AI wrote the code and you haven't read it — the ticket PR is your genuine first read, not a formality. That's a stronger reason than a human team has.
+**Why a PR per ticket when you're solo.** Because the AI wrote the code and you haven't read it — the ticket PR is your post-merge first read, the audit trail. That's a stronger reason than a human team has.
 
 **Three closures, three altitudes.** A unit's state tracks the thing that unit controls:
 
