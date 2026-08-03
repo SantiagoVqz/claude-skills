@@ -1,120 +1,103 @@
 ---
 name: cleanup
-description: "Post-merge teardown for finished work — confirm every PR merged, then reclaim what it left on your machine: the stack, the worktree, the local + remote branches, any per-branch scratch DB, Docker leftovers, stale metadata, and a refreshed trunk."
+description: "Post-merge teardown for a finished spec — confirm the feature branch merged, close the spec issue, then reclaim what the work left on your machine: the worktree, the branches, the per-worktree scratch DB, Docker leftovers, stale metadata, and a refreshed trunk."
 disable-model-invocation: true
-argument-hint: [worktree-path | branch | ticket]
+argument-hint: [worktree-path | feature-branch | spec]
 ---
 
-# cleanup — post-merge ticket teardown
+# cleanup — post-merge spec teardown
 
-Run this **after a ticket's PR is merged** to reclaim everything the work left behind: the worktree it lived in (if it used one), the branch it carried, any per-branch scratch DB, and a primary checkout left sitting on a fresh trunk. Destructive — it removes a worktree and deletes branches — so the merged-state gate below is mandatory, not optional. When the PR is still open, this skill stops; keep working instead.
+Run this **once per spec**, after its feature branch's PR is merged, to reclaim everything the work left behind: the worktree it lived in, the feature branch, the per-worktree scratch DB, and a primary checkout left sitting on a fresh trunk. It also closes the spec issue — the last of the three closures.
 
-**Trunk** = the branch this repo merges into, recorded by `/setup-skills` under delivery shape (`develop` on a git-flow repo, `main` otherwise). Fall back to the default branch (`git symbolic-ref refs/remotes/origin/HEAD`) only when nothing is recorded. Every step below that refreshes or parks the primary checkout uses **that** branch — teardown that hardcodes `main` on a `develop` repo leaves the primary stale and the next feature worktree branched off the wrong base.
+**Spec-scoped, not ticket-scoped.** Tickets need no teardown: `/ticket-done` already squash-merged each task branch and deleted it, and nothing was ever provisioned per ticket. The worktree, the env, the ports, and the DB were all provisioned **once** by `/implement` Step 0 and shared by every ticket in the spec, so they are reclaimed **once**, here.
 
-The work may have lived in one of three shapes; detect which before touching anything:
+Destructive — it removes a worktree and deletes branches — so the merged-state gate below is mandatory. When the PR is still open, this skill stops.
 
-- **Stack** — a chain of layer branches in one worktree, one per ticket, each with its own PR. Every PR must be merged before teardown; `gh stack` reclaims the branches, this skill reclaims everything else.
-- **Worktree ticket** — a single branch checked out in a dedicated `git worktree`. Full teardown: remove the worktree, then the branch, DB, metadata.
-- **Plain-branch ticket** — the branch was worked directly in the primary checkout (no worktree). No worktree to remove; still delete the local + remote branch and any per-branch DB.
+**Trunk** = the branch this repo merges into, recorded by `/setup-skills` under delivery shape (`develop` on a git-flow repo, `main` otherwise). Fall back to the default branch (`git symbolic-ref refs/remotes/origin/HEAD`) only when nothing is recorded. Teardown that hardcodes `main` on a `develop` repo leaves the primary stale and the next worktree branched off the wrong base.
 
-You cannot remove a worktree you are standing in, and you cannot delete a branch that is currently checked out. Run every git command with `-C <primary>` (the primary checkout), or `cd` there first. If you're inside the target worktree or on the target branch, move the primary to `<trunk>` (see [Refresh](#refresh-the-primary-checkout)) before deleting.
+You cannot remove a worktree you are standing in, and you cannot delete a branch that is currently checked out. Run every git command with `-C <primary>` (the primary checkout), or `cd` there first.
 
 ## Identify scope
 
-- **Target** from `$ARGUMENTS` — a worktree path, a branch name, or a ticket that maps to one. Else infer from context (the worktree you were just working in, or the current branch).
+- **Target** from `$ARGUMENTS` — a worktree path, a feature branch, or a spec that maps to one. Else infer from context (the worktree you were just working in, or the current branch).
 - List worktrees: `git worktree list`. Record the **primary checkout** (the non-worktree entry, usually sitting on the trunk).
-- **Trunk** — read it from the delivery shape `/setup-skills` recorded; fall back to the default branch only if nothing is recorded.
-- **Decide the shape**, in order:
-  - `gh stack view --json` succeeds → **stack**. Record every branch in it and the worktree holding them. (Exit **2** or **9** → not a stack; fall through.)
-  - A worktree entry holds the target branch → **worktree ticket**. Record the worktree path and its branch.
-  - Neither → **plain-branch ticket**. Record just the branch; there is no worktree to remove.
+- **Trunk** — read it from the delivery shape `/setup-skills` recorded.
+- **Feature branch** — the `<type>/<feature>` stem. Its task branches (`<type>/<feature>-<NN>-*`) should already be gone; `git branch --list '<type>/<feature>-*'` catching any survivor means a `/ticket-done` didn't finish. Surface it rather than deleting silently.
 
-Completion: you can name the target branch (or every branch in the stack), whether a worktree holds it and its path, the primary checkout, and the trunk — before touching anything.
+Completion: you can name the feature branch, the worktree holding it and its path, the primary checkout, and the trunk — before touching anything.
 
 ## Gate: confirm the work is MERGED
 
-Do **not** destroy anything until the work has landed:
+Do **not** destroy anything until the feature branch has landed:
 
 ```bash
-gh pr list --head <branch> --state merged --json number,url,mergedAt
+gh pr list --head <feature-branch> --state merged --json number,url,mergedAt
 ```
 
-For a **stack**, run this for **every** branch in it — a stack is torn down all-or-nothing, so a single unmerged layer stops the whole teardown. `gh stack view --json` reports each layer's PR state in one call; use it, then confirm the merges.
+- Merged → proceed.
+- Still **open** (or no merged PR exists) → stop and say so. Only override on explicit user instruction (e.g. branch abandoned, intentionally never merged) — and say so in the report.
 
-- Every PR merged → proceed.
-- Any PR still **open** (or no merged PR exists) → stop and report which. Only override on explicit user instruction (e.g. branch abandoned, intentionally never merged) — and say so in the report.
+## Close the spec issue
 
-## Reconcile the tracker
-
-The work has landed, so every issue behind it should be closed. Read the `Closes #<n>` references out of each merged PR body and check them:
+The feature has landed, so the spec — the unit of delivery — is done. This is where it closes; nothing earlier can, because `/spec-done` deliberately stops at opening the PR.
 
 ```bash
 gh pr view <n> --json body --jq '.body | scan("[Cc]loses #[0-9]+")'
 gh issue view <n> --json number,state
 ```
 
-Close any still open — `gh issue close <n> --reason completed` — and **name them in the report**. Two ways one survives to here, both silent:
+Close anything still open — `gh issue close <n> --reason completed` — and **name it in the report**. `Closes #<n>` fires automatically only when the PR merges into the repository's **default branch**, so on a git-flow repo (trunk `develop`, default `main`) *nothing* the pipeline merges ever closes an issue by keyword. Treat closing by hand here as the normal path, not an exception.
 
-- **Solo shape** — the tickets were never closed per-ticket by design; the feature's single PR carries every `Closes`, and only the ones it actually names get closed.
-- **A closing keyword that never fired** — GitHub honours `Closes #<n>` only when the PR merges into the repository's **default branch**. A stacked layer merged while its base was still the layer below it silently closes nothing. Merging bottom-up avoids this, since GitHub retargets each layer to the trunk as the one under it merges and its branch is deleted — but nothing enforces the order, so verify rather than assume.
-- **A trunk that isn't the default branch** — on a git-flow repo the trunk is `develop` while the default branch is `main`, so *no* PR merged by this pipeline ever fires a closing keyword; issues only close when `develop` is promoted. Where trunk ≠ default branch, treat closing every issue by hand here as the normal path, not an exception.
+Ticket issues should already be closed by `/ticket-done`. Any still open is a signal a ticket never finished — surface it rather than closing it silently.
 
-On a **local markdown** tracker there is nothing to reconcile: `/ticket-done` already set each file's Status to `done`.
+On a **local markdown** tracker there is nothing to reconcile: `/ticket-done` set each ticket file's Status to `done`; set the spec file's Status to `done` here.
 
-Completion: every issue referenced by the merged PRs is closed, and any you had to close by hand is named in the report.
+Completion: the spec issue is closed, and any ticket issue that survived to here is named in the report.
 
 ## Teardown
 
-Order matters: a branch can't be deleted while a worktree has it checked out (or while it's the current branch), so free it first.
+Order matters: a branch can't be deleted while a worktree has it checked out, so free it first.
 
-**0. Retire the stack** — *stack shape only.* Two commands reclaim every branch the stack held, so steps 2 and 3 below have nothing left to do:
-
-```bash
-gh stack sync --prune   # fast-forward trunk, delete local branches whose PRs merged
-gh stack unstack        # drop local tracking and unstack on GitHub
-```
-
-Any branch `--prune` leaves behind (it skips branches with unmerged commits) is a signal that work never landed — surface it rather than force-deleting, then continue with the shared steps below.
-
-**1. Remove the worktree** — *worktree tickets only; skip for plain-branch tickets.* Post-merge the working tree should be clean:
+**1. Remove the worktree.** Post-merge the working tree should be clean:
 ```bash
 git -C <primary> worktree remove <worktree-path>
 ```
 If git refuses (uncommitted changes or untracked files left behind), **stop and surface it** — don't reach for `--force`; the user may have unsaved work there.
 
-**2. Delete the local branch** — *skip whatever step 0 already pruned.* For a plain-branch ticket, first make sure the primary isn't sitting on it — checkout `<trunk>` there (see [Refresh](#refresh-the-primary-checkout)) or the delete will refuse. Squash-merge rewrites history, so `git branch -d` reports "not fully merged" and refuses; the merged-state gate already confirmed the PR landed, so force-delete is the correct call here:
+**2. Delete the local feature branch.** Squash-merge rewrites history, so `git branch -d` reports "not fully merged" and refuses; the merged-state gate already confirmed the PR landed, so force-delete is the correct call:
 ```bash
-git -C <primary> branch -D <branch>
+git -C <primary> branch -D <feature-branch>
 ```
+Also sweep any surviving task branch you flagged during scoping.
 
 **3. Delete the remote branch** if it still exists (many repos auto-delete on merge):
 ```bash
-git -C <primary> ls-remote --exit-code --heads origin <branch> >/dev/null 2>&1 \
-  && git -C <primary> push origin --delete <branch> || echo "remote branch already gone"
+git -C <primary> ls-remote --exit-code --heads origin <feature-branch> >/dev/null 2>&1 \
+  && git -C <primary> push origin --delete <feature-branch> || echo "remote branch already gone"
 ```
 
-**4. Prune stale worktree metadata:** `git -C <primary> worktree prune`. Harmless to run even for a plain-branch ticket.
+**4. Prune stale worktree metadata:** `git -C <primary> worktree prune`.
 
 ## Refresh the primary checkout
 
-Leave the primary sitting on the merged trunk, ready for the next feature worktree to branch off it:
+Leave the primary sitting on the merged trunk, ready for the next worktree to branch off it:
 ```bash
 git -C <primary> checkout <trunk> && git -C <primary> pull --ff-only
 ```
 `--ff-only` keeps it honest — if the primary has local divergence it errors instead of forging a merge commit; surface that rather than papering over it.
 
-## Per-ticket teardown hooks
+## Per-worktree teardown hooks
 
-The work may have provisioned more than a branch — a scratch DB, generated artifacts — that outlives the branch and needs matching teardown. This applies to **both** shapes: a plain-branch ticket can just as easily have created a per-branch DB. Run a hook only when the ticket actually used it, and mirror whatever the setup created:
+`/implement` Step 0 may have provisioned more than a branch — a scratch DB, generated artifacts — that outlives it. Everything here is **per worktree**, matching what setup created, and runs once:
 
-- **Scratch database** — a per-branch dev DB (`myapp_<suffix>`) cloned at setup. Drop it, since its name usually lives in the branch's `.env`: `psql -d postgres -c 'DROP DATABASE IF EXISTS <name> WITH (FORCE);'` (`FORCE` terminates lingering connections so the drop doesn't block). For a worktree ticket the `.env` sits in the worktree — read the DB name *before* removing the worktree, or you'll lose the pointer.
+- **Scratch database** — the per-worktree dev DB (`myapp_<suffix>`) cloned at provisioning, shared by every ticket in the spec. Drop it: `psql -d postgres -c 'DROP DATABASE IF EXISTS <name> WITH (FORCE);'` (`FORCE` terminates lingering connections so the drop doesn't block). Its name lives in the worktree's `.env` — read it *before* removing the worktree, or you'll lose the pointer.
 - **Cleanup script** — if the repo ships one (`scripts/cleanup*.sh`, a `make teardown` target), prefer it over hand-rolled steps.
-- **Docker stack** — if the repo ships a compose file, run the [Docker teardown](docker.md): sort artifacts into **keyed** (this ticket's, destroy) and **dangling** (untagged images, anonymous volumes — report, then reclaim on the user's go-ahead). Almost nothing is keyed by default, so this hook is mostly the dangling pass; a keyed stack must come down *before* the worktree is removed.
-- **Other per-branch artifacts** — temp files and generated output keyed to the branch/ticket. Remove what the setup created; leave shared infrastructure alone.
+- **Docker stack** — if the repo ships a compose file, run the [Docker teardown](docker.md): sort artifacts into **keyed** (this worktree's, destroy) and **dangling** (untagged images, anonymous volumes — report, then reclaim on the user's go-ahead). Almost nothing is keyed by default, so this hook is mostly the dangling pass; a keyed stack must come down *before* the worktree is removed.
+- **Other per-worktree artifacts** — temp files and generated output keyed to the feature. Remove what the setup created; leave shared infrastructure alone.
 - **Post-merge migration on primary** — if the merged branch added a schema migration and the primary dev DB never applied it, apply it now so the next session doesn't break on a missing column. Report failures, don't force-fix.
 
 If you find no such setup, say so — skipping a hook the repo doesn't use is the right outcome, not an omission.
 
 ## Report
 
-Shape (stack of N / worktree / plain branch) · trunk · stack unstacked and pruned or n/a · worktree removed (path) or n/a · PR merged-state (every layer, for a stack) · issues reconciled (already closed, or closed by hand — list them) · branches deleted (local / remote, or "remote already gone") · DB / hooks dropped or skipped-why · Docker: keyed stack torn down or n/a, dangling reclaimed (size) or awaiting go-ahead · primary refreshed to `<trunk>` (new HEAD). Call out anything skipped — PR still open, dirty worktree, non-ff trunk — so nothing is silently left behind.
+Trunk · PR merged-state · spec issue closed (and any ticket issue that shouldn't have survived) · worktree removed (path) · branches deleted (local / remote, or "remote already gone") · surviving task branches, if any · DB / hooks dropped or skipped-why · Docker: keyed stack torn down or n/a, dangling reclaimed (size) or awaiting go-ahead · primary refreshed to `<trunk>` (new HEAD). Call out anything skipped — PR still open, dirty worktree, non-ff trunk — so nothing is silently left behind.
