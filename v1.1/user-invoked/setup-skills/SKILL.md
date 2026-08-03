@@ -11,7 +11,7 @@ Scaffold the per-repo configuration that the engineering skills assume:
 - **Issue tracker** — where issues live (GitHub by default; local markdown is also supported out of the box)
 - **Triage labels** — the strings used for the five canonical triage roles
 - **Domain docs** — where `CONTEXT.md` and ADRs live, and the consumer rules for reading them
-- **Delivery shape** — the **trunk** features merge into, and whether this repo can carry stacked PRs, so `/ticket-done`, `/ship`, and `/cleanup` know what to base on and which mode they run in
+- **Delivery shape** — the **trunk** features merge into, so `/implement`, `/spec-done`, and `/cleanup` know what to branch off and merge back to
 - **Worktree provisioning** — an optional `scripts/provision.sh` that `/implement` runs to set up a fresh worktree (env, dev-server ports, per-worktree DB); skipped for repos with no dev servers or DB
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm with the user, then write.
@@ -30,7 +30,6 @@ Look at the current repo to understand its starting state. Read whatever exists;
 - `.scratch/` — sign that a local-markdown issue tracker convention is already in use
 - Is the `triage` skill installed? (a `triage` skill folder alongside this one, or `triage` in your available skills.) This decides whether Section B runs at all.
 - Monorepo signals — a `pnpm-workspace.yaml`, a `workspaces` field in `package.json`, or a populated `packages/*` with its own `src/`. Present only in a genuinely large multi-package repo; their absence means single-context, which is almost every repo.
-- **Stacked PRs** — is the `gh stack` extension installed (`gh extension list`), and does this repo accept stacks? `gh stack view --json` from any branch answers both: exit **9** means stacked PRs aren't enabled here, exit **2** just means you aren't in a stack (which is fine — the feature works). This is a fact, not a decision; record it without asking.
 - **Trunk** — the branch features actually merge into. `git branch -r` plus the default branch (`git symbolic-ref refs/remotes/origin/HEAD`) usually settles it; a repo carrying both `main` and `develop` is running git-flow, so the trunk is `develop`. Propose what you found and confirm — it's the one delivery fact the skills can't infer reliably.
 - `scripts/provision.sh` — does the worktree provisioner already exist? Note the repo's shape for Section D: a `frontend`/`backend` split, the env vars carrying each server's URL to the other, a `DATABASE_URL` in a backend env file, a migration tool (Alembic `migrations/`, Prisma, etc.).
 
@@ -107,9 +106,9 @@ The block:
 
 ### Delivery shape
 
-Trunk: `[branch]` — features merge here, and `/implement` bases every feature worktree on it.
+Trunk: `[branch]` — `/implement` cuts every feature branch off it, and `/spec-done` rebases onto it and opens the feature's PR against it.
 
-Stacked PRs: [enabled / not enabled]. When enabled, `/ticket-done` seals each ticket as its own stack layer with its own PR and `/ship` publishes the whole stack; otherwise both run in solo-branch mode, one PR for the feature.
+One spec → one worktree → one feature branch → one PR per ticket. Each ticket is a task branch squash-merged into the feature branch by `/ticket-done`; the feature branch itself is merged to the trunk by hand, never by a skill.
 ```
 
 Include the `### Triage labels` sub-block, and write `docs/agents/triage-labels.md`, only when `triage` is installed and Section B ran. When it isn't, both are omitted.

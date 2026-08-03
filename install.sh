@@ -15,7 +15,7 @@ usage() {
   echo "skills always install under their leaf name."
   echo ""
   echo "Examples:"
-  echo "  ./install.sh v1.1/user-invoked/ship            # Install to current project"
+  echo "  ./install.sh v1.1/user-invoked/cleanup         # Install to current project"
   echo "  ./install.sh v1.1/model-invoked/tdd --global   # Install globally"
   echo "  ./install.sh --all --global                    # Install all skills globally"
   exit 1

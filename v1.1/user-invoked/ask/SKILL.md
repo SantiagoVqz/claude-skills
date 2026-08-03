@@ -20,7 +20,7 @@ The route most work travels. You have an idea and want it built.
    - **`/prototype`** to answer the question with throwaway code,
    - **`/handoff`** back what you learned, and reference it from the original idea thread.
 3. **Branch — is this a multi-session build?**
-   - **Yes** → **`/to-spec`** (turn the thread into a spec), then **`/to-tickets`** to split it into tracer-bullet tickets, each declaring its **blocking edges**. On a local tracker that's one file per ticket under `.scratch/<feature>/issues/`, worked blockers-first by hand; on a real tracker the edges become native blocking links. Either way the edges set the **layer order** for one stack — kick off **`/implement`**, which builds the tickets one layer at a time, **clearing context between each one**.
+   - **Yes** → **`/to-spec`** (turn the thread into a spec), then **`/to-tickets`** to split it into tracer-bullet tickets, each declaring its **blocking edges** and the **user stories** it satisfies. On a local tracker that's one file per ticket under `.scratch/<feature>/issues/`, worked blockers-first by hand; on a real tracker the edges become native blocking links. Either way the edges set the **ticket order**, and a **traceability table** goes back into the spec issue — kick off **`/implement`**, which builds the tickets one at a time, **clearing context between each one**.
    - **No** → **`/implement`** right here, in the same context window.
 
    Either way, **`/implement`** builds each issue by driving **`/tdd`** internally — one red-green slice at a time. Reach for **`/tdd`** on its own when you just want to build a concrete behaviour test-first without a full spec, and **`/code-review`** on its own whenever you want to review a branch or PR against a fixed point.
@@ -29,19 +29,32 @@ The route most work travels. You have an idea and want it built.
 
 ## Landing the work
 
-The two units. A **worktree** is the horizontal unit — one per **feature**, worked in parallel with other features. A **layer** is the vertical unit — one per **ticket**, its own branch and its own PR, reviewable the moment it seals. A stack lives in **one** worktree; a cascading rebase has to move every branch in the chain, and git won't touch a branch checked out somewhere else.
+**One spec → one worktree → one feature branch → one PR per ticket.** Three units:
 
-That makes the whole shape: **one spec → one worktree → one stack → one PR per ticket.** The blocking edges from `/to-tickets` are consumed once, to order the layers; after that the dependency lives in the branch graph, so nothing has to be unlocked — layer N literally can't exist without N-1 underneath it.
+- **worktree** — horizontal. One per **spec**, worked in parallel with other specs. Provisioned once (env, ports, DB) and shared by every ticket in it.
+- **feature branch** — the integration branch inside the worktree, cut once off the trunk. Everything merges here.
+- **task branch** — vertical, one per **ticket**: cut from the feature branch, its own PR, squash-merged back.
 
-Where stacked PRs aren't enabled, the shape collapses to **solo**: the feature is one branch, tickets are commits on it, and `/ship` opens its single PR at the end. The gates below run identically; you just review the feature whole instead of ticket by ticket. Reviewing ticket by ticket is precisely what stacking buys — if you want it, enable stacked PRs rather than working around solo.
+The blocking edges from `/to-tickets` are consumed once, to order the tickets; after that git holds the dependency, since ticket N+1 is cut from a feature branch that already contains ticket N. Nothing has to be unlocked and no rebase cascades.
 
-Two gates, sized differently. Running one gate on both sizes is what makes a build feel slow:
+**Why a PR per ticket when you're solo.** Because the AI wrote the code and you haven't read it — the ticket PR is your genuine first read, not a formality. That's a stronger reason than a human team has.
 
-- **`/ticket-done`** — the **tight** per-ticket ritual: a **cold-read** by a zero-context agent hunting the edit's residue, running *in parallel* with checks scoped to the diff's blast radius, then commit, publish this layer's PR (Decisions in the body, `Closes #N`), and `gh stack add` the next. Pre-approved start to finish — it doesn't stop to ask. Clear context after it returns.
-- **`/feature-done`** — the **conformance** gate, once, when the last ticket seals: `/simplify` over the whole feature diff, the full suite, then `/code-review` against the spec. Everything that scales with the feature rather than the diff lives here, which is why it doesn't run per ticket.
-- **`/ship`** — the external-git half: integrate, push, PR. Solo branch → one PR. Stack → `gh stack sync` then `gh stack submit`, refreshing every layer's PR against the synced trunk. It never merges; that stays yours.
-- **`/resolving-merge-conflicts`** — fires whenever an integration stops on a conflict, including a `gh stack rebase` that exits **3**. Resolves by tracing each side's intent to its primary source, then verifies the surviving diff is exactly the intended change.
-- **`/cleanup`** — after the PRs merge, reclaim the machine: unstack, remove the worktree, delete the branches, drop any per-branch scratch DB, reclaim Docker leftovers, refresh the trunk.
+**Three closures, three altitudes.** A unit's state tracks the thing that unit controls:
+
+| Unit | Closes when | Closed by |
+|---|---|---|
+| **Ticket** — unit of work | its PR squash-merges into the feature branch | `/ticket-done` |
+| **Spec** — unit of delivery | the feature branch merges to the trunk | `/cleanup` |
+| **Release** — unit of value | deployed to production | your project's own release skill |
+
+Two gates, sized differently. Running one gate at both sizes is what makes a build feel slow:
+
+- **`/ticket-done`** — the **tight** per-ticket ritual, all three passes fired in *one* turn: a **cold-read** by a zero-context agent hunting the edit's residue, **`/simplify`** scoped to this ticket's diff, and checks scoped to the diff's blast radius. Then commit, open the PR **into the feature branch**, squash-merge it, close the issue, cut the next task branch. Pre-approved start to finish. Clear context after it returns.
+- **`/spec-done`** — the **conformance** gate, once, when the last ticket merges: walk the **traceability table** (every story has a merged ticket, every ticket has a story), rebase onto the trunk, full suite, cross-ticket `/simplify` (duplication *between* tickets — the only part one ticket couldn't see), `/code-review` against the spec, then **open the feature branch's PR to the trunk and stop**.
+- **`/resolving-merge-conflicts`** — fires whenever an integration stops on a conflict. Resolves by tracing each side's intent to its primary source, then verifies the surviving diff is exactly the intended change.
+- **`/cleanup`** — after the PR merges, close the spec issue and reclaim the machine: remove the worktree, delete the branches, drop the per-worktree scratch DB, reclaim Docker leftovers, refresh the trunk. Once per spec — tickets need no teardown.
+
+**No skill ever merges to the trunk.** `/ticket-done` merges task branches into the feature branch, which is not the trunk and has shipped nothing. Landing the feature is always yours. Deploying is a project-local release skill — the global pipeline stops at "merged to trunk".
 
 ### Context hygiene
 
@@ -92,4 +105,4 @@ Off the main flow entirely.
 
 ## Precondition
 
-**`/setup-skills`** — run before your first engineering flow to configure the issue tracker, triage labels, doc layout, delivery shape (stacked PRs or not), and the worktree provisioner the other skills assume. Custom issue trackers also work.
+**`/setup-skills`** — run before your first engineering flow to configure the issue tracker, triage labels, doc layout, delivery shape (the trunk), and the worktree provisioner the other skills assume. Custom issue trackers also work.

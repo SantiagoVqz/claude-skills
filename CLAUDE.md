@@ -27,23 +27,34 @@ The split is the load trade-off: a model-invoked description sits in context eve
                                                                         ↓
                                                     /ticket-done  (per ticket, tight)
                                                                         ↓
-                              /cleanup  ←  merge  ←  /ship  ←  /feature-done  (once)
+                            /cleanup  ←  you merge  ←  PR  ←  /spec-done  (once)
 ```
 
-**One spec → one worktree → one stack → one PR per ticket.** Two units:
+**One spec → one worktree → one feature branch → one PR per ticket.** Three units:
 
-- **worktree** — horizontal. One per **feature**, worked in parallel with other features.
-- **layer** — vertical. One per **ticket**: its own branch, its own PR, reviewable the moment it seals. Named `<type>/<feature>-<NN>-<ticket-slug>`.
+- **worktree** — horizontal. One per **spec**, worked in parallel with other specs. Provisioned once by `/implement` Step 0 — env, ports, DB — and shared by every ticket in it.
+- **feature branch** — the integration branch inside the worktree, cut once off the trunk. Named `<type>/<feature>`. Never committed to directly.
+- **task branch** — vertical. One per **ticket**: cut from the feature branch, its own PR, squash-merged back by `/ticket-done`. Named `<type>/<feature>-<NN>-<ticket-slug>`.
 
-`/to-tickets` emits a blocking DAG whose edges set the layer order; after that git holds the dependency, since ticket N's branch is based on N-1's. Nothing needs unlocking, and a ticket is unblocked when its blocker's PR **opens**, not merges. The cost is that a stack serializes the DAG — genuinely parallel tracks want their own spec and worktree.
+`/to-tickets` emits a blocking DAG whose edges set the ticket order; after that git holds the dependency, since ticket N+1 is cut from a feature branch that already contains N. Nothing needs unlocking and no rebase cascades. The cost is that this serializes the DAG — genuinely parallel tracks want their own spec and worktree.
 
-A stack lives in one worktree: a cascading rebase must move every branch in the chain, and git refuses to touch a branch checked out elsewhere.
+A per-ticket PR earns its keep even solo: the AI wrote the code and you haven't read it, so that PR is your genuine first read, not a formality.
 
-**Two gates, sized differently.** `/ticket-done` is tight — cold-read and checks scoped to the diff, run in parallel — and fires on every ticket. `/feature-done` carries everything that scales with the feature — full suite, `/simplify` over the whole diff, `/code-review` against the spec — and fires once. Running one gate at both sizes is what makes a build feel slow.
+**Three closures, three altitudes.** A unit's state tracks what that unit controls:
 
-Most skills are adapted from [`mattpocock/skills`](https://github.com/mattpocock/skills); `ticket-done`, `feature-done`, `ship`, and `cleanup` are mine. The stacked path needs `gh extension install github/gh-stack`. Without it the shape collapses to **solo** — one feature branch, tickets as commits, one PR at the end — and both gates run unchanged; only per-ticket review is lost.
+- **ticket** (unit of work) — closes when its PR squash-merges into the feature branch, which is what unblocks the next ticket. `/ticket-done` does it.
+- **spec** (unit of delivery) — closes when the feature branch merges to the trunk. `/cleanup` does it, so an open spec issue reliably means built-but-not-shipped.
+- **release** (unit of value) — closes on deploy, via a project-local release skill outside this pipeline.
 
-Ticket state lives in **one** place: the tracker `/setup-skills` configured. On GitHub/Linear/Jira that's the issue (`Closes #N` on the PR, `ready-for-agent` removed); on a local-markdown tracker it's the ticket file's checkboxes and Status. Never both.
+**No skill merges to the trunk.** `/ticket-done` merges task branches into the feature branch — not the trunk, nothing shipped. `/spec-done` opens the feature's PR and stops. Landing it is always the user's call.
+
+**Two gates, sized differently.** `/ticket-done` is tight — cold-read, scoped checks, and `/simplify` on this ticket's diff, all fired in one turn — and runs on every ticket. `/spec-done` carries everything that scales with the spec — traceability walk, rebase onto the trunk, full suite, cross-ticket `/simplify`, `/code-review` against the spec — and runs once. Running one gate at both sizes is what makes a build feel slow.
+
+**Traceability** is what makes conformance countable instead of a vibe: `/to-tickets` maps each numbered user story to the ticket delivering it and writes the table into the **spec issue body**; `/spec-done` walks it both ways, flagging stories with no ticket and tickets with no story.
+
+Most skills are adapted from [`mattpocock/skills`](https://github.com/mattpocock/skills); `ticket-done`, `spec-done`, and `cleanup` are mine. No `gh` extension is required.
+
+Ticket state lives in **one** place: the tracker `/setup-skills` configured. On GitHub/Linear/Jira that's the issue (closed explicitly by `/ticket-done` — `Closes #N` only fires on merges into the *default* branch, which the feature branch isn't); on a local-markdown tracker it's the ticket file's checkboxes and Status. Never both.
 
 ## Installation
 

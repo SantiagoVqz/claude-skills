@@ -1,12 +1,12 @@
 # Claude Skills
 
-Personal collection of reusable Claude Code skills. Many are adapted from [`mattpocock/skills`](https://github.com/mattpocock/skills) and nudged to taste; the delivery lifecycle (`ticket-done`, `feature-done`, `ship`, `cleanup`) is mine. Please check his work out!
+Personal collection of reusable Claude Code skills. Many are adapted from [`mattpocock/skills`](https://github.com/mattpocock/skills) and nudged to taste; the delivery lifecycle (`ticket-done`, `spec-done`, `cleanup`) is mine. Please check his work out!
 
 Everything lives in [`v1.1/`](./v1.1), split by how each skill is reached:
 
 | Folder | What's inside |
 |--------|---------------|
-| [`v1.1/user-invoked/`](./v1.1/user-invoked) | Reachable only when you type them. The pipeline: `setup-skills`, `grill-with-docs`, `to-spec`, `to-tickets`, `implement`, `ticket-done`, `feature-done`, `ship`, `cleanup`, plus `wayfinder`, `triage`, `handoff` and the `ask` router. |
+| [`v1.1/user-invoked/`](./v1.1/user-invoked) | Reachable only when you type them. The pipeline: `setup-skills`, `grill-with-docs`, `to-spec`, `to-tickets`, `implement`, `ticket-done`, `spec-done`, `cleanup`, plus `wayfinder`, `triage`, `handoff` and the `ask` router. |
 | [`v1.1/model-invoked/`](./v1.1/model-invoked) | Model- or user-reachable, so other skills can call them: `grilling`, `tdd`, `prototype`, `research`, `diagnosing-bugs`, `resolving-merge-conflicts`, `code-review`, `domain-modeling`, `codebase-design`. |
 
 [`v1.1/README.md`](./v1.1/README.md) lists every skill with a one-line description.
@@ -20,25 +20,27 @@ Everything lives in [`v1.1/`](./v1.1), split by how each skill is reached:
         ▲                                             ▲        │
   big effort ──/wayfinder                             └─ /ticket-done   (per ticket)
                                                                │
-                                          /feature-done ◄───────┘   (once)
+                                            /spec-done ◄────────┘   (once)
                                                  │
-                                              /ship ──► merge ──► /cleanup
+                                          PR ──► you merge ──► /cleanup
 ```
 
-**One spec → one worktree → one stack → one PR per ticket.** The worktree is the parallel unit (fan out across features); the layer is the serial unit (one per ticket, inside the feature). `/to-tickets` emits a blocking DAG, and those edges order the layers — after that git holds the dependency, since ticket N's branch is based on N-1's.
+**One spec → one worktree → one feature branch → one PR per ticket.** The worktree is the parallel unit (fan out across specs, provisioned once and shared by every ticket in it). The feature branch is the integration branch inside it. Each ticket is a short-lived task branch, squash-merged into the feature branch by `/ticket-done` — which is what makes ticket N+1 buildable, since it's cut from a feature branch that already contains N. No stacking, no cascading rebase, no extension required.
 
-A stack lives in one worktree — a cascading rebase has to move every branch in the chain, and git won't touch a branch checked out elsewhere. So the DAG gets serialized inside a feature; genuinely parallel tracks want their own spec and their own worktree.
+A PR per ticket is worth it even solo: the AI wrote the code and you haven't read it, so that PR is your genuine first read rather than a formality.
 
-Two gates, sized differently, which is what keeps the loop fast: `/ticket-done` stays scoped to the diff and runs on every ticket, while everything that scales with the *feature* — the full suite, `/simplify`, spec conformance — waits for `/feature-done`.
+**Three closures, three altitudes.** The ticket closes when its PR squash-merges into the feature branch (unblocking the next). The spec closes when the feature branch merges to the trunk — `/cleanup` does that, so an open spec issue always means work built but not shipped. The release closes when it deploys, via a project-local skill outside this pipeline.
 
-Requires [`gh stack`](https://github.com/github/gh-stack) (`gh extension install github/gh-stack`) for the stacked path; the skills fall back to solo-branch mode where stacked PRs aren't enabled.
+**No skill merges to the trunk.** `/spec-done` opens the feature's PR and stops; landing it is always your call.
+
+Two gates, sized differently, which is what keeps the loop fast: `/ticket-done` stays scoped to the diff and runs on every ticket (cold-read, checks, and `/simplify` all fired in one turn), while everything that scales with the *spec* — the traceability walk, the rebase onto the trunk, the full suite, cross-ticket duplication, spec conformance — waits for `/spec-done`.
 
 ## Installation
 
 Skills install into either `~/.claude/skills/` (global, every project) or `.claude/skills/` (current project only), symlinked — so edits in this repo are live with no re-install.
 
 ```bash
-./install.sh v1.1/user-invoked/ship             # one skill, current project
+./install.sh v1.1/user-invoked/cleanup          # one skill, current project
 ./install.sh v1.1/model-invoked/tdd --global    # one skill, globally
 ./install.sh --all --global                     # everything, globally
 ./install.sh --all                              # everything, current project

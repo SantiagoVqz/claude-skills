@@ -16,7 +16,13 @@ The issue tracker and triage label vocabulary should have been provided to you �
 
 Check with the user that these seams match their expectations.
 
-3. Write the spec using the template below, then publish it to the project issue tracker. Apply the `ready-for-agent` triage label - no need for additional triage.
+3. Write the spec using the template below, then publish it to the project issue tracker.
+
+   **Do NOT apply `ready-for-agent`** — the spec is not grabbable work, it's the parent of work. `/to-tickets` produces the grabbable tickets and labels those. Labelling the spec would put it in the "what's ready to pick up?" queue alongside real tickets. If the tracker has an epic/parent label, use that; otherwise leave it unlabelled.
+
+   **The spec issue stays open for the whole build.** It is the unit of delivery, and it closes exactly once — when its feature branch merges to the trunk, which `/cleanup` does. That makes an open spec issue the reliable signal for work that's built but not yet shipped, and it means an abandoned feature always leaves one open thing behind rather than a set of silently-closed tickets.
+
+   `/to-tickets` will append a `## Traceability` table to this body later. Number the user stories so it can.
 
 <spec-template>
 
