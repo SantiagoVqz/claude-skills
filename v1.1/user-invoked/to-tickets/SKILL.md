@@ -30,14 +30,14 @@ Break the work into **tracer bullet** tickets.
 
 - Each slice cuts a narrow but COMPLETE path through every layer (schema, API, UI, tests) — vertical, NOT a horizontal slice of one layer
 - A completed slice is demoable or verifiable on its own
-- Each slice is sized to fit in a single fresh context window, which is also the size of a PR one person reviews in one sitting — **one ticket = one task branch = one PR into the feature branch**, so this sizing is what makes the review bearable
+- Each slice is sized to fit in a single fresh context window, which is also the chunk one person reads in one sitting — **one ticket = one gated commit on the feature branch**, so this sizing is what makes the read bearable
 - Any prefactoring should be done first
 
 </vertical-slice-rules>
 
 Give each ticket its **blocking edges** — the other tickets that must complete before it can start. A ticket with no blockers can start immediately.
 
-**The edges decide ticket order, then git holds them.** A spec's tickets are built in one worktree on one feature branch: each ticket is a task branch cut from the feature branch and squash-merged back into it, so ticket N+1 is cut *after* ticket N merged. The dependency lives in the branch graph, not in a label anyone has to check. This **serializes** the DAG: tickets that could genuinely run in parallel won't. When two tracks are truly independent and worth working at the same time, that's a signal they want separate specs, so each gets its own worktree and its own feature branch.
+**The edges decide ticket order, then git holds them.** A spec's tickets are built in one worktree on one feature branch: each ticket lands as one gated commit, so ticket N+1 starts *after* ticket N's commit. The dependency lives in the commit history, not in a label anyone has to check. This **serializes** the DAG: tickets that could genuinely run in parallel won't. When two tracks are truly independent and worth working at the same time, that's a signal they want separate specs, so each gets its own worktree and its own feature branch.
 
 **Wide refactors are the exception to vertical slicing.** A **wide refactor** is one mechanical change — rename a column, retype a shared symbol — whose **blast radius** fans across the whole codebase, so a single edit breaks thousands of call sites at once and no vertical slice can land green. Don't force it into a tracer bullet; sequence it as **expand–contract**. First expand: add the new form beside the old so nothing breaks. Then migrate the call sites over in batches sized by blast radius (per package, per directory), each batch its own ticket blocked by the expand, keeping CI green batch to batch because the old form still exists. Finally contract: delete the old form once no caller remains, in a ticket blocked by every migrate batch. When even the batches can't stay green alone, keep the sequence but let them share an integration branch that all block a final integrate-and-verify ticket — green is promised only there.
 
@@ -55,7 +55,7 @@ Then read it both ways and report what you find:
 - **Orphan stories** — a story no ticket delivers. Either a ticket is missing, or the story is out of scope and the spec should say so.
 - **Orphan tickets** — a ticket delivering no story. That's scope nobody asked for; cut it, or the spec is incomplete.
 
-This table is what turns spec conformance from a judgement call into something countable — `/spec-done` walks it as its first step, and each ticket PR cites the story numbers it satisfied. Building it now, while the breakdown is still editable, is also the cheapest coverage check available: a missing ticket costs nothing here and costs a whole gate later.
+This table is what turns spec conformance from a judgement call into something countable — `/spec-done` walks it as its first step, and each ticket's commit body cites the story numbers it satisfied. Building it now, while the breakdown is still editable, is also the cheapest coverage check available: a missing ticket costs nothing here and costs a whole gate later.
 
 ### 5. Quiz the user
 
@@ -105,7 +105,7 @@ This is the **only** modification to make to the spec issue — it stays open, l
 
 ### 8. Working the tickets
 
-Work the **frontier**: any ticket whose blockers have **merged into the feature branch**, which `/ticket-done` does as it closes each one. That merge is what makes the next ticket buildable — its task branch is cut from a feature branch that already contains the work beneath it. Nothing waits on the trunk; the feature branch merges there once, at the end, after `/spec-done`.
+Work the **frontier**: any ticket whose blockers have **landed on the feature branch** — `/implement`'s slice loop commits each one and closes its issue. That commit is what makes the next ticket buildable — the feature branch already contains the work beneath it. Nothing waits on the trunk; the feature branch merges there once, at the end, after `/spec-done`.
 
 <local-ticket-template>
 

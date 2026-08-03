@@ -108,7 +108,7 @@ The block:
 
 Trunk: `[branch]` — `/implement` cuts every feature branch off it, and `/spec-done` rebases onto it and opens the feature's PR against it.
 
-One spec → one worktree → one feature branch → one PR per ticket. Each ticket is a task branch squash-merged into the feature branch by `/ticket-done`; the feature branch itself is merged to the trunk by hand, never by a skill.
+One spec → one worktree → one feature branch → one gated commit per ticket. `/implement`'s slice loop lands each ticket as a commit on the feature branch; `/spec-done` opens the feature's PR; the feature branch itself is merged to the trunk by hand, never by a skill.
 ```
 
 Include the `### Triage labels` sub-block, and write `docs/agents/triage-labels.md`, only when `triage` is installed and Section B ran. When it isn't, both are omitted.
