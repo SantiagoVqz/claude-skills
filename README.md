@@ -4,7 +4,7 @@ Personal collection of reusable Claude Code skills. The engineering and producti
 
 | Folder | What's inside |
 |--------|---------------|
-| [`skills/engineering/`](./skills/engineering) | Upstream: `ask` (the router), `setup-skills`, `grill-with-docs`, `to-spec`, `to-tickets`, `implement`, `wayfinder`, `triage`, `improve-codebase-architecture`, `code-review`, `tdd`, `prototype`, `research`, `diagnosing-bugs`, `resolving-merge-conflicts`, `domain-modeling`, `codebase-design`. |
+| [`skills/engineering/`](./skills/engineering) | Upstream: `ask` (the router), `setup-skills`, `grill-with-docs`, `to-spec`, `to-tickets`, `implement`, `wayfinder`, `triage`, `improve-codebase-architecture`, `two-axis-review`, `tdd`, `prototype`, `research`, `diagnosing-bugs`, `resolving-merge-conflicts`, `domain-modeling`, `codebase-design`. |
 | [`skills/productivity/`](./skills/productivity) | Upstream: `grilling`, `grill-me`, `handoff`, `teach`, `writing-great-skills`. |
 | [`skills/own/`](./skills/own) | Mine: `ship` — rebase onto trunk, full suite, push, PR; `cleanup` — post-merge teardown of a ticket's worktree, branches, scratch DB, Docker leftovers, and a trunk refresh. |
 
@@ -12,7 +12,7 @@ Personal collection of reusable Claude Code skills. The engineering and producti
 
 Run `/setup-skills` once per repo, then plan: `/grill-with-docs` → `/to-spec` → `/to-tickets` (tracer-bullet vertical slices with blocking edges — each ticket independently demoable, so each can land on the trunk by itself).
 
-Then **per ticket, trunk-based**: worktree + branch off the trunk (provision per Section D) → `/implement <ticket>` in it (drives `/tdd`, reviews with `/code-review`, commits to the current branch) → `/ship` (rebase onto trunk, full suite, push, PR carrying `Closes #<ticket>`) → **you merge** → `/cleanup` (verify issue closed, tear down worktree/branch/DB, refresh trunk). Frontier tickets can run in parallel, one worktree + terminal pane each. `/ask` routes when you don't remember which skill you want.
+Then **per ticket, trunk-based**: worktree + branch off the trunk (provision per Section D) → `/implement <ticket>` in it (drives `/tdd`, reviews with `/two-axis-review`, commits to the current branch) → `/ship` (rebase onto trunk, full suite, push, PR carrying `Closes #<ticket>`) → **you merge** → `/cleanup` (verify issue closed, tear down worktree/branch/DB, refresh trunk). Frontier tickets can run in parallel, one worktree + terminal pane each. `/ask` routes when you don't remember which skill you want.
 
 To resync with upstream: re-copy `skills/engineering` and `skills/productivity` from a fresh clone, then re-apply both deltas: (1) the rename (`ask-matt` → `ask`, `setup-matt-pocock-skills` → `setup-skills`, plus cross-references); (2) `setup-skills` Section D — restore `provision.sh` into the skill folder and the three Section D edits in its `SKILL.md` (scaffold bullet, exploration bullet, Section D itself, seed-template entry) from git history.
 
@@ -33,7 +33,7 @@ Fresh machine restore:
 git clone <this-repo> && cd claude-skills && ./install.sh --all --global
 ```
 
-> Skills install by their leaf name (e.g. `tdd`, not `skills/engineering/tdd`) — the folders above it are organizational only. Note `code-review` shadows Claude Code's built-in `/code-review` when installed — intentional; remove the symlink to get the built-in back.
+> Skills install by their leaf name (e.g. `tdd`, not `skills/engineering/tdd`) — the folders above it are organizational only. `two-axis-review` is deliberately *not* named `code-review`: that name collides with Claude Code's built-in `/code-review` (the billed multi-agent cloud review), and the ambiguity leaked into skills that reference it, like `/implement`.
 
 ## Conventions
 
