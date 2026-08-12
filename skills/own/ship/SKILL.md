@@ -44,11 +44,11 @@ Completion: `git rev-list --count <head>..origin/<base>` is 0 — the branch con
 
 ## Step 4 — Full test suite
 
-Run the repo's complete suite (plus typecheck/lint if the repo has them) **after** integrating the base — the point is proving the combination, not re-proving the branch. `/implement` already ran the suite on the branch alone; this run catches what the trunk moved underneath you.
+Only if Step 3 integrated something. The point is proving the combination, not re-proving the branch — `/implement` already ran the suite on the branch alone. Step 3 skipped means nothing moved underneath you; skip to Step 5.
 
-Red → stop. Fix on the branch (back through `/implement` for anything non-trivial), commit, re-run. Never ship red.
+Otherwise run the repo's complete suite (plus typecheck/lint if the repo has them) on the post-rebase head. Red → stop. Fix on the branch (back through `/implement` for anything non-trivial), commit, re-run. Never ship red.
 
-Completion: suite green on the post-rebase head.
+Completion: base integrated and suite green, or Step 3 skipped.
 
 ## Step 5 — Push
 
