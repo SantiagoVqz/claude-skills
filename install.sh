@@ -41,7 +41,7 @@ fi
 
 # List every skill path (folder relative to repo root that holds a SKILL.md).
 list_skills() {
-  find "$SCRIPT_DIR" -name SKILL.md -not -path '*/.git/*' \
+  find "$SCRIPT_DIR" -name SKILL.md -not -path '*/.git/*' -not -path "$SCRIPT_DIR/Progress/*" \
     | sed "s|$SCRIPT_DIR/||;s|/SKILL.md||" | sort
 }
 
@@ -76,7 +76,7 @@ if [[ "$ALL" == true ]]; then
   fi
   while IFS= read -r skill_md; do
     install_skill "$(dirname "$skill_md")"
-  done < <(find "$SCRIPT_DIR" -name SKILL.md -not -path '*/.git/*')
+  done < <(find "$SCRIPT_DIR" -name SKILL.md -not -path '*/.git/*' -not -path "$SCRIPT_DIR/Progress/*")
 else
   src="$SCRIPT_DIR/$SKILL"
   if [[ ! -f "$src/SKILL.md" ]]; then
