@@ -1,13 +1,13 @@
 ---
 name: reconcile-branch
-description: "Bring a working branch up to date with its base and confirm the surviving diff is exactly the intended change: inspect base-vs-head, integrate the base (merge/rebase per repo convention), resolve conflicts conservatively, prune anything unintended, and re-verify. Never merges the PR. Use when a branch is behind or shows conflicts, after the base moved, or when the user says 'reconcile my branch', 'rebase and check the diff', 'resolve conflicts and verify', 'is my diff clean'."
+description: "Bring a working branch up to date with its base and confirm the surviving diff is exactly the intended change: inspect base-vs-head, integrate the base (merge/rebase per repo convention), resolve conflicts hunk by hunk, prune anything unintended, and re-verify. Also resolves an already-in-progress merge or rebase conflict. Never merges the PR. Use when a branch is behind or shows conflicts, when git has stopped mid-merge or mid-rebase, after the base moved, or when the user says 'reconcile my branch', 'rebase and check the diff', 'resolve the conflicts', 'is my diff clean'."
 ---
 
 # Reconcile Branch
 
 Take a branch that has drifted from its base and leave it **up to date, conflict-free, and containing only the changes it was meant to contain**. Three jobs, in order: (1) see what the branch actually changes, (2) integrate the base and resolve conflicts, (3) verify the surviving diff is exactly the intended change — no more, no less. This skill does **not** merge the branch anywhere; the merge decision stays with the human.
 
-Sibling to `/ship`: `ship` is the happy path for a ticket branch that just needs a rebase before its PR. Reach for `reconcile-branch` when the base has moved far enough that the diff itself needs auditing.
+Sibling to `/ship`: `ship` is the happy path for a ticket branch that just needs a rebase before its PR. Reach for `reconcile-branch` when the base has moved far enough that the diff itself needs auditing, or when an integration has already stopped on a conflict.
 
 ## Phase 0 — Establish base and head
 
@@ -15,7 +15,16 @@ Sibling to `/ship`: `ship` is the happy path for a ticket branch that just needs
 2. **Base** = what this branch targets. In order of preference: the branch's open PR base (`gh pr view --json baseRefName -q .baseRefName`); else the repo default branch (`git symbolic-ref refs/remotes/origin/HEAD`); else `main`. If ambiguous, ask.
 3. State both back to the user in one line (`head <X> ← base <Y>`) before touching anything.
 
+**Are you already mid-integration?** Check this **first** — `git status` reporting `You have unmerged paths`, or the presence of `.git/MERGE_HEAD` / `.git/rebase-merge` / `.git/rebase-apply`, means git has already stopped on a conflict. Then:
+
+- **Head** is not what step 1 returns — a rebase leaves HEAD detached, so `--abbrev-ref HEAD` gives `HEAD`. Read the real branch from `.git/rebase-merge/head-name` (or `ORIG_HEAD` for a merge).
+- **Phase 1 does not apply** — the tree is *supposed* to be dirty — and Phase 3's method is already chosen for you.
+- Do Phase 2's intent read against the pre-integration tip (`ORIG_HEAD`, or the branch's remote ref), then go straight to Phase 3's conflict work.
+- **Phases 4 and 5 still run.** Finishing the operation is not the same as verifying it — that audit is why you're here rather than just typing `git rebase --continue`.
+
 ## Phase 1 — Preflight
+
+Skip this phase entirely when Phase 0 found an integration already in progress.
 
 - **Clean working tree.** `git status --porcelain` must be empty. If not, stop and ask — never stash or discard the user's in-progress work to clear it.
 - **Fetch.** `git fetch --all --prune` so base and head reflect the remote, not a stale local copy.
@@ -31,11 +40,17 @@ Snapshot what the branch means to do, so you can tell later whether the diff sti
 
 ## Phase 3 — Integrate the base and resolve conflicts
 
-- **Method: an explicit directive wins, then CLAUDE.md is law** (rebase vs merge). A caller or user asking for a **rebase** — e.g. `/ship` reconciling a new, unreviewed branch — overrides everything below. When no one asks and the repo is silent, default to **merge base into head** for a branch already under review (non-destructive, preserves review threads and existing approvals); **rebase** only a branch not yet reviewed.
-- Conflicts → `/resolving-merge-conflicts`: work them hunk by hunk, resolving by intent traced to each side's primary source, and **finish** the operation — never `--abort`.
-- Resolve each conflict **conservatively, preserving the intent of BOTH sides** — the base change and the branch change. Never resolve a conflict by silently reverting a base change or dropping the branch's work to make the merge trivial.
+**Method: an explicit directive wins, then CLAUDE.md is law** (rebase vs merge). A caller or user asking for a **rebase** — e.g. `/ship` reconciling a new, unreviewed branch — overrides everything below. When no one asks and the repo is silent, default to **merge base into head** for a branch already under review (non-destructive, preserves review threads and existing approvals); **rebase** only a branch not yet reviewed.
+
+Then work the conflicts **hunk by hunk**. Always resolve; **never `--abort`** — abandoning the operation leaves the drift in place and throws away the resolutions already made.
+
+- **Trace each side to its primary source before resolving it.** Understand why each change was made and what it was for: read the commit messages, the PRs, the original issues. A resolution picked from the diff text alone is a guess.
+- **Preserve the intent of BOTH sides** — the base change and the branch change. Where they're compatible, keep both. Never resolve a conflict by silently reverting a base change or dropping the branch's work to make the merge trivial. Do **not** invent new behaviour to bridge them.
+- Where the two are genuinely incompatible, pick the one matching the integration's stated goal and **note the trade-off** in your report.
 - If schema/migration/seed state changed on the base, reset the local DB to the integrated branch before any DB-backed test — a DB ahead of the code produces phantom failures.
 - **Stop and flag** (do not auto-resolve) when a conflict is **semantic, not textual** — both sides changed the same behavior in incompatible ways and picking one silently changes the product. Surface it; let the human decide.
+
+**Finish the operation**: stage the resolutions and commit. If rebasing, `git rebase --continue` until every commit is replayed — a rebase stopped halfway is not integrated.
 
 ## Phase 4 — Verify the surviving diff is exactly what's needed
 
@@ -60,10 +75,12 @@ Walk the final diff hunk by hunk against the Phase 2 intent. The output of this 
 ## Never
 
 - **Never merge the branch** into its base — reconcile leaves it up to date and review-ready; the merge stays the human's call.
+- **Never `--abort`** a merge or rebase — always resolve it through.
 - **Never `git push --force`** — only `--force-with-lease`, and only for rebase-based branches.
 - **Never stash or discard** uncommitted work to clear preflight — stop and ask.
 - **Never resolve a semantic conflict just to make tests go green** — flag it.
 - **Never revert a base change or drop branch work** to simplify a conflict — preserve both sides' intent.
+- **Never invent new behaviour** in a resolution — a conflict is resolved from the two sides that exist.
 
 ## Report
 

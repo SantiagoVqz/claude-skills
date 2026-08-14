@@ -5,7 +5,7 @@ My own skill set, highly inspired by [mattpocock/skills](https://github.com/matt
 ## Structure
 
 - **Top level** — the pipeline skills (plan → build → land), plus the two structural ones: `ask` (the router — "what skill do I run here?") and `setup-skills` (per-repo config: tracker, labels, domain docs, worktree/Docker provisioning).
-- [`support/`](./support) — modular skills the pipeline composes but you rarely invoke by name: `domain-modeling` (paired with `/grilling` by grill/triage/wayfinder), `research` and `prototype` (wayfinder ticket types), `resolving-merge-conflicts` (ship/reconcile hand off to it). Keeping them separate is what lets wayfinder call exactly the piece it needs.
+- [`support/`](./support) — modular skills the pipeline composes but you rarely invoke by name: `domain-modeling` (paired with `/grilling` by grill/triage/wayfinder), `research` and `prototype` (wayfinder ticket types). Keeping them separate is what lets wayfinder call exactly the piece it needs.
 
 ## The set
 
@@ -22,19 +22,21 @@ My own skill set, highly inspired by [mattpocock/skills](https://github.com/matt
 | `tdd` | model | The red → green reference: seams, anti-patterns, rules of the loop. |
 | `wayfinder` | `/wayfinder` | Fog-of-war planning, upstream-faithful: shared map of decision tickets (grilling/research/prototype/task types), resolved one at a time. |
 | `ship` | `/ship` | Rebase onto trunk, full suite, push, PR with `Closes #<ticket>`. Never merges. |
-| `reconcile-branch` | model | Integrate a moved base and audit that the surviving diff is exactly the intended change. |
+| `reconcile-branch` | model | Integrate a moved base and audit that the surviving diff is exactly the intended change; also resolves an already-in-progress merge/rebase conflict, hunk by hunk, never `--abort`. |
 | `cleanup` | `/cleanup` | Post-merge teardown: worktree, branches, scratch DB, Docker leftovers ([docker.md](./cleanup/docker.md)), trunk refresh. |
+| `diagnosing-bugs` | model | Diagnosis loop for hard bugs and perf regressions: build a tight feedback loop first, then reproduce, hypothesise, instrument, fix with regression test. |
+| `handoff` | `/handoff` | Compact the current conversation into a handoff document (in OS temp dir) for a fresh agent to pick up. |
+| `wait-what` | `/wait-what` | Stop — that last message didn't land. Re-pitch it in Simplified Technical English using the `CONTEXT.md` ubiquitous language. |
 | `support/domain-modeling` | model | The active glossary/ADR discipline: sharpen terms, update `CONTEXT.md` inline, offer ADRs behind the three gates ([formats](./support/domain-modeling)). |
 | `support/research` | model | Background agent investigating against primary sources, leaving a cited markdown file. |
 | `support/prototype` | model | Throwaway code answering one design question — logic demo or UI variations. |
-| `support/resolving-merge-conflicts` | model | Resolve an in-progress merge/rebase hunk by hunk, by intent; never `--abort`. |
 | `support/wizard` | model | Interactive bash wizard for steps only a human can take — credentials, CI secrets, third-party dashboards, one-off cutovers. Kept upstream-verbatim. |
 
 ## Deliberately dropped from the upstream set
 
 - **improve-codebase-architecture / simplify** — not needed.
 - **triage's PR-as-issue surface and `.out-of-scope/` knowledge base** — lean first; add back if rejected requests start recurring.
-- **handoff / teach / to-questionnaire / wait-what / grill-me / two-axis-review / codebase-design / diagnosing-bugs** — not part of my flow (all recoverable from git history or upstream).
+- **teach / to-questionnaire / grill-me / two-axis-review / codebase-design** — not part of my flow (all recoverable from git history or upstream).
 
 ## Status
 

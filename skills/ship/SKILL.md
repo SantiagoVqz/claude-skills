@@ -37,7 +37,7 @@ Completion: you can state `head ← base` and whether the branch is new or under
 ## Step 3 — Rebase onto the base, only if behind
 
 - Behind? `git rev-list --count <head>..origin/<base>` greater than 0 means the base moved ahead. If 0, skip to Step 4.
-- **New branch → rebase**: `git rebase origin/<base>`. No approvals exist to preserve, so buy the clean linear history. Conflicts → `/resolving-merge-conflicts` (finish the rebase, never `--abort`).
+- **New branch → rebase**: `git rebase origin/<base>`. No approvals exist to preserve, so buy the clean linear history. Conflicts → `/reconcile-branch` (finish the rebase, never `--abort`).
 - **Under review → merge the base in** (`git merge origin/<base>`) — a rebase discards review threads and approvals.
 
 Completion: `git rev-list --count <head>..origin/<base>` is 0 — the branch contains the base.

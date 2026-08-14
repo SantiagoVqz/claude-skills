@@ -29,7 +29,8 @@ Keep steps 1–3 in one unbroken context window so the grilling, spec, and ticke
 
 ## On-ramps
 
-- **Bugs and requests piling up** → **`/triage`**. Moves issues through the triage roles and produces agent-ready briefs that `/implement` later picks up. Only for issues you didn't create — `/tickets` output is already agent-ready, so don't triage it.
+- **Something broken, throwing, or slow right now** → **`/diagnosing-bugs`**. Builds a tight red-capable feedback loop before any theorising, then reproduces, hypothesises, instruments, and lands the fix with a regression test — a complete loop, no merge onto the main flow needed.
+- **Bugs and requests piling up** → **`/triage`**. Moves issues through the triage roles and produces agent-ready briefs that `/implement` later picks up. Only for issues you didn't create — `/tickets` output is already agent-ready, so don't triage it. One bug in front of you now is `/diagnosing-bugs` instead.
 - **A huge, foggy effort — too big for one session** → **`/wayfinder`**. Charts a shared map of decision tickets on the tracker and resolves them one at a time — decisions, not deliverables — until the way is clear. It calls `/grilling`, `/research`, and `/prototype` per ticket type. When the map clears, merge onto the main flow at `/spec`; never loop the map straight into `/implement` unless the effort turned out genuinely small.
 
 ## Underneath and alongside
@@ -39,4 +40,6 @@ Keep steps 1–3 in one unbroken context window so the grilling, spec, and ticke
 - **`/tdd`** — the red → green reference: seams, anti-patterns, rules of the loop. `/implement` drives it; reach for it alone to build one behaviour test-first without a full spec.
 - **`/research`** — delegate reading legwork to a background agent that investigates against primary sources and leaves a cited markdown file. Feeds the thinking at `/grill`; doesn't replace it.
 - **`/prototype`** — throwaway code that answers one design question (logic demo or UI variations). The answer folds into the real code; the prototype survives on a `prototype/<name>` branch as a primary source.
-- **`/resolving-merge-conflicts`** — work an in-progress merge/rebase conflict hunk by hunk, resolving by intent traced to each side's primary source. `/ship` and `/reconcile-branch` hand off to it; reach for it directly when already mid-conflict.
+- **`/reconcile-branch`** — beyond its main-flow role, it's also the skill for an already-in-progress merge or rebase conflict: it works the hunks by intent traced to each side's primary source and finishes the operation, never `--abort`. `/ship` hands conflicts to it; reach for it directly when already mid-conflict.
+- **`/handoff`** — compact the current conversation into a handoff document (OS temp dir, with suggested skills) so a fresh session picks up mid-flow without re-deriving the thinking. Pass an argument describing what the next session is for.
+- **`/wait-what`** — the agent's last message didn't land: it re-pitches with context, in Simplified Technical English, using the `CONTEXT.md` ubiquitous language.
