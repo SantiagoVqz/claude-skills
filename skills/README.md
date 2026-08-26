@@ -24,7 +24,7 @@ My own skill set, highly inspired by [mattpocock/skills](https://github.com/matt
 | `ship` | `/ship` | Rebase onto trunk, full suite, push, PR with `Closes #<ticket>`. Never merges. |
 | `reconcile-branch` | model | Integrate a moved base and audit that the surviving diff is exactly the intended change; also resolves an already-in-progress merge/rebase conflict, hunk by hunk, never `--abort`. |
 | `cleanup` | `/cleanup` | Post-merge teardown: worktree, branches, scratch DB, Docker leftovers ([docker.md](./cleanup/docker.md)), trunk refresh. |
-| `diagnosing-bugs` | model | Diagnosis loop for hard bugs and perf regressions: build a tight feedback loop first, then reproduce, hypothesise, instrument, fix with regression test. |
+| `diagnosing-bugs` | model | Diagnosis loop for hard bugs and perf regressions, in a provisioned bug worktree: build a tight feedback loop first, then reproduce, hypothesise, instrument, fix with regression test; exits via `/ship`. |
 | `handoff` | `/handoff` | Compact the current conversation into a handoff document (in OS temp dir) for a fresh agent to pick up. |
 | `wait-what` | `/wait-what` | Stop — that last message didn't land. Re-pitch it in Simplified Technical English using the `CONTEXT.md` ubiquitous language. |
 | `support/domain-modeling` | model | The active glossary/ADR discipline: sharpen terms, update `CONTEXT.md` inline, offer ADRs behind the three gates ([formats](./support/domain-modeling)). |

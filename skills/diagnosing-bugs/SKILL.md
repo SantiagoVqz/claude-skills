@@ -15,7 +15,11 @@ This skill has you show commands, outputs and captured artifacts. **Redact every
 
 If the redacted output is not enough to diagnose the bug, say so and ask the user.
 
-## Phase 1 — Build a feedback loop
+## Phase 0 — Worktree
+
+Confirm you're in a worktree on a bug branch off the trunk. If not, create it (`git worktree add`) and provision it with `scripts/provision.sh` (plus `provision.sh db` when the repo clones a per-worktree DB) so the feedback loop is runnable there before any diagnosis. Everything downstream — instrumentation, throwaway harnesses, DB resets, the fix itself — happens in this worktree, never in the main working copy.
+
+Exception: when the bug only reproduces in the state of an existing working copy (uncommitted changes, a specific DB state), diagnose where it reproduces — but say so, and still land the fix on a bug branch.
 
 **This is the skill.** Everything else is mechanical. If you have a **tight** pass/fail signal for the bug — one that goes red on _this_ bug — you will find the cause; bisection, hypothesis-testing, and instrumentation all just consume it. If you don't have one, no amount of staring at code will save you.
 
@@ -136,5 +140,6 @@ Required before declaring done:
 - [ ] All `[DEBUG-...]` instrumentation removed (`grep` the prefix)
 - [ ] Throwaway prototypes deleted (or moved to a clearly-marked debug location)
 - [ ] The hypothesis that turned out correct is stated in the commit / PR message — so the next debugger learns
+- [ ] The fix is committed on the bug branch — exit through `/ship` (PR, never merges), then `/cleanup` after the human merges
 
 **Then ask: what would have prevented this bug?** If the answer involves architectural change (no good test seam, tangled callers, hidden coupling) state the specifics to the user and offer to capture them as a ticket or ADR. Make the recommendation **after** the fix is in, not before — you have more information now than when you started.

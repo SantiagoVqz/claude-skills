@@ -29,7 +29,7 @@ Keep steps 1–3 in one unbroken context window so the grilling, spec, and ticke
 
 ## On-ramps
 
-- **Something broken, throwing, or slow right now** → **`/diagnosing-bugs`**. Builds a tight red-capable feedback loop before any theorising, then reproduces, hypothesises, instruments, and lands the fix with a regression test — a complete loop, no merge onto the main flow needed.
+- **Something broken, throwing, or slow right now** → **`/diagnosing-bugs`**. In a bug worktree off the trunk (provisioned like any ticket), builds a tight red-capable feedback loop before any theorising, then reproduces, hypothesises, instruments, and lands the fix with a regression test — merging onto the main flow at `/ship`.
 - **Bugs and requests piling up** → **`/triage`**. Moves issues through the triage roles and produces agent-ready briefs that `/implement` later picks up. Only for issues you didn't create — `/tickets` output is already agent-ready, so don't triage it. One bug in front of you now is `/diagnosing-bugs` instead.
 - **A huge, foggy effort — too big for one session** → **`/wayfinder`**. Charts a shared map of decision tickets on the tracker and resolves them one at a time — decisions, not deliverables — until the way is clear. It calls `/grilling`, `/research`, and `/prototype` per ticket type. When the map clears, merge onto the main flow at `/spec`; never loop the map straight into `/implement` unless the effort turned out genuinely small.
 
