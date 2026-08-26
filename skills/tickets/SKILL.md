@@ -42,7 +42,9 @@ Present the breakdown as a numbered list — title, blocked-by, and what end-to-
 
 ### 5. Publish
 
-Publish one issue per ticket in dependency order (blockers first) to the repo's tracker (GitHub via `gh` by default), using native blocking relationships where they exist, otherwise a "Blocked by" list in the body. Label each `ready-for-agent`. No tracker → one file per ticket under `.scratch/<feature-slug>/issues/<NN>-<slug>.md`, numbered in dependency order. Never close or modify a parent issue.
+Publish one issue per ticket in dependency order (blockers first) to the repo's tracker (GitHub via `gh` by default), using native blocking relationships where they exist, otherwise a "Blocked by" list in the body. Label each `ready-for-agent`. No tracker → one file per ticket under `.scratch/<feature-slug>/issues/<NN>-<slug>.md`, numbered in dependency order.
+
+When the spec or plan exists as a tracker issue, attach every ticket to it as a **sub-issue** (on GitHub: `gh api POST .../issues/{parent_number}/sub_issues` — takes the child's database `id`, not its issue number). Done when a read-back of the parent lists all tickets as sub-issues. Never close or modify the parent issue beyond attaching sub-issues.
 
 <ticket-template>
 
