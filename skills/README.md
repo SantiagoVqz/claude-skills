@@ -2,7 +2,7 @@
 
 The upstream [`mattpocock/skills`](https://github.com/mattpocock/skills) set, kept verbatim and installed under my own names, plus my `cleanup` skill. Sections follow the [aihero.dev skills page](https://www.aihero.dev/skills).
 
-The only edited skill is `implement`: on the first ticket of a spec it creates the spec's worktree and runs `scripts/provision.sh`, so separate specs run in parallel, one worktree each.
+The upstream set was imported verbatim on 2026-09-02, then edited where it earns it. `implement` creates the spec's worktree on the first ticket and runs `scripts/provision.sh`, so separate specs run in parallel, one worktree each. A prompt audit the same day removed dated patterns (word caps, capitalized prohibitions, pinned token counts) from eight skills.
 
 ## 01 Getting started
 
@@ -62,4 +62,4 @@ Vocabulary layers the flow skills run underneath.
 
 ## Resync
 
-Clone upstream, re-copy each section's folders, then re-apply the two local deltas: the renames (`setup-matt-pocock-skills` → `setup-skills`, `ask-matt` → `ask`, and every `/setup-matt-pocock-skills` and `/ask-matt` reference) and the worktree step plus `provision.sh` in `implement`.
+Clone upstream, re-copy each section's folders, then re-apply the local deltas by diffing this repo's previous commit against the fresh copy: the renames (`setup-matt-pocock-skills` → `setup-skills`, `ask-matt` → `ask`, and every `/setup-matt-pocock-skills` and `/ask-matt` reference), the worktree step plus `provision.sh` in `implement`, and the prompt-audit edits. Local edits are no longer limited to `implement` and `cleanup`.
