@@ -1,16 +1,16 @@
 # Claude Skills
 
-My skill harness for Claude Code. It is the [`mattpocock/skills`](https://github.com/mattpocock/skills) set (please check his work out!), kept verbatim under my own names, plus my `cleanup` skill and one edit to `implement`: the first ticket of a spec creates and provisions a worktree, so separate specs run in parallel.
+My skill harness for Claude Code. It is the [`mattpocock/skills`](https://github.com/mattpocock/skills) set, kept verbatim under my own names. His work is worth a look. On top of it I added my `cleanup` skill and one edit to `implement`. The first ticket of a spec creates and provisions a worktree, so separate specs run in parallel.
 
-See [`skills/README.md`](./skills/README.md) for the full set, grouped as on the [aihero.dev skills page](https://www.aihero.dev/skills): getting started, the main flow, shaping, upkeep, productivity, reference.
+See [`skills/README.md`](./skills/README.md) for the full set. It follows the groups on the [aihero.dev skills page](https://www.aihero.dev/skills): getting started, the main flow, shaping, upkeep, productivity, reference.
 
 ## The flow
 
-Run `/setup-skills` once per repo. Then `/grill-with-docs` an idea → `/to-spec` → `/to-tickets`. Per ticket, `/implement <ticket>`: the first ticket of a spec creates the spec's worktree and branch and runs `scripts/provision.sh`; later tickets commit to the same branch. `/code-review` before each commit. You open the PR and merge. `/cleanup` after the merge. `/ask` routes when you do not remember which skill you want.
+Run `/setup-skills` once per repo. Then take an idea through `/grill-with-docs`, `/to-spec` and `/to-tickets`. For each ticket, run `/implement <ticket>`. The first ticket of a spec creates the spec's worktree and branch and runs `scripts/provision.sh`. Later tickets commit to the same branch. Run `/code-review` before each commit. You open the PR and merge. Run `/cleanup` after the merge. If you do not remember which skill you want, `/ask` routes you.
 
 ## Installation
 
-Skills install into either `~/.claude/skills/` (global, every project) or `.claude/skills/` (current project only), symlinked, so edits in this repo are live with no re-install.
+`install.sh` symlinks a skill into `~/.claude/skills/` for every project, or into `.claude/skills/` for the current project only. Because they are symlinks, an edit in this repo is live at once. No re-install.
 
 ```bash
 ./install.sh skills/main-flow/cleanup      # one skill, current project
@@ -25,8 +25,9 @@ Fresh machine restore:
 git clone <this-repo> && cd claude-skills && ./install.sh --all --global
 ```
 
-> Skills install by their leaf name (e.g. `tdd`, not `skills/reference/tdd`). Folders above it are organizational only.
+> A skill installs by its leaf name, so `tdd` and not `skills/reference/tdd`. The folders above it only group skills.
 
 ## Conventions
 
-- `install.sh` discovers any `SKILL.md` at any depth (excluding `Progress/`, the drafting area), so nesting is free; two skills must never share a leaf name.
+- `install.sh` finds every `SKILL.md` at any depth, so you can nest folders as you like. It skips `Progress/`, the drafting area.
+- Two skills must never share a leaf name.
