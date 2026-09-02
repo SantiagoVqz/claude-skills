@@ -1,43 +1,65 @@
-# My skill harness
+# Skills
 
-My own skill set, highly inspired by [mattpocock/skills](https://github.com/mattpocock/skills) (reference copies in [`../Progress/reference/`](../Progress/reference/)) but authored for my workflow: trunk-based, per-ticket worktrees, parallel agents, TDD by default, minimal instructions.
+The upstream [`mattpocock/skills`](https://github.com/mattpocock/skills) set, kept verbatim and installed under my own names, plus my `cleanup` skill. Sections follow the [aihero.dev skills page](https://www.aihero.dev/skills).
 
-## Structure
+The only edited skill is `implement`: on the first ticket of a spec it creates the spec's worktree and runs `scripts/provision.sh`, so separate specs run in parallel, one worktree each.
 
-- **Top level** — the pipeline skills (plan → build → land), plus the two structural ones: `ask` (the router — "what skill do I run here?") and `setup-skills` (per-repo config: tracker, labels, domain docs, worktree/Docker provisioning).
-- [`support/`](./support) — modular skills the pipeline composes but you rarely invoke by name: `domain-modeling` (paired with `/grilling` by grill/triage/wayfinder), `research` and `prototype` (wayfinder ticket types). Keeping them separate is what lets wayfinder call exactly the piece it needs.
+## 01 Getting started
 
-## The set
+Set up once, then find your way around.
 
-| Skill | Invocation | What it's for |
-|-------|------------|---------------|
-| `ask` | `/ask` | The router: flows, on-ramps, and which skill fits the situation. |
-| `setup-skills` | `/setup-skills` | Once per repo: issue tracker (GitHub/GitLab/Linear/local), triage labels, domain docs, `provision.sh` worktree provisioning with Docker awareness. |
-| `grill` | `/grill` | Entry point: runs `/grilling` together with `/domain-modeling` — the interview that leaves a paper trail. |
-| `grilling` | model | The pure interview engine: frontier-of-questions rounds, facts are the agent's job, decisions are yours. Composed by `grill`, `triage`, and `wayfinder`. |
-| `spec` | `/spec` | Synthesize the grilled conversation into a spec on the tracker. No interview. |
-| `tickets` | `/tickets` | Cut a spec into strictly vertical tracer-bullet slices with blocking edges (logical **and** same-code-area), sized for parallel worktree agents. Backend + frontend bundled per slice. |
-| `triage` | `/triage` | Classify captured tickets later: category + state roles, claim verification, `/grilling` + `/domain-modeling` when thin, agent briefs. |
-| `implement` | `/implement` | One ticket, ready → committed: worktree + provision, ground in rules/glossary/ADRs, TDD at agreed seams, full suite + lint, 3-attempt self-correction, commit. Loopable. |
-| `tdd` | model | The red → green reference: seams, anti-patterns, rules of the loop. |
-| `wayfinder` | `/wayfinder` | Fog-of-war planning, upstream-faithful: shared map of decision tickets (grilling/research/prototype/task types), resolved one at a time. |
-| `ship` | `/ship` | Rebase onto trunk, full suite, push, PR with `Closes #<ticket>`. Never merges. |
-| `reconcile-branch` | model | Integrate a moved base and audit that the surviving diff is exactly the intended change; also resolves an already-in-progress merge/rebase conflict, hunk by hunk, never `--abort`. |
-| `cleanup` | `/cleanup` | Post-merge teardown: worktree, branches, scratch DB, Docker leftovers ([docker.md](./cleanup/docker.md)), trunk refresh. |
-| `diagnosing-bugs` | model | Diagnosis loop for hard bugs and perf regressions, in a provisioned bug worktree: build a tight feedback loop first, then reproduce, hypothesise, instrument, fix with regression test; exits via `/ship`. |
-| `handoff` | `/handoff` | Compact the current conversation into a handoff document (in OS temp dir) for a fresh agent to pick up. |
-| `wait-what` | `/wait-what` | Stop — that last message didn't land. Re-pitch it in Simplified Technical English using the `CONTEXT.md` ubiquitous language. |
-| `support/domain-modeling` | model | The active glossary/ADR discipline: sharpen terms, update `CONTEXT.md` inline, offer ADRs behind the three gates ([formats](./support/domain-modeling)). |
-| `support/research` | model | Background agent investigating against primary sources, leaving a cited markdown file. |
-| `support/prototype` | model | Throwaway code answering one design question — logic demo or UI variations. |
-| `support/wizard` | model | Interactive bash wizard for steps only a human can take — credentials, CI secrets, third-party dashboards, one-off cutovers. Kept upstream-verbatim. |
+- [`setup-skills`](./getting-started/setup-skills) — configure one repo: issue tracker, triage labels, domain doc layout. Run once per repo.
+- [`ask`](./getting-started/ask) — which skill or flow fits the situation you are in.
 
-## Deliberately dropped from the upstream set
+## 02 The main flow
 
-- **improve-codebase-architecture / simplify** — not needed.
-- **triage's PR-as-issue surface and `.out-of-scope/` knowledge base** — lean first; add back if rejected requests start recurring.
-- **teach / to-questionnaire / grill-me / two-axis-review / codebase-design** — not part of my flow (all recoverable from git history or upstream).
+The idea → ship spine, in order.
 
-## Status
+- [`grill-with-docs`](./main-flow/grill-with-docs) — get interviewed about a plan and record the decisions.
+- [`to-spec`](./main-flow/to-spec) — turn an agreed conversation into a written spec.
+- [`to-tickets`](./main-flow/to-tickets) — split a spec into small tickets an agent can build.
+- [`implement`](./main-flow/implement) — build a ticket into code, test-first. First ticket of a spec creates and provisions the spec worktree.
+- [`code-review`](./main-flow/code-review) — review a diff against your standards and against the spec.
+- [`cleanup`](./main-flow/cleanup) — after the merge of a spec: tear down its worktree, branches, scratch DB, Docker leftovers, and refresh the trunk.
 
-Live since 2026-08-12; the upstream engineering/productivity copies were deleted the same day (recoverable from git history). Installed globally via `./install.sh --all --global`.
+## 03 Shaping
+
+Explore an open question and produce a decision that feeds the flow.
+
+- [`wayfinder`](./shaping/wayfinder) — plan a huge chunk of work as a shared map of decision tickets.
+- [`prototype`](./shaping/prototype) — throwaway code that answers one design question.
+- [`research`](./shaping/research) — investigate against primary sources, as a background agent.
+
+## 04 Upkeep
+
+Keep the codebase and issue list healthy; generates work for the flow.
+
+- [`improve-codebase-architecture`](./upkeep/improve-codebase-architecture) — scan for deepening opportunities and grill through one.
+- [`diagnosing-bugs`](./upkeep/diagnosing-bugs) — diagnosis loop for hard bugs and performance regressions.
+- [`resolving-merge-conflicts`](./upkeep/resolving-merge-conflicts) — work an in-progress merge or rebase conflict by intent.
+- [`triage`](./upkeep/triage) — move issues through the triage state machine.
+- [`wizard`](./upkeep/wizard) — an interactive bash wizard for steps only a human can do.
+
+## 05 Productivity
+
+Human-facing workflows you run, not about code.
+
+- [`grill-me`](./productivity/grill-me) — relentless interview, no repo needed.
+- [`handoff`](./productivity/handoff) — compact the conversation for another agent.
+- [`to-questionnaire`](./productivity/to-questionnaire) — turn a decision into a questionnaire for the one person who can answer it.
+- [`teach`](./productivity/teach) — learn a skill or concept over multiple sessions.
+- [`wait-what`](./productivity/wait-what) — the last message did not land; re-pitch it in plain English.
+- [`writing-for-agents`](./productivity/writing-for-agents) — writing skills, AGENTS.md, CLAUDE.md.
+
+## 06 Reference
+
+Vocabulary layers the flow skills run underneath.
+
+- [`codebase-design`](./reference/codebase-design) — deep modules, small interfaces, clean seams.
+- [`domain-modeling`](./reference/domain-modeling) — sharpen terms, update `CONTEXT.md` and ADRs inline.
+- [`grilling`](./reference/grilling) — the interview engine.
+- [`tdd`](./reference/tdd) — red → green → refactor.
+
+## Resync
+
+Clone upstream, re-copy each section's folders, then re-apply the two local deltas: the renames (`setup-matt-pocock-skills` → `setup-skills`, `ask-matt` → `ask`, and every `/setup-matt-pocock-skills` and `/ask-matt` reference) and the worktree step plus `provision.sh` in `implement`.
