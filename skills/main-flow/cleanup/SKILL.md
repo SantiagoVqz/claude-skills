@@ -38,7 +38,7 @@ git -C <primary> log <trunk> --oneline --grep '<spec-number>' | head        # co
 
 ## Verify the spec issue and its tickets closed
 
-`/dispatch` closes each ticket as it commits, and the spec issue when the last one lands, so this is normally a verification pass. A spec driven by hand instead relies on `Closes #<spec>` plus one `Closes #<ticket>` per ticket in the PR body, and that keyword fires only when the PR merges into the repository's **default branch**:
+`/dispatch` closes each ticket as it commits, and `/ship` closes the spec issue when it opens the PR, so this is normally a verification pass. A spec driven by hand instead relies on `Closes #<spec>` plus one `Closes #<ticket>` per ticket in the PR body, and that keyword fires only when the PR merges into the repository's **default branch**:
 
 ```bash
 gh pr view <n> --json body --jq '.body | scan("[Cc]loses #[0-9]+")'
@@ -47,7 +47,7 @@ gh issue view <n> --json number,state          # for the spec and each ticket
 
 List the spec's tickets from the tracker (sub-issues of the spec, or its "Blocked by" graph) so a ticket missing from the PR body is not missed.
 
-- Driven by `/dispatch`, or trunk **is** the default branch → the issues should already be closed. Verify rather than assume — a ticket dispatch parked, or a PR body that lost a keyword, leaves that issue open silently.
+- Driven by `/dispatch` and `/ship`, or trunk **is** the default branch → the issues should already be closed. Verify rather than assume — a ticket dispatch parked, or a PR body that lost a keyword, leaves that issue open silently.
 - Trunk is `develop` but the default branch is `main` → the keywords never fired; closing by hand here is the normal path, not an exception.
 
 Close anything still open — `gh issue close <n> --reason completed` — tickets first, then the spec, and **name each one in the report**. On a **local markdown** tracker: set every ticket file's Status to `done`, then mark the spec file `done`.

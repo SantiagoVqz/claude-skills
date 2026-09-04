@@ -1,0 +1,5 @@
+interface:
+  display_name: "Ship"
+  short_description: "Rebase, test, push, and open the spec PR with the spec record"
+policy:
+  allow_implicit_invocation: true

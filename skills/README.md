@@ -20,7 +20,8 @@ The idea → ship spine, in order.
 - [`to-tickets`](./main-flow/to-tickets) — split a spec into small tickets an agent can build.
 - [`implement`](./main-flow/implement) — build a ticket into code, test-first. First ticket of a spec creates and provisions the spec worktree.
 - [`code-review`](./main-flow/code-review) — review a diff against your standards and against the spec.
-- [`dispatch`](./main-flow/dispatch) — drive one spec ticket by ticket in its worktree, closing each ticket as it commits, and hand back a green branch.
+- [`dispatch`](./main-flow/dispatch) — drive one spec ticket by ticket in its worktree, closing each ticket against its acceptance criteria as it commits, then ship it.
+- [`ship`](./main-flow/ship) — rebase, test, push, and open the spec PR with the spec record as its body; close the spec issue. Own skill, not from upstream.
 - [`cleanup`](./main-flow/cleanup) — after the merge of a spec: tear down its worktree, branches, scratch DB, Docker leftovers, and refresh the trunk.
 
 ## 03 Shaping
@@ -61,6 +62,7 @@ Vocabulary layers the flow skills run underneath.
 - [`domain-modeling`](./reference/domain-modeling) — sharpen terms, update `CONTEXT.md` and ADRs inline.
 - [`grilling`](./reference/grilling) — the interview engine.
 - [`tdd`](./reference/tdd) — red → green → refactor.
+- [`close-ticket`](./reference/close-ticket) — tick the acceptance criteria a commit meets and close the ticket, or report what is unmet. Own skill, not from upstream.
 
 ## Resync
 
