@@ -21,7 +21,7 @@ The idea → ship spine, in order.
 - [`implement`](./main-flow/implement) — build a ticket into code, test-first. First ticket of a spec creates and provisions the spec worktree.
 - [`code-review`](./main-flow/code-review) — review a diff against your standards and against the spec.
 - [`dispatch`](./main-flow/dispatch) — drive one spec ticket by ticket in its worktree, closing each ticket against its acceptance criteria as it commits, then ship it.
-- [`ship`](./main-flow/ship) — rebase, test, push, and open the spec PR with the spec record as its body; close the spec issue. Own skill, not from upstream.
+- [`ship`](./main-flow/ship) — rebase, test, push, and open a PR whose body is a record. Spec mode closes the spec issue; one-off mode commits the change first and replaces `/cpr`. Own skill, not from upstream.
 - [`cleanup`](./main-flow/cleanup) — after the merge of a spec: tear down its worktree, branches, scratch DB, Docker leftovers, and refresh the trunk.
 
 ## 03 Shaping
