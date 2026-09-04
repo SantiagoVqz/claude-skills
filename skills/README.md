@@ -20,6 +20,7 @@ The idea → ship spine, in order.
 - [`to-tickets`](./main-flow/to-tickets) — split a spec into small tickets an agent can build.
 - [`implement`](./main-flow/implement) — build a ticket into code, test-first. First ticket of a spec creates and provisions the spec worktree.
 - [`code-review`](./main-flow/code-review) — review a diff against your standards and against the spec.
+- [`dispatch`](./main-flow/dispatch) — drive one spec ticket by ticket in its worktree, closing each ticket as it commits, and hand back a green branch.
 - [`cleanup`](./main-flow/cleanup) — after the merge of a spec: tear down its worktree, branches, scratch DB, Docker leftovers, and refresh the trunk.
 
 ## 03 Shaping
