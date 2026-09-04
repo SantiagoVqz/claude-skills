@@ -1,0 +1,5 @@
+interface:
+  display_name: "Close ticket"
+  short_description: "Tick the acceptance criteria a commit meets and close the ticket"
+policy:
+  allow_implicit_invocation: true
