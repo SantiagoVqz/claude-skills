@@ -1,13 +1,13 @@
 ---
 name: cleanup
-description: "Post-merge teardown for a landed spec — confirm its PR merged, verify the spec issue and its tickets closed, then reclaim what the work left on your machine: the worktree, the branches, the per-worktree scratch DB, Docker leftovers, stale metadata, and a refreshed trunk."
+description: "Post-merge teardown for a landed spec — confirm the spec branch landed, verify the spec issue and its tickets closed, then reclaim what the work left on your machine: the worktree, the branches, the per-worktree scratch DB, Docker leftovers, stale metadata, and a refreshed trunk."
 disable-model-invocation: true
 argument-hint: [worktree-path | spec-branch | spec]
 ---
 
 # cleanup — post-merge spec teardown
 
-One spec = one worktree, one branch off the trunk, one PR, merged by the human. Tickets are commits on that branch. Run this once per spec after the merge: verify the spec issue and its tickets closed, then reclaim everything provisioned for that worktree — worktree, branches, scratch DB, Docker leftovers — and leave the primary checkout on a fresh trunk.
+One spec = one worktree, one branch off the trunk, landed by the human. Tickets are commits on that branch, closed by `/dispatch` as they land. Run this once per spec after the branch lands: verify the spec issue and its tickets closed, then reclaim everything provisioned for that worktree — worktree, branches, scratch DB, Docker leftovers — and leave the primary checkout on a fresh trunk.
 
 **Trunk** = the branch this repo merges into (`develop` on a git-flow repo, `main` otherwise). Default to the default branch (`git symbolic-ref refs/remotes/origin/HEAD`); a repo carrying both `main` and `develop` is running git-flow, so the trunk is `develop`. Teardown that hardcodes `main` on a `develop` repo leaves the primary stale and the next worktree branched off the wrong base.
 
@@ -22,22 +22,23 @@ You cannot remove a worktree you are standing in, and you cannot delete a branch
 
 Completion: you can name the spec branch, the worktree holding it and its path, the primary checkout, and the trunk — before touching anything.
 
-## Gate: confirm the work is MERGED
+## Gate: confirm the work LANDED
 
-Nothing is destroyed until the spec branch has landed:
+Nothing is destroyed until the spec branch is on the trunk. A spec lands either through a PR or by a direct merge, so take whichever signal exists:
 
 ```bash
-gh pr list --head <spec-branch> --state merged --json number,url,mergedAt
+gh pr list --head <spec-branch> --state merged --json number,url,mergedAt   # if the spec went through a PR
+git -C <primary> log <trunk> --oneline --grep '<spec-number>' | head        # commits from the branch, on the trunk
 ```
 
-(GitLab: `glab mr list` equivalents per the tracker doc, here and throughout. No remote → squash-merges defeat `git branch --merged`, so ask the user to confirm the branch landed on the trunk; their confirmation is the gate.)
+(GitLab: `glab mr list` equivalents per the tracker doc, here and throughout.)
 
-- Merged → proceed.
-- Still **open** (or no merged PR exists) → stop and say so. Only override on explicit user instruction (e.g. branch abandoned, intentionally never merged) — and say so in the report.
+- A merged PR, or the branch's commits present on the trunk → proceed.
+- Neither, or a PR still **open** → stop and say so. Squash-merges rewrite hashes and defeat both checks, so where the trunk was squashed, the user's confirmation that the branch landed is the gate. Only override on explicit user instruction (e.g. branch abandoned, intentionally never merged) — and say so in the report.
 
 ## Verify the spec issue and its tickets closed
 
-The PR body should carry `Closes #<spec>` plus one `Closes #<ticket>` per ticket, and the keyword fires when the PR merges into the repository's **default branch**:
+`/dispatch` closes each ticket as it commits, and the spec issue when the last one lands, so this is normally a verification pass. A spec driven by hand instead relies on `Closes #<spec>` plus one `Closes #<ticket>` per ticket in the PR body, and that keyword fires only when the PR merges into the repository's **default branch**:
 
 ```bash
 gh pr view <n> --json body --jq '.body | scan("[Cc]loses #[0-9]+")'
@@ -46,7 +47,7 @@ gh issue view <n> --json number,state          # for the spec and each ticket
 
 List the spec's tickets from the tracker (sub-issues of the spec, or its "Blocked by" graph) so a ticket missing from the PR body is not missed.
 
-- Trunk **is** the default branch (the normal case) → the issues should already be closed. Verify rather than assume — a body that lost a keyword leaves that issue open silently.
+- Driven by `/dispatch`, or trunk **is** the default branch → the issues should already be closed. Verify rather than assume — a ticket dispatch parked, or a PR body that lost a keyword, leaves that issue open silently.
 - Trunk is `develop` but the default branch is `main` → the keywords never fired; closing by hand here is the normal path, not an exception.
 
 Close anything still open — `gh issue close <n> --reason completed` — tickets first, then the spec, and **name each one in the report**. On a **local markdown** tracker: set every ticket file's Status to `done`, then mark the spec file `done`.
@@ -98,4 +99,4 @@ If you find no such setup, say so — skipping a hook the repo doesn't use is th
 
 ## Report
 
-Trunk · PR merged-state · tickets closed (N by keyword, M by hand, listed) · spec issue closed (by keyword or by hand) · worktree removed (path) · branches deleted (local / remote, or "remote already gone") · DB / hooks dropped or skipped-why · Docker: keyed stack torn down or n/a, dangling reclaimed (size) or awaiting go-ahead · primary refreshed to `<trunk>` (new HEAD). Call out anything skipped — PR still open, dirty worktree, open tickets, non-ff trunk — so nothing is silently left behind.
+Trunk · how the branch landed (merged PR, or commits on trunk) · tickets closed (N by keyword, M by hand, listed) · spec issue closed (by keyword or by hand) · worktree removed (path) · branches deleted (local / remote, or "remote already gone") · DB / hooks dropped or skipped-why · Docker: keyed stack torn down or n/a, dangling reclaimed (size) or awaiting go-ahead · primary refreshed to `<trunk>` (new HEAD). Call out anything skipped — PR still open, dirty worktree, open tickets, non-ff trunk — so nothing is silently left behind.
