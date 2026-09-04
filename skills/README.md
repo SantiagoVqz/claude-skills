@@ -51,6 +51,7 @@ Human-facing workflows you run, not about code.
 - [`teach`](./productivity/teach) — learn a skill or concept over multiple sessions.
 - [`wait-what`](./productivity/wait-what) — the last message did not land; re-pitch it in plain English.
 - [`writing-for-agents`](./productivity/writing-for-agents) — writing skills, AGENTS.md, CLAUDE.md.
+- [`unslop`](./productivity/unslop) — cut AI tells from existing text and add human voice. Own skill, not from upstream.
 
 ## 06 Reference
 
