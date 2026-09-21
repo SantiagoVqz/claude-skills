@@ -1,5 +1,5 @@
 interface:
   display_name: "Dispatch"
-  short_description: "Drive one spec ticket by ticket under /loop"
+  short_description: "Drive one spec ticket by ticket, then ship it"
 policy:
   allow_implicit_invocation: false

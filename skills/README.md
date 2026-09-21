@@ -1,8 +1,8 @@
 # Skills
 
-The upstream [`mattpocock/skills`](https://github.com/mattpocock/skills) set, kept verbatim and installed under my own names, plus my `cleanup` skill. Sections follow the [aihero.dev skills page](https://www.aihero.dev/skills).
+The upstream [`mattpocock/skills`](https://github.com/mattpocock/skills) set, kept verbatim and installed under my own names, plus my own skills, each marked below. Sections follow the [aihero.dev skills page](https://www.aihero.dev/skills).
 
-The upstream set was imported verbatim on 2026-09-02, then edited where it earns it. `implement` creates the spec's worktree on the first ticket and runs `scripts/provision.sh`, so separate specs run in parallel, one worktree each. A prompt audit the same day removed dated patterns (word caps, capitalized prohibitions, pinned token counts) from eight skills.
+Upstream was last synced on 2026-09-20 from commit `c55ee46` (v1.2.3). Every upstream skill is byte-for-byte upstream, apart from two renames applied to file contents: `setup-matt-pocock-skills` → `setup-skills` and `ask-matt` → `ask`. `retro` and `pr` are copied from upstream's `in-progress` folder. My own skills are marked below. They read only what the upstream files define: the tracker doc, the five triage labels, and the ticket templates from `/to-tickets`.
 
 ## 01 Getting started
 
@@ -18,11 +18,12 @@ The idea → ship spine, in order.
 - [`grill-with-docs`](./main-flow/grill-with-docs) — get interviewed about a plan and record the decisions.
 - [`to-spec`](./main-flow/to-spec) — turn an agreed conversation into a written spec.
 - [`to-tickets`](./main-flow/to-tickets) — split a spec into small tickets an agent can build.
-- [`implement`](./main-flow/implement) — build a ticket into code, test-first. First ticket of a spec creates and provisions the spec worktree.
+- [`implement`](./main-flow/implement) — build a ticket into code, test-first.
 - [`code-review`](./main-flow/code-review) — review a diff against your standards and against the spec.
-- [`dispatch`](./main-flow/dispatch) — drive one spec ticket by ticket in its worktree, closing each ticket against its acceptance criteria as it commits, then ship it.
-- [`ship`](./main-flow/ship) — rebase, test, push, and open a PR whose body is a record. Spec mode closes the spec issue; one-off mode commits the change first and replaces `/cpr`. Own skill, not from upstream.
-- [`cleanup`](./main-flow/cleanup) — after the merge of a spec: tear down its worktree, branches, scratch DB, Docker leftovers, and refresh the trunk.
+- [`dispatch`](./main-flow/dispatch) — drive one spec ticket by ticket in its own worktree: `/implement` per ticket in a subagent, `close-ticket` after each commit, `/ship` at the end. State is the triage labels. Own skill, not from upstream.
+- [`pr`](./main-flow/pr) — write a PR body: summary, before and after evidence, merge danger. Promoted from upstream `in-progress`.
+- [`ship`](./main-flow/ship) — rebase, test, push, and open the PR with a `/pr` body plus the spec's ticket table. Own skill, not from upstream.
+- [`cleanup`](./main-flow/cleanup) — after the merge of a spec: confirm it landed, verify the tickets closed, delete the branches, refresh the trunk. Own skill, not from upstream.
 
 ## 03 Shaping
 
@@ -40,7 +41,10 @@ Keep the codebase and issue list healthy; generates work for the flow.
 - [`diagnosing-bugs`](./upkeep/diagnosing-bugs) — diagnosis loop for hard bugs and performance regressions.
 - [`resolving-merge-conflicts`](./upkeep/resolving-merge-conflicts) — work an in-progress merge or rebase conflict by intent.
 - [`triage`](./upkeep/triage) — move issues through the triage state machine.
+- [`ticket-clerk`](./upkeep/ticket-clerk) — file one thing you hit mid-task as a ticket, labelled for triage. Own skill, not from upstream.
 - [`wizard`](./upkeep/wizard) — an interactive bash wizard for steps only a human can do.
+- [`retro`](./upkeep/retro) — retrospective on a coding session: propose changes to the agent's environment, checks over prose. Promoted from upstream `in-progress`.
+- [`ui-review`](./upkeep/ui-review) — browser-driven review loop: start or reuse the dev servers, open Chrome, then inspect, diagnose, fix, and verify each piece of feedback. Own skill, not from upstream.
 
 ## 05 Productivity
 
@@ -62,8 +66,8 @@ Vocabulary layers the flow skills run underneath.
 - [`domain-modeling`](./reference/domain-modeling) — sharpen terms, update `CONTEXT.md` and ADRs inline.
 - [`grilling`](./reference/grilling) — the interview engine.
 - [`tdd`](./reference/tdd) — red → green → refactor.
-- [`close-ticket`](./reference/close-ticket) — tick the acceptance criteria a commit meets and close the ticket, or report what is unmet. Own skill, not from upstream.
+- [`close-ticket`](./reference/close-ticket) — tick the acceptance criteria a commit meets and close the ticket, or report what is unmet. Model-invoked so dispatch subagents can reach it. Own skill, not from upstream.
 
 ## Resync
 
-Clone upstream, re-copy each section's folders, then re-apply the local deltas by diffing this repo's previous commit against the fresh copy: the renames (`setup-matt-pocock-skills` → `setup-skills`, `ask-matt` → `ask`, and every `/setup-matt-pocock-skills` and `/ask-matt` reference), the worktree step plus `provision.sh` in `implement`, and the prompt-audit edits. Local edits are no longer limited to `implement` and `cleanup`.
+Clone upstream and re-copy each upstream skill's folder with the two renames applied to file contents. Nothing else to re-apply. Then reread `dispatch`, `ship`, `close-ticket` and `cleanup` against `implement`, `to-tickets`, the tracker docs and `triage-labels.md`: they depend on those and on nothing else.

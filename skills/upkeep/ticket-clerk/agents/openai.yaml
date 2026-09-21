@@ -1,0 +1,5 @@
+interface:
+  display_name: "Ticket Clerk"
+  short_description: "File one capture as a ticket for later"
+policy:
+  allow_implicit_invocation: false
