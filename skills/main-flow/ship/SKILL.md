@@ -1,7 +1,7 @@
 ---
 name: ship
 description: "Ship the current branch as a PR: rebase or merge the base, run the full suite, push, and open or update the PR with a body written by /pr. Use when every ticket of a spec is done (from /dispatch or by hand), or for any branch that is ready for review. Never merges."
-argument-hint: [spec]
+argument-hint: [spec] [checkout]
 ---
 
 # ship — one branch, one PR
@@ -12,7 +12,8 @@ argument-hint: [spec]
 
 - **Trunk**: the branch the repo merges into (`develop` on a git-flow repo, `main` otherwise); same rule as `/cleanup`.
 - **Base**: the branch the PR targets. The trunk for a new PR, the PR's own `baseRefName` for one that exists.
-- **Spec**: `$ARGUMENTS`, or the `<spec-number>` in a `<type>/<spec-number>-<slug>` branch name, resolved on the tracker (`docs/agents/issue-tracker.md`). A branch with no spec ships as a plain change.
+- **Checkout**: the working tree ship runs in. The cwd by default; `/dispatch` passes the spec worktree. Every git and gh command runs there, `git -C <checkout>` and `gh` from inside it.
+- **Spec**: the first of `$ARGUMENTS`, or the `<spec-number>` in a `<type>/<spec-number>-<slug>` branch name, resolved on the tracker (`docs/agents/issue-tracker.md`). A branch with no spec ships as a plain change.
 
 ## 1. Preflight
 

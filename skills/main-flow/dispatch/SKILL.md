@@ -21,7 +21,7 @@ Each ticket runs in its own subagent, so implementation context never enters thi
 
 - **Trunk**: the branch the repo merges into (`develop` on a git-flow repo, `main` otherwise); same rule as `/cleanup`.
 - **Spec branch**: `<type>/<spec-number>-<spec-slug>` off the trunk.
-- **Dispatch worktree**: `.claude/worktrees/dispatch`, one persistent worktree that dispatch owns. Subagents work there, so the primary checkout stays the human's.
+- **Spec worktree**: the linked worktree that holds the spec branch, found or created by `/worktree`, wherever it lives. Subagents work there, so the primary checkout stays the human's.
 - **Ticket ref**: `#<n>` on a real tracker, `NN-<slug>` on a local one. Every ticket commit carries it in the message; it is how git and the tracker are joined.
 - **Done**: closed on the tracker (`Status: done` locally), by `close-ticket` after its commit. Only a done ticket unblocks its dependents.
 - **Committed, open**: a commit on the spec branch carries the ticket ref but the ticket is still open. A crash between commit and close, or an unmet criterion, leaves a ticket here. It is reconciled before any new work starts.
@@ -35,9 +35,9 @@ Dispatch speaks only the five triage roles from `triage-labels.md`, so a ticket'
 
 ## 1. Read the state
 
-1. **Worktree.** `git worktree list`. If `.claude/worktrees/dispatch` is missing, `git worktree add .claude/worktrees/dispatch <trunk>` and install dependencies the way the repo's README says. Every git command below runs with `-C .claude/worktrees/dispatch`.
-2. **Clean tree.** `git status --porcelain` must be empty. A dirty dispatch worktree means a subagent died mid-ticket: stop, show the diff, and ask the human whether to keep it (commit it with the ticket ref) or drop it (`git checkout -- . && git clean -fd`).
-3. **Branch.** `git fetch --all --prune`. Check out the spec branch; create it off `origin/<trunk>` if it does not exist. Then `git rebase origin/<trunk>`. The branch is unpushed until `/ship`, so the rebase is free. On conflict run `/resolving-merge-conflicts`.
+1. **Worktree.** Invoke the `worktree` skill on `<spec-branch>`. It finds the worktree that holds the branch or creates one off the trunk, then provisions it. Every git command below runs with `-C <worktree>`.
+2. **Clean tree.** `git status --porcelain` must be empty. A dirty spec worktree means a subagent died mid-ticket: stop, show the diff, and ask the human whether to keep it (commit it with the ticket ref) or drop it (`git checkout -- . && git clean -fd`).
+3. **Branch.** `git fetch --all --prune`, then `git rebase origin/<trunk>`. The branch is unpushed until `/ship`, so the rebase is free. On conflict run `/resolving-merge-conflicts`. When the rebase moved HEAD, rerun `scripts/provision.sh` where it exists: a lockfile that moved on the trunk needs its install.
 4. **Tickets.** From the tracker, list the spec's tickets with state, labels, and Blocked by. From `git log <trunk>..<spec-branch>`, mark which tickets have a commit.
 5. **Implement.** Locate the `implement` skill file: `.claude/skills/implement/SKILL.md`, else `~/.claude/skills/implement/SKILL.md`. Subagents read it by path, because a user-invoked skill cannot be reached through the Skill tool.
 
@@ -59,7 +59,7 @@ Completion: no ticket is committed-open.
 
 Take frontier tickets one at a time, in dependency order. Record `git rev-parse HEAD` as the ticket's fixed point. Dispatch one subagent per ticket and **wait for its report before starting the next**; two agents on one branch collide.
 
-> Work in the worktree `.claude/worktrees/dispatch` on branch `<spec-branch>`. Read `<implement path>` and follow it for ticket `<ticket ref>`, whose body follows. The tracker is described in `docs/agents/issue-tracker.md`. When it says to use `/code-review`, the fixed point is `<hash>`. Commit with `<ticket ref>` in the message. Then invoke the `close-ticket` skill on `<ticket ref>` with that commit hash. Report back the commit hash and the close result (done, or the unmet criteria verbatim, or that a criterion needs a human), or the exact failure: a red suite after your remediation attempts, a conflict, a step you could not take.
+> Work in the worktree `<worktree>` on branch `<spec-branch>`. Read `<implement path>` and follow it for ticket `<ticket ref>`, whose body follows. The tracker is described in `docs/agents/issue-tracker.md`. When it says to use `/code-review`, the fixed point is `<hash>`. Commit with `<ticket ref>` in the message. Then invoke the `close-ticket` skill on `<ticket ref>` with that commit hash. Report back the commit hash and the close result (done, or the unmet criteria verbatim, or that a criterion needs a human), or the exact failure: a red suite after your remediation attempts, a conflict, a step you could not take.
 >
 > <ticket body>
 
@@ -73,10 +73,10 @@ Completion: every ticket is done, or the only open tickets are `ready-for-human`
 
 ## 4. Ship the branch
 
-Every ticket is done. Invoke the `ship` skill on the spec. Ship rebases onto the trunk, runs the full suite, pushes, and opens the PR. Relay ship's report.
+Every ticket is done. Invoke the `ship` skill on the spec with `<worktree>` as its checkout. Ship rebases onto the trunk, runs the full suite, pushes, and opens the PR. Relay ship's report.
 
 - **Shipped**: notify `Spec <spec> shipped: <PR url>`.
-- **Red**: ship stopped before the push. Report the failing test. Notify `Spec <spec> red: <test>`. The branch stays as it is; the human fixes it in the dispatch worktree and reruns `/ship`.
+- **Red**: ship stopped before the push. Report the failing test. Notify `Spec <spec> red: <test>`. The branch stays as it is; the human fixes it in the spec worktree and reruns `/ship`.
 
 The human merges the PR and runs `/cleanup` afterwards.
 
