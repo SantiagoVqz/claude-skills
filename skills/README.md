@@ -9,6 +9,8 @@ Upstream was last synced on 2026-09-20 from commit `c55ee46` (v1.2.3). Every ups
 Set up once, then find your way around.
 
 - [`setup-skills`](./getting-started/setup-skills) — configure one repo: issue tracker, triage labels, domain doc layout. Run once per repo.
+- [`setup-worktrees`](./getting-started/setup-worktrees) — install `scripts/provision.sh` and the session hook, so every linked worktree gets env files, dependencies, ports and its own database. Run once per repo. Own skill, not from upstream.
+- [`upgrade-skills`](./getting-started/upgrade-skills) — bring a repo set up under an earlier version of this set to the current one: Agent skills block, linked skills, worktree harness. Own skill, not from upstream.
 - [`ask`](./getting-started/ask) — which skill or flow fits the situation you are in.
 
 ## 02 The main flow
@@ -20,10 +22,10 @@ The idea → ship spine, in order.
 - [`to-tickets`](./main-flow/to-tickets) — split a spec into small tickets an agent can build.
 - [`implement`](./main-flow/implement) — build a ticket into code, test-first.
 - [`code-review`](./main-flow/code-review) — review a diff against your standards and against the spec.
-- [`dispatch`](./main-flow/dispatch) — drive one spec ticket by ticket on its branch: `/implement` per ticket in a subagent, `close-ticket` after each commit, `/ship` at the end. State is the triage labels. Own skill, not from upstream.
+- [`dispatch`](./main-flow/dispatch) — drive one spec ticket by ticket on its branch, in its own worktree: `/implement` per ticket in a subagent, `close-ticket` after each commit, `/ship` at the end. State is the triage labels. Own skill, not from upstream.
 - [`pr`](./main-flow/pr) — write a PR body: summary, before and after evidence, merge danger. Promoted from upstream `in-progress`.
 - [`ship`](./main-flow/ship) — rebase, test, push, and open the PR with a `/pr` body plus the spec's ticket table. Own skill, not from upstream.
-- [`cleanup`](./main-flow/cleanup) — after the merge of a spec: confirm it landed, verify the tickets closed, delete the branches, refresh the trunk. Own skill, not from upstream.
+- [`cleanup`](./main-flow/cleanup) — after the merge of a spec: confirm it landed, verify the tickets closed, remove the worktree and its database, delete the branches, refresh the trunk. Own skill, not from upstream.
 
 ## 03 Shaping
 
@@ -70,4 +72,4 @@ Vocabulary layers the flow skills run underneath.
 
 ## Resync
 
-Clone upstream and re-copy each upstream skill's folder with the two renames applied to file contents. Then reread `dispatch`, `ship`, `close-ticket` and `cleanup` against `implement`, `to-tickets`, the tracker docs and `triage-labels.md`: they depend on those and on nothing else.
+Clone upstream and re-copy each upstream skill's folder with the two renames applied to file contents. Then reread `dispatch`, `ship`, `close-ticket`, `cleanup`, `setup-worktrees` and `upgrade-skills` against `implement`, `to-tickets`, the tracker docs and `triage-labels.md`: they depend on those and on nothing else.
