@@ -2,13 +2,13 @@
 
 The upstream [`mattpocock/skills`](https://github.com/mattpocock/skills) set, kept verbatim and installed under my own names, plus my own skills, each marked below. Sections follow the [aihero.dev skills page](https://www.aihero.dev/skills).
 
-Upstream was last synced on 2026-09-20 from commit `c55ee46` (v1.2.3). Every upstream skill is byte-for-byte upstream, apart from two renames applied to file contents, `setup-matt-pocock-skills` → `setup-skills` and `ask-matt` → `ask`, and one addition: `setup-skills` carries a Section D that installs the worktree harness from the `worktree` skill folder. `retro` and `pr` are copied from upstream's `in-progress` folder. My own skills are marked below. They read only what the upstream files define: the tracker doc, the five triage labels, and the ticket templates from `/to-tickets`.
+Upstream was last synced on 2026-09-20 from commit `c55ee46` (v1.2.3). Every upstream skill is byte-for-byte upstream, apart from two renames applied to file contents, `setup-matt-pocock-skills` → `setup-skills` and `ask-matt` → `ask`,. `retro` and `pr` are copied from upstream's `in-progress` folder. My own skills are marked below. They read only what the upstream files define: the tracker doc, the five triage labels, and the ticket templates from `/to-tickets`.
 
 ## 01 Getting started
 
 Set up once, then find your way around.
 
-- [`setup-skills`](./getting-started/setup-skills) — configure one repo: issue tracker, triage labels, domain doc layout, worktree provisioning. Run once per repo. Section D is my addition.
+- [`setup-skills`](./getting-started/setup-skills) — configure one repo: issue tracker, triage labels, domain doc layout. Run once per repo.
 - [`ask`](./getting-started/ask) — which skill or flow fits the situation you are in.
 
 ## 02 The main flow
@@ -20,11 +20,10 @@ The idea → ship spine, in order.
 - [`to-tickets`](./main-flow/to-tickets) — split a spec into small tickets an agent can build.
 - [`implement`](./main-flow/implement) — build a ticket into code, test-first.
 - [`code-review`](./main-flow/code-review) — review a diff against your standards and against the spec.
-- [`worktree`](./main-flow/worktree) — find or create the linked worktree for a branch and provision it with the repo's `scripts/provision.sh`. Holds the template script and the session hook that `/setup-skills` installs. Model-invoked so dispatch can reach it. Own skill, not from upstream.
-- [`dispatch`](./main-flow/dispatch) — drive one spec ticket by ticket in its worktree: `/implement` per ticket in a subagent, `close-ticket` after each commit, `/ship` at the end. State is the triage labels. Own skill, not from upstream.
+- [`dispatch`](./main-flow/dispatch) — drive one spec ticket by ticket on its branch: `/implement` per ticket in a subagent, `close-ticket` after each commit, `/ship` at the end. State is the triage labels. Own skill, not from upstream.
 - [`pr`](./main-flow/pr) — write a PR body: summary, before and after evidence, merge danger. Promoted from upstream `in-progress`.
 - [`ship`](./main-flow/ship) — rebase, test, push, and open the PR with a `/pr` body plus the spec's ticket table. Own skill, not from upstream.
-- [`cleanup`](./main-flow/cleanup) — after the merge of a spec: confirm it landed, verify the tickets closed, drop the forked database, remove the worktree, delete the branches, refresh the trunk. Own skill, not from upstream.
+- [`cleanup`](./main-flow/cleanup) — after the merge of a spec: confirm it landed, verify the tickets closed, delete the branches, refresh the trunk. Own skill, not from upstream.
 
 ## 03 Shaping
 
@@ -71,4 +70,4 @@ Vocabulary layers the flow skills run underneath.
 
 ## Resync
 
-Clone upstream and re-copy each upstream skill's folder with the two renames applied to file contents. Re-apply Section D to `setup-skills` (`git log -p -- skills/getting-started/setup-skills/SKILL.md` shows it). Then reread `worktree`, `dispatch`, `ship`, `close-ticket` and `cleanup` against `implement`, `to-tickets`, the tracker docs and `triage-labels.md`: they depend on those and on nothing else.
+Clone upstream and re-copy each upstream skill's folder with the two renames applied to file contents. Then reread `dispatch`, `ship`, `close-ticket` and `cleanup` against `implement`, `to-tickets`, the tracker docs and `triage-labels.md`: they depend on those and on nothing else.
