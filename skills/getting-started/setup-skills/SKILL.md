@@ -11,6 +11,7 @@ Scaffold the per-repo configuration that the engineering skills assume:
 - **Issue tracker**: where issues live (GitHub by default; local markdown is also supported out of the box)
 - **Triage labels**: the strings used for the five canonical triage roles
 - **Domain docs**: where `CONTEXT.md` and ADRs live, and the consumer rules for reading them
+- **Worktree provisioning**: `scripts/provision.sh` and the hook that runs it in every linked worktree, so a fresh worktree has env files, dependencies, and its own database before any work. Skipped for a repo with nothing to provision.
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm with the user, then write.
 
@@ -27,6 +28,7 @@ Look at the current repo to understand its starting state. Read whatever exists;
 - `docs/agents/`: does this skill's prior output already exist?
 - `.scratch/`: a sign that a local-markdown issue tracker convention is already in use
 - Is the `triage` skill installed? (a `triage` skill folder alongside this one, or `triage` in your available skills.) This decides whether Section B runs at all.
+- `scripts/provision.sh` and `.claude/hooks/provision-worktree.sh`: does the worktree provisioner already exist? Note what a fresh worktree would lack: gitignored `.env*` files (`git ls-files --others --ignored --exclude-standard`), a dependency lockfile, a database URL in an env file, a migration tool.
 - Monorepo signals: a `pnpm-workspace.yaml`, a `workspaces` field in `package.json`, or a populated `packages/*` with its own `src/`. These are present only in a genuinely large multi-package repo; their absence means single-context, which is almost every repo.
 
 ### 2. Present findings and ask
@@ -60,12 +62,15 @@ The defaults are the five canonical roles, each label string equal to its name: 
 
 Offer **multi-context** (a root `CONTEXT-MAP.md` pointing to per-context `CONTEXT.md` files) only when exploration found monorepo signals. Then confirm which layout they want.
 
+**Section D: Worktree provisioning.** Skip it when exploration found no env files, no lockfile, and no database: there is nothing to provision. Skip it when both files already exist. Otherwise recommend **yes** and say what the harness does: `scripts/provision.sh` copies the primary's env files into a linked worktree, installs dependencies, stamps a free dev-server port pair, and forks the primary's database as `<db>_<branch>`, so a migration in one worktree never touches another. The hook runs the script on every session that opens in a linked worktree, whatever tool created it, so nobody calls it by hand. `/worktree` and `/dispatch` run it for the worktrees they create. Only the CONFIG block is per repo: the install commands, the port bases and the env vars that carry them, and the database block, deleted outright for a repo with no database.
+
 ### 3. Confirm and edit
 
 Show the user a draft of:
 
 - The `## Agent skills` block to add to whichever of `CLAUDE.md` / `AGENTS.md` is being edited (see step 4 for selection rules)
 - The contents of `docs/agents/issue-tracker.md`, `docs/agents/domain.md`, and `docs/agents/triage-labels.md` (the last only when `triage` is installed)
+- The CONFIG block of `scripts/provision.sh`, filled from exploration, when Section D ran
 
 Let them edit before writing.
 
@@ -97,9 +102,13 @@ The block:
 ### Domain docs
 
 [one-line summary of layout: "single-context" or "multi-context"]. See `docs/agents/domain.md`.
+
+### Worktrees
+
+A linked worktree is provisioned by `scripts/provision.sh`, run by the session hook. Work in a worktree, never in the primary checkout.
 ```
 
-Include the `### Triage labels` sub-block, and write `docs/agents/triage-labels.md`, only when `triage` is installed and Section B ran. When it isn't, both are omitted.
+Include the `### Triage labels` sub-block, and write `docs/agents/triage-labels.md`, only when `triage` is installed and Section B ran. When it isn't, both are omitted. Include `### Worktrees` only when Section D ran.
 
 Then write the docs files using the seed templates in this skill folder as a starting point:
 
@@ -108,6 +117,25 @@ Then write the docs files using the seed templates in this skill folder as a sta
 - [issue-tracker-local.md](./issue-tracker-local.md): local-markdown issue tracker
 - [triage-labels.md](./triage-labels.md): label mapping (only if `triage` is installed)
 - [domain.md](./domain.md): domain doc consumer rules + layout
+
+When Section D ran, install the worktree harness from the `worktree` skill folder (`.claude/skills/worktree/`, else `~/.claude/skills/worktree/`), the single copy of both files:
+
+- `provision.sh` to `scripts/provision.sh`, executable, with the CONFIG block filled as confirmed in step 3.
+- `hook.sh` to `.claude/hooks/provision-worktree.sh`, executable.
+- Merge into `.claude/settings.json`, keeping any hooks already there:
+
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [ { "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/provision-worktree.sh", "timeout": 600 } ] }
+    ],
+    "PostToolUse": [
+      { "matcher": "EnterWorktree", "hooks": [ { "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/provision-worktree.sh", "timeout": 600 } ] }
+    ]
+  }
+}
+```
 
 For "other" issue trackers, write `docs/agents/issue-tracker.md` from scratch using the user's description.
 
