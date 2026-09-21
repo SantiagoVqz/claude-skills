@@ -53,17 +53,21 @@ Completion: every ticket and the spec issue are closed, and the report says whic
 
 ## Teardown
 
-Leave the branch before deleting it:
+You cannot delete a branch that a worktree has checked out. A spec branch lives in its own linked worktree (`git worktree list`), provisioned by `scripts/provision.sh` where the repo has one. Run this from the primary checkout; standing in the spec worktree, `ExitWorktree` first.
 
 ```bash
+(cd <worktree> && scripts/provision.sh db drop)   # only if the script exists: the forked database goes with the worktree
+git worktree remove <worktree>                     # refuses on uncommitted or untracked files: stop and surface it, never --force
 git checkout <trunk> && git pull --ff-only
 git branch -D <spec-branch>                    # -D: a squash-merge makes -d refuse; the gate above already proved it landed
 git ls-remote --exit-code --heads origin <spec-branch> >/dev/null 2>&1 \
   && git push origin --delete <spec-branch> || echo "remote branch already gone"
 ```
 
+A spec branch with no worktree skips the first two lines.
+
 `--ff-only` errors on local divergence instead of forging a merge commit; surface that rather than papering over it. If the merged branch added a schema migration and the local dev DB never applied it, apply it now so the next session doesn't break on a missing column. Report failures, don't force-fix.
 
 ## Report
 
-Trunk · how the branch landed (merged PR, or commits on trunk) · tickets closed (N by keyword, M by hand, listed) · spec issue closed (by keyword or by hand) · branches deleted (local / remote, or "remote already gone") · trunk refreshed (new HEAD) · migration applied or n/a. Call out anything skipped, PR still open, open tickets, non-ff trunk, so nothing is silently left behind.
+Trunk · how the branch landed (merged PR, or commits on trunk) · tickets closed (N by keyword, M by hand, listed) · spec issue closed (by keyword or by hand) · worktree removed (path) or n/a · database dropped or n/a · branches deleted (local / remote, or "remote already gone") · trunk refreshed (new HEAD) · migration applied or n/a. Call out anything skipped, PR still open, open tickets, dirty worktree, non-ff trunk, so nothing is silently left behind.
