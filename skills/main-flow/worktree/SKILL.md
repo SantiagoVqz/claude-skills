@@ -24,7 +24,7 @@ Read `git worktree list --porcelain` and where you stand. Take the one matching 
 - In a linked worktree whose branch is the target, or carries the spec or ticket number: stay. A hand-made worktree keeps its branch name; that name is the branch from here on.
 - In a linked worktree on any other branch: stop and say so. That worktree belongs to other work.
 - In the primary, and a worktree holds the branch: `EnterWorktree` on its path.
-- In the primary, and nothing holds the branch: create the worktree, then `EnterWorktree` on it. With `herdr` on PATH, `herdr worktree create --branch <branch> --base <trunk>`, so it lands beside the hand-made ones. Otherwise `git worktree add -b <branch> .claude/worktrees/<slug> <trunk>`, without `-b` when the branch exists.
+- In the primary, and nothing holds the branch: `git worktree add -b <branch> .claude/worktrees/<slug> <trunk>`, without `-b` when the branch exists, then `EnterWorktree` on it. Always use plain git here, never a terminal tool such as Herdr: the tool opens the worktree in a new pane, and this conversation stays in the primary's pane.
 - In the primary, and the primary itself has the branch checked out: stop and say so. A branch is checked out in one place only.
 
 Completion: the session stands in a linked worktree that has the branch checked out.
