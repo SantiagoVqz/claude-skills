@@ -30,17 +30,17 @@ One line per change, grouped as below. The human strikes lines before anything i
 
 ## 3. Apply
 
-**Agent file.** Rewrite the `## Agent skills` block to the shape `/setup-skills` writes today: `### Issue tracker`, `### Triage labels` (only when `docs/agents/triage-labels.md` exists), `### Domain docs`, each a one-line summary plus its `See docs/agents/<file>.md` pointer. Keep the existing summaries; they are the repo's. Remove every old worktree rule and section. When the repo keeps a harness, add the `### Worktrees` sub-block exactly as step 3 of the `setup-worktrees` skill writes it (`../setup-worktrees/SKILL.md`), with the bracketed parts the CONFIG does not do dropped.
+**Agent file.** Rewrite the `## Agent skills` block to the shape `/setup-skills` writes today: `### Issue tracker`, `### Triage labels` (only when `docs/agents/triage-labels.md` exists), `### Domain docs`, each a one-line summary plus its `See docs/agents/<file>.md` pointer. Keep the existing summaries; they are the repo's. Add the docs-to-trunk sentence to `### Domain docs` exactly as `/setup-skills` writes it (`../setup-skills/SKILL.md`), when it is missing. Remove every old worktree rule and section. When the repo keeps a harness, write the `### Worktrees` sub-block exactly as step 3 of the `setup-worktrees` skill writes it (`../setup-worktrees/SKILL.md`), with the bracketed parts the CONFIG does not do dropped. An older Worktrees block is replaced: the current one sends `/implement` to the `worktree` skill.
 
 Text outside the block stays byte for byte.
 
-**In-repo skills.** For each stale copy: delete the folder, then `<set>/install.sh skills/<path-to-leaf> --prefix <prefix>` from the target repo root (`--no-prefix` when the copy had none). The link keeps the same name the repo already uses in prompts. Repo-own skills are listed in the report and left alone.
+**In-repo skills.** For each stale copy: delete the folder, then `<set>/install.sh skills/<path-to-leaf> --prefix <prefix>` from the target repo root (`--no-prefix` when the copy had none). The link keeps the same name the repo already uses in prompts. Repo-own skills are listed in the report and left alone. A repo that links the set into `.claude/skills/` and has a harness also gets `worktree` linked, with the same prefix.
 
 **Worktree harness.** When the repo needs provisioning:
 
-- `scripts/provision.sh`: take the CONFIG values from the old file (`install_deps`, port bases, `stamp_ports`, the DATABASE variables, `stamp_database`, `migrate`) and put them into the current template from the `setup-worktrees` skill folder. The ENGINE section is the template's. Removed modes (`db share`, `--no-db`) are gone; say so.
+- `scripts/provision.sh`: take the CONFIG values from the old file (`install_deps`, port bases, `stamp_ports`, the DATABASE variables, `stamp_database`, `migrate`) and put them into the current template from the `setup-worktrees` skill folder. The ENGINE section is the template's. `stamp_database` now takes the dev database and the test database as two arguments; adapt the old body to it. Say what changed: the default shares the primary's dev database, `db fork` is the explicit fork, and `db share` and `--no-db` are gone.
 - `.claude/hooks/provision-worktree.sh`: replace with the template's `hook.sh`.
-- A primary-checkout guard hook: delete the file and its entry in `.claude/settings.json`. One-off work happens in the primary now.
+- A primary-checkout guard hook: delete the file and its entry in `.claude/settings.json`. Planning and changes to docs only happen in the primary now.
 - `.claude/settings.json`: the SessionStart and PostToolUse(EnterWorktree) entries as `/setup-worktrees` writes them; other hooks stay.
 - `.claude/worktrees/` in `.git/info/exclude`.
 
@@ -49,7 +49,7 @@ Completion: every line of the confirmed plan applied, or named as skipped with t
 ## 4. Verify
 
 - `ls -la .claude/skills` shows a link for every skill of the set, a folder for every repo-own one.
-- With a harness: a throwaway worktree off the trunk in `.claude/worktrees/provision-check` runs `scripts/provision.sh` green, then `db drop` when there is a database, `git worktree remove`, and its branch deleted.
+- With a harness: a throwaway worktree off the trunk in `.claude/worktrees/provision-check` runs `scripts/provision.sh` green. When there is a database, the tail shows it shared, `db fork` runs green, and `db drop` removes the fork and the test database. Then `git worktree remove` it and delete its branch.
 
 ## Report
 

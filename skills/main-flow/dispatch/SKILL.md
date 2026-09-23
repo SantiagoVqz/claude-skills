@@ -34,13 +34,7 @@ Dispatch speaks only the five triage roles from `triage-labels.md`, so a ticket'
 
 ## 1. Read the state
 
-1. **Worktree.** A spec runs in its own linked worktree; the primary checkout stays free for one-off work. Read `git worktree list --porcelain` and where you stand (`git rev-parse --absolute-git-dir` differs from `git rev-parse --path-format=absolute --git-common-dir` in a linked worktree), then take the one matching case:
-   - In a linked worktree whose branch is the spec branch, or carries the spec number: stay. A hand-made worktree keeps its branch name; that name is the spec branch from here on.
-   - In a linked worktree on any other branch: stop and say so. That worktree belongs to other work.
-   - In the primary, and a worktree holds the spec branch: `EnterWorktree` on its path.
-   - In the primary, and nothing holds the spec branch: create the worktree, then `EnterWorktree` on it. With Herdr on PATH, `herdr worktree create --branch <spec-branch> --base <trunk>`, so it lands beside the hand-made ones. Otherwise `git worktree add -b <spec-branch> .claude/worktrees/<spec-slug> <trunk>`.
-   - In the primary, and the primary itself has the spec branch checked out: stop and say so. A branch is checked out in one place only.
-   Then run `scripts/provision.sh` when the repo has it. It is idempotent, so a provisioned worktree costs one no-op run. Red: report the tail and stop. No script, and the repo has gitignored `.env*` files or a database URL in one: say `Run /setup-worktrees` and stop.
+1. **Worktree.** Invoke the `worktree` skill on the spec branch. It stands the session in the spec worktree, provisioned, with the database shared or forked from the spec. It stops: relay why and stop.
 2. **Clean tree.** `git status --porcelain` must be empty. A dirty tree means a subagent died mid-ticket: stop, show the diff, and ask the human whether to keep it (commit it with the ticket ref) or drop it (`git checkout -- . && git clean -fd`).
 3. **Rebase.** `git fetch --all --prune`, then `git rebase origin/<trunk>`. The branch is unpushed until `/ship`, so the rebase is free. On conflict run `/resolving-merge-conflicts`. When the rebase moved a lockfile or added a migration, rerun `scripts/provision.sh`; without it, install dependencies the way the repo's README says.
 4. **Tickets.** From the tracker, list the spec's tickets with state, labels, and Blocked by. From `git log <trunk>..<spec-branch>`, mark which tickets have a commit.
