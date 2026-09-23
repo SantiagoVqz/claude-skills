@@ -26,7 +26,7 @@ Each ticket runs in its own subagent, so implementation context never enters thi
 - **Committed, open**: a commit on the spec branch carries the ticket ref but the ticket is still open. A crash between commit and close, or an unmet criterion, leaves a ticket here. It is reconciled before any new work starts.
 - **Frontier**: open tickets labelled `ready-for-agent`, with no commit, whose blockers are all done.
 
-Dispatch speaks only the five triage roles from `triage-labels.md`, so a ticket's state reads the same in `/triage` and here:
+Dispatch speaks only the triage roles from `triage-labels.md`, so a ticket's state reads the same in `/triage` and here:
 
 - `ready-for-agent`: dispatch may take it.
 - `ready-for-human`: a checkpoint. Set by the human at `/to-tickets` time to stop dispatch before the ticket, or by dispatch when a committed ticket's unmet criterion only a human can verify. The human does the step and relabels `ready-for-agent`, or closes the ticket.
