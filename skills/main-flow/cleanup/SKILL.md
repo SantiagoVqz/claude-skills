@@ -56,7 +56,7 @@ Completion: every ticket and the spec issue are closed, and the report says whic
 You cannot delete a branch that a worktree has checked out. A spec branch lives in its own linked worktree (`git worktree list`), provisioned by `scripts/provision.sh` where the repo has one. Run this from the primary checkout; standing in the spec worktree, `ExitWorktree` first.
 
 ```bash
-(cd <worktree> && scripts/provision.sh db drop)   # only if the script exists: the forked database goes with the worktree
+(cd <worktree> && scripts/provision.sh db drop)   # only if the script exists: drops the fork, if any, and the test database
 git worktree remove <worktree>                     # refuses on uncommitted or untracked files: stop and surface it, never --force
 git checkout <trunk> && git pull --ff-only
 git branch -D <spec-branch>                    # -D: a squash-merge makes -d refuse; the gate above already proved it landed
@@ -70,4 +70,4 @@ A spec branch with no worktree skips the first two lines.
 
 ## Report
 
-Trunk · how the branch landed (merged PR, or commits on trunk) · tickets closed (N by keyword, M by hand, listed) · spec issue closed (by keyword or by hand) · worktree removed (path) or n/a · database dropped or n/a · branches deleted (local / remote, or "remote already gone") · trunk refreshed (new HEAD) · migration applied or n/a. Call out anything skipped, PR still open, open tickets, dirty worktree, non-ff trunk, so nothing is silently left behind.
+Trunk · how the branch landed (merged PR, or commits on trunk) · tickets closed (N by keyword, M by hand, listed) · spec issue closed (by keyword or by hand) · worktree removed (path) or n/a · databases dropped (fork and test, test only, or n/a) · branches deleted (local / remote, or "remote already gone") · trunk refreshed (new HEAD) · migration applied or n/a. Call out anything skipped, PR still open, open tickets, dirty worktree, non-ff trunk, so nothing is silently left behind.

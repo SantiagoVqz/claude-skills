@@ -2,17 +2,21 @@
 #
 # provision.sh — provision the linked git worktree you are standing in.
 #
-#   scripts/provision.sh            # env files, dependencies, ports, own database
-#   scripts/provision.sh db drop    # remove this worktree's own database (cleanup)
+#   scripts/provision.sh            # env files, dependencies, ports, databases
+#   scripts/provision.sh db fork    # the same, with this worktree's own dev database
+#   scripts/provision.sh db drop    # remove this worktree's own databases (cleanup)
 #
 # It never creates a worktree; it sets up the one you are in, whoever made it:
 # Herdr, `git worktree add`, or /dispatch. Idempotent: a second run copies
 # nothing, keeps stamped ports, and finds the database there. The primary
 # checkout refuses to run it.
 #
-# One database per worktree. The primary's database is the template; a
-# worktree gets <APP_DB>_<branch>, so a migration here never touches what the
-# primary, or any other worktree, is running.
+# The dev database is shared by default: the worktree points at APP_DB, the
+# primary's, because a fork is slow and most work never touches the schema.
+# `db fork` clones APP_DB as <APP_DB>_<branch>, so a migration here never
+# touches what the primary, or any other worktree, is running. Once forked, a
+# rerun keeps the fork. The test database is always the worktree's own,
+# <APP_DB>_<branch>_test: the suite truncates it, so worktrees never share one.
 #
 # PORTING: edit the CONFIG block only. Delete the DATABASE block for a repo
 # with no database; the engine detects its absence.
@@ -69,7 +73,7 @@ stamp_ports() {
 # whole block, down to the ENGINE header, for a repo with no database.
 # ============================================================================
 
-APP_DB="myapp"          # the primary's database, the template for every fork
+APP_DB="myapp"          # the primary's database: shared by default, the template for every fork
 DB_USER="myapp"
 DB_PASSWORD="myapp"
 DB_PORT="5432"          # the published port, shared by every worktree
@@ -77,9 +81,9 @@ DB_SERVICE="db"         # compose service; empty runs psql on the host instead
 
 db_url() { printf 'postgresql+psycopg://%s:%s@127.0.0.1:%s/%s' "$DB_USER" "$DB_PASSWORD" "$DB_PORT" "$1"; }
 
-stamp_database() {   # point the app at database $1
+stamp_database() {   # point the app at dev database $1 and test database $2
   set_env "$WT/backend/.env" DATABASE_URL      "$(db_url "$1")"
-  set_env "$WT/backend/.env" TEST_DATABASE_URL "$(db_url "${1}_test")"
+  set_env "$WT/backend/.env" TEST_DATABASE_URL "$(db_url "$2")"
 }
 
 migrate() {          # bring database $1 to head
@@ -123,7 +127,8 @@ start_db_server() {
 fork_db_name() {
   local slug
   slug="$(printf '%s' "$BRANCH" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/_/g; s/^_+|_+$//g')"
-  printf '%s_%s' "$APP_DB" "${slug:-branch}" | cut -c1-63
+  # 58, not 63: the _test suffix must fit in Postgres's 63-byte name limit.
+  printf '%s_%s' "$APP_DB" "${slug:-branch}" | cut -c1-58
 }
 
 clone_db() {         # clone_db <template> <new>
@@ -140,33 +145,51 @@ clone_db() {         # clone_db <template> <new>
   fi
 }
 
+share_db() {         # the default: shared dev database, own test database
+  start_db_server
+  create_db "$APP_DB"
+  local name; name="$(fork_db_name)"
+  # The test database starts empty: the test suite migrates and truncates it.
+  create_db "${name}_test"
+  # A worktree that forked keeps its fork; reverting to share would strand its migrations.
+  if db_exists "$name"; then
+    stamp_database "$name" "${name}_test"; DB_NAME="$name"
+  else
+    # Never migrate the shared database: its schema belongs to the primary.
+    stamp_database "$APP_DB" "${name}_test"; DB_NAME="$APP_DB (shared)"
+  fi
+  TEST_DB_NAME="${name}_test"
+}
+
 fork_db() {
   start_db_server
   create_db "$APP_DB"
   local name; name="$(fork_db_name)"
   clone_db "$APP_DB" "$name"
-  # The _test twin starts empty: the test suite migrates and truncates it.
   create_db "${name}_test"
-  stamp_database "$name"
+  stamp_database "$name" "${name}_test"
   say "Bringing $name to head"; migrate "$name"
-  DB_NAME="$name"
+  DB_NAME="$name"; TEST_DB_NAME="${name}_test"
 }
 
 drop_db() {
   start_db_server
   local name; name="$(fork_db_name)"
   [[ "$name" == "$APP_DB" ]] && die "refusing to drop the shared database"
-  pg_do dropdb --if-exists "$name"
+  # A shared worktree has no fork, so only its test database goes.
+  local dropped="${name}_test"
+  if db_exists "$name"; then pg_do dropdb "$name"; dropped="$name and $dropped"; fi
   pg_do dropdb --if-exists "${name}_test"
-  say "Dropped $name and ${name}_test"
+  say "Dropped $dropped"
 }
 
 
 MODE="provision"
 case "${1:-}${2:+ $2}" in
   "")        ;;
+  "db fork") MODE="fork" ;;
   "db drop") MODE="drop" ;;
-  *)         die "usage: provision.sh [db drop]" ;;
+  *)         die "usage: provision.sh [db fork | db drop]" ;;
 esac
 
 git rev-parse --is-inside-work-tree >/dev/null 2>&1 || die "not inside a git repo"
@@ -177,10 +200,10 @@ WT="$(git rev-parse --show-toplevel)"
 PRIMARY="$(dirname "$COMMON")"
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 
-if [[ "$MODE" == "drop" ]]; then
+if [[ "$MODE" != "provision" ]]; then
   [[ -n "${APP_DB:-}" ]] || die "this repo has no database block"
-  drop_db; exit 0
 fi
+if [[ "$MODE" == "drop" ]]; then drop_db; exit 0; fi
 
 say "Provisioning $WT (branch $BRANCH, primary $PRIMARY)"
 
@@ -218,12 +241,15 @@ if [[ -n "${FE_PORT_BASE:-}${BE_PORT_BASE:-}" ]]; then
   say "Stamped ports  dev:$FE_PORT  api:$BE_PORT"
 fi
 
-DB_NAME=""
-if [[ -n "${APP_DB:-}" ]]; then fork_db; fi
+DB_NAME=""; TEST_DB_NAME=""
+if [[ -n "${APP_DB:-}" ]]; then
+  if [[ "$MODE" == "fork" ]]; then fork_db; else share_db; fi
+fi
 
 say "Worktree provisioned."
 printf '  branch  %s\n' "$BRANCH"
 [[ -n "$FE_PORT" ]] && printf '  dev     http://localhost:%s\n' "$FE_PORT"
 [[ -n "$BE_PORT" ]] && printf '  api     http://127.0.0.1:%s\n' "$BE_PORT"
 [[ -n "$DB_NAME" ]] && printf '  db      127.0.0.1:%s/%s\n' "$DB_PORT" "$DB_NAME"
+[[ -n "$TEST_DB_NAME" ]] && printf '  test    127.0.0.1:%s/%s\n' "$DB_PORT" "$TEST_DB_NAME"
 exit 0
