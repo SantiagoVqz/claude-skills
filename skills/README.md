@@ -2,12 +2,13 @@
 
 The upstream [`mattpocock/skills`](https://github.com/mattpocock/skills) set, kept verbatim and installed under my own names, plus my own skills, each marked below. Sections follow the [aihero.dev skills page](https://www.aihero.dev/skills).
 
-Upstream was last synced on 2026-09-20 from commit `c55ee46` (v1.2.3). Every upstream skill is byte-for-byte upstream, apart from two renames applied to file contents, `setup-matt-pocock-skills` → `setup-skills` and `ask-matt` → `ask`, and two added lines:
+Upstream was last synced on 2026-09-20 from commit `c55ee46` (v1.2.3). Every upstream skill is byte-for-byte upstream, apart from two renames applied to file contents, `setup-matt-pocock-skills` → `setup-skills` and `ask-matt` → `ask`, and these additions:
 
 - `to-spec`: Implementation Decisions ends with a required `Schema changes:` line. The `worktree` skill reads it.
-- `setup-skills`: the Domain docs line in the `## Agent skills` block says that a change to docs only is committed straight to the trunk.
+- `setup-skills`: the Domain docs line in the `## Agent skills` block says that a change to docs only is committed straight to the trunk. The label template has a `later` row, and missing labels are created on GitHub.
+- `triage`: a sixth state role, `later`, for an issue that is decided but waits for a named condition with no issue. Discovery skips it.
 
-`retro` and `pr` are copied from upstream's `in-progress` folder. My own skills are marked below. They read only what the upstream files define: the tracker doc, the five triage labels, and the ticket templates from `/to-tickets`.
+`retro` and `pr` are copied from upstream's `in-progress` folder. My own skills are marked below. They read only what the upstream files define: the tracker doc, the triage labels, and the ticket templates from `/to-tickets`.
 
 ## 01 Getting started
 
@@ -78,4 +79,4 @@ Vocabulary layers the flow skills run underneath.
 
 ## Resync
 
-Clone upstream and re-copy each upstream skill's folder with the two renames applied to file contents. Re-apply the added lines in `to-spec` and `setup-skills`; a re-copy removes them. Then reread `worktree`, `dispatch`, `ship`, `close-ticket`, `cleanup`, `setup-worktrees` and `upgrade-skills` against `implement`, `to-spec`, `to-tickets`, the tracker docs and `triage-labels.md`: they depend on those and on nothing else.
+Clone upstream and re-copy each upstream skill's folder with the two renames applied to file contents. Re-apply the additions in `to-spec`, `setup-skills` and `triage`; a re-copy removes them. Then reread `worktree`, `dispatch`, `ship`, `close-ticket`, `cleanup`, `setup-worktrees` and `upgrade-skills` against `implement`, `to-spec`, `to-tickets`, the tracker docs and `triage-labels.md`: they depend on those and on nothing else.
