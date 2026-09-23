@@ -5,8 +5,8 @@ The upstream [`mattpocock/skills`](https://github.com/mattpocock/skills) set, ke
 Upstream was last synced on 2026-09-20 from commit `c55ee46` (v1.2.3). Every upstream skill is byte-for-byte upstream, apart from two renames applied to file contents, `setup-matt-pocock-skills` → `setup-skills` and `ask-matt` → `ask`, and these additions:
 
 - `to-spec`: Implementation Decisions ends with a required `Schema changes:` line. The `worktree` skill reads it.
-- `setup-skills`: the Domain docs line in the `## Agent skills` block says that a change to docs only is committed straight to the trunk. The label template has a `later` row, and missing labels are created on GitHub.
-- `triage`: a sixth state role, `later`, for an issue that is decided but waits for a named condition with no issue. Discovery skips it.
+- `setup-skills`: the Domain docs line in the `## Agent skills` block says that a change to docs only is committed straight to the trunk. The label template has a `later` row, and missing labels are created on GitHub. The tracker templates have an `## Idea notes` section, and the `needs-grilling` label is created on GitHub or GitLab whether or not `triage` is installed.
+- `triage`: a sixth state role, `later`, for an issue that is decided but waits for a named condition with no issue. Discovery skips it. Discovery also skips `needs-grilling`, a label outside the triage roles for my own idea notes that wait for a grilling session.
 
 `retro` and `pr` are copied from upstream's `in-progress` folder. My own skills are marked below. They read only what the upstream files define: the tracker doc, the triage labels, and the ticket templates from `/to-tickets`.
 

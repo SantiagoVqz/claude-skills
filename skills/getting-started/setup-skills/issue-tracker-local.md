@@ -18,6 +18,10 @@ Create a new file under `.scratch/<feature-slug>/` (creating the directory if ne
 
 Read the file at the referenced path. The user will normally pass the path or the issue number directly.
 
+## Idea notes
+
+An issue file with `Status: needs-grilling` holds the maintainer's rough idea, written down instead of a grilling session. It waits for one: `/grill-me` or `/grill-with-docs` runs from it, and `/to-spec` publishes the result as a new spec. Then append a comment that links the spec and set `Status: closed`. `/triage` skips these files.
+
 ## Wayfinding operations
 
 Used by `/wayfinder`. The **map** is a file with one **child** file per ticket.

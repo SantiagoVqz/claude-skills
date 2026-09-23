@@ -34,6 +34,13 @@ Create a GitLab issue.
 
 Run `glab issue view <number> --comments`.
 
+## Idea notes
+
+An issue labelled `needs-grilling` holds the maintainer's rough idea, written down instead of a grilling session. It waits for one: `/grill-me` or `/grill-with-docs` runs from it, and `/to-spec` publishes the result as a new spec issue. Close the idea issue with a note that links the spec. `/triage` skips these issues.
+
+- **List**: `glab issue list --label needs-grilling -F json`
+- **Close**: `glab issue note <n> --message "Specced in #<spec>"`, then `glab issue close <n>`
+
 ## Wayfinding operations
 
 Used by `/wayfinder`. The **map** is a single issue with **child** issues as tickets.
