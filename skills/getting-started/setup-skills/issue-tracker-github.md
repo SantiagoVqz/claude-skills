@@ -33,6 +33,13 @@ Create a GitHub issue.
 
 Run `gh issue view <number> --comments`.
 
+## Idea notes
+
+An issue labelled `needs-grilling` holds the maintainer's rough idea, written down instead of a grilling session. It waits for one: `/grill-me` or `/grill-with-docs` runs from it, and `/to-spec` publishes the result as a new spec issue. Close the idea issue with a comment that links the spec. `/triage` skips these issues.
+
+- **List**: `gh issue list --label needs-grilling --state open`
+- **Close**: `gh issue close <n> --comment "Specced in #<spec>"`
+
 ## Wayfinding operations
 
 Used by `/wayfinder`. The **map** is a single issue with **child** issues as tickets.

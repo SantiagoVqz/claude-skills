@@ -101,6 +101,8 @@ The block:
 
 Include the `### Triage labels` sub-block, and write `docs/agents/triage-labels.md`, only when `triage` is installed and Section B ran. When it isn't, both are omitted. On a GitHub tracker, create each label from the table that the repo does not have yet, with its Meaning as the description: for example, `gh label create later --description "Decided, parked until a named condition is met"`.
 
+On a GitHub or GitLab tracker, create the `needs-grilling` label whether or not `triage` is installed, when the repo does not have it yet. It marks idea notes, which the `## Idea notes` section of the tracker doc defines: `gh label create needs-grilling --description "Idea notes waiting for a grilling session"`, or `glab label create --name needs-grilling --description "Idea notes waiting for a grilling session"`.
+
 Then write the docs files using the seed templates in this skill folder as a starting point:
 
 - [issue-tracker-github.md](./issue-tracker-github.md): GitHub issue tracker

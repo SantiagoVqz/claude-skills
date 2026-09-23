@@ -64,6 +64,8 @@ Query the issue tracker and present three buckets, oldest first:
 
 Skip issues in `later`. On request, list them with the condition that each one waits for.
 
+Skip issues labelled `needs-grilling`. They are the maintainer's own idea notes. A grilling session turns each one into a spec, so triage never touches them.
+
 When PRs are in scope, include external PRs in these buckets and tag each line `[PR]` or `[issue]`. Discovery surfaces only *external* PRs (the tracker config defines who counts as external), so a collaborator's in-flight PR is not triage work. This filter is discovery-only; an explicitly named PR is always triaged regardless of author.
 
 Show counts and a one-line summary per item. Let the maintainer pick.
