@@ -1,6 +1,12 @@
 ---
 name: diagnosing-bugs
 description: Diagnosis loop for hard bugs and performance regressions. Use when the user says "diagnose"/"debug this", or reports something broken/throwing/failing/slow.
+metadata:
+  credits:
+    skill: diagnosing-bugs
+    author: Matt Pocock
+    organisation: AI Hero
+    url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/diagnosing-bugs/SKILL.md"
 ---
 
 # Diagnosing Bugs

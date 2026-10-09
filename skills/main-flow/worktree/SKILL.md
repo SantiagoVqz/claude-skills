@@ -1,7 +1,7 @@
 ---
 name: worktree
 description: "Put code work in its own provisioned linked worktree: find the worktree that holds the branch or create one, run scripts/provision.sh, and share or fork the database from the spec's Schema changes line. Use before /implement or /dispatch writes code, and before you add a migration in a worktree that shares the database."
-argument-hint: [branch | spec | ticket]
+argument-hint: "[branch | spec | ticket]"
 ---
 
 # worktree: one spec, one provisioned checkout

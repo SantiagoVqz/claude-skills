@@ -1,7 +1,7 @@
 ---
 name: ship
 description: "Ship the current branch as a PR: rebase or merge the base, run the full suite, push, and open or update the PR with a body written by /pr. Use when every ticket of a spec is done (from /dispatch or by hand), or for any branch that is ready for review. Never merges."
-argument-hint: [spec]
+argument-hint: "[spec]"
 ---
 
 # ship — one branch, one PR

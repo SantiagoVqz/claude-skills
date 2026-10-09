@@ -2,7 +2,7 @@
 name: dispatch
 description: "Drive one spec end to end: run each ready-for-agent ticket in its own subagent on the spec branch, close each ticket against its acceptance criteria as it commits, then ship the branch as a PR. Run as `/dispatch <spec>`, or under `/loop` when the spec has ready-for-human checkpoints."
 disable-model-invocation: true
-argument-hint: [spec]
+argument-hint: "[spec]"
 ---
 
 # dispatch — one spec, ticket by ticket

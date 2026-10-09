@@ -1,6 +1,12 @@
 ---
 name: resolving-merge-conflicts
 description: "Use when you need to resolve an in-progress git merge/rebase conflict."
+metadata:
+  credits:
+    skill: resolving-merge-conflicts
+    author: Matt Pocock
+    organisation: AI Hero
+    url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/resolving-merge-conflicts/SKILL.md"
 ---
 
 1. **See the current state** of the merge/rebase. Check git history, and the conflicting files.
