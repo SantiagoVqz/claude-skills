@@ -56,7 +56,7 @@ Keep the codebase and issue list healthy; generates work for the flow.
 - [`ticket-clerk`](./upkeep/ticket-clerk) — file one thing you hit mid-task as a ticket, labelled for triage. Own skill, not from upstream.
 - [`wizard`](./upkeep/wizard) — an interactive bash wizard for steps only a human can do.
 - [`retro`](./upkeep/retro) — retrospective on a coding session: propose changes to the agent's environment, checks over prose. Promoted from upstream `in-progress`.
-- [`ui-review`](./upkeep/ui-review) — browser-driven review loop: start or reuse the dev servers, open Chrome, then inspect, diagnose, fix, and verify each piece of feedback. Own skill, not from upstream.
+- [`ui-review`](./upkeep/ui-review) — browser-driven UI review: walk the screens a change touches against its spec and a rubric, report a punch list, then fix and verify the picked items. Own skill, not from upstream.
 
 ## 05 Productivity
 
