@@ -3,6 +3,12 @@ name: teach
 description: Teach the user a new skill or concept, within this workspace.
 disable-model-invocation: true
 argument-hint: "What would you like to learn about?"
+metadata:
+  credits:
+    skill: teach
+    author: Matt Pocock
+    organisation: AI Hero
+    url: "https://github.com/mattpocock/skills/blob/main/skills/productivity/teach/SKILL.md"
 ---
 
 The user has asked you to teach them something. This is a stateful request - they intend to learn the topic over multiple sessions.

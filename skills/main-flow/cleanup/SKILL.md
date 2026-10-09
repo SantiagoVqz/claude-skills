@@ -2,7 +2,7 @@
 name: cleanup
 description: "Post-merge teardown for a landed spec: confirm the spec branch landed, verify the spec issue and its tickets closed, delete the local and remote branches, and leave the checkout on a refreshed trunk."
 disable-model-invocation: true
-argument-hint: [spec-branch | spec]
+argument-hint: "[spec-branch | spec]"
 ---
 
 # cleanup — post-merge spec teardown

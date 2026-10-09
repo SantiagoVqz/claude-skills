@@ -1,6 +1,6 @@
 # Claude Skills
 
-My skill harness for Claude Code. It is the [`mattpocock/skills`](https://github.com/mattpocock/skills) set, kept verbatim under my own names, apart from small additions to `to-spec`, `setup-skills` and `triage`. His work is worth a look. Beside it sit my own `worktree`, `dispatch`, `ship`, `cleanup`, `close-ticket`, `setup-worktrees`, `upgrade-skills`, `ticket-clerk`, `ui-review` and `unslop`, plus his in-progress `retro` and `pr`.
+My skill harness for Claude Code. It is the [`mattpocock/skills`](https://github.com/mattpocock/skills) set, copied under my own names. Each copy credits him in its frontmatter. Small additions go to `to-spec`, `setup-skills`, `triage` and `pr`. His work is worth a look. Beside it sit my own `worktree`, `dispatch`, `ship`, `cleanup`, `close-ticket`, `setup-worktrees`, `upgrade-skills`, `ticket-clerk`, `ui-review` and `unslop`, plus his in-progress `retro` and `pr`.
 
 See [`skills/README.md`](./skills/README.md) for the full set. It follows the groups on the [aihero.dev skills page](https://www.aihero.dev/skills): getting started, the main flow, shaping, upkeep, productivity, reference.
 

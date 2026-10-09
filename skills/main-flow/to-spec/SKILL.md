@@ -2,6 +2,12 @@
 name: to-spec
 description: "Turn the current conversation into a spec and publish it to the project issue tracker: no interview, just synthesis of what you've already discussed."
 disable-model-invocation: true
+metadata:
+  credits:
+    skill: to-spec
+    author: Matt Pocock
+    organisation: AI Hero
+    url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/to-spec/SKILL.md"
 ---
 
 This skill takes the current conversation context and codebase understanding and produces a spec. Do NOT interview the user; just synthesize what you already know.

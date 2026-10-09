@@ -2,6 +2,12 @@
 name: triage
 description: Move issues and external PRs through a state machine of triage roles, categorise, verify, grill if needed, and write agent-ready briefs.
 disable-model-invocation: true
+metadata:
+  credits:
+    skill: triage
+    author: Matt Pocock
+    organisation: AI Hero
+    url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/triage/SKILL.md"
 ---
 
 # Triage

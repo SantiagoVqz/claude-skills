@@ -2,6 +2,12 @@
 name: setup-skills
 description: "Configure this repo for the engineering skills: set up its issue tracker, triage label vocabulary, and domain doc layout. Run once before first use of the other engineering skills."
 disable-model-invocation: true
+metadata:
+  credits:
+    skill: setup-matt-pocock-skills
+    author: Matt Pocock
+    organisation: AI Hero
+    url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/setup-matt-pocock-skills/SKILL.md"
 ---
 
 # Setup Skills

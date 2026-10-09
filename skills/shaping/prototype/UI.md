@@ -1,8 +1,28 @@
 # UI Prototype
 
-Generate **several radically different UI variations** on a single route, switchable from a floating bottom bar. The user flips between variants in the browser, picks one (or steals bits from each), then throws the rest away.
+Generate **several radically different UI variations**, switchable from a floating bottom bar. The user flips between variants in the browser, picks one (or steals bits from each), then throws the rest away.
 
 If the question is about logic/state rather than what something looks like, this is the wrong branch. Use [LOGIC.md](LOGIC.md).
+
+## Pick a surface
+
+The surface is where the variants run:
+
+- **You can publish an artifact** (a claude.ai or claude.ai/design session, or an Artifact tool in your tool list) → the **artifact surface**, always. Follow [Artifact surface](#artifact-surface).
+- **Otherwise** → the **code surface**. Follow [Code surface](#code-surface-two-sub-shapes-strongly-prefer-sub-shape-a).
+
+Steps 1 and 2 of the process apply to both surfaces.
+
+## Artifact surface
+
+All N variants and the floating switcher live in **one self-contained artifact**. There is no route and no dev server: the share is a link.
+
+- **Styling.** When the project's design system is synced to claude.ai/design, build with it. Otherwise match the project's styling from the code or screenshots the user gives.
+- **Host page.** When the variants belong inside an existing page, read that page's code and rebuild its chrome (header, sidebar, neighbouring sections) around each variant, so the variants are judged in context.
+- **Content.** Fill every variant with realistic sample data at the real page's density, since an empty artifact flatters every layout.
+- **Switcher.** Build the bar from step 4, with the current variant held in component state, since an artifact has no URL to carry it. Keep the arrow keys and the input guard; skip the production gate.
+- **Hand over and iterate** in the same conversation. "The header from B with the sidebar from C" becomes a new variant in the same artifact.
+- **Capture.** Record the winner and why on the implementation issue, with the artifact link as the context pointer. Commit an HTML export of the artifact to the throwaway branch so the primary source survives outside claude.ai. The winner enters the codebase as a rewrite in the project's own components.
 
 ## When this is the right shape
 
@@ -11,7 +31,7 @@ If the question is about logic/state rather than what something looks like, this
 - "Try a different layout for the settings screen."
 - Any time the user would otherwise spend a day picking between three vague mockups in their head.
 
-## Two sub-shapes: strongly prefer sub-shape A
+## Code surface: two sub-shapes, strongly prefer sub-shape A
 
 A UI prototype is much easier to judge when it's **butting up against the rest of the app**: real header, real sidebar, real data, real density. A throwaway route on its own is a vacuum: every variant looks fine in isolation. Default to sub-shape A whenever there's a plausible existing page to host the variants. Only reach for sub-shape B if the prototype genuinely has no nearby home.
 

@@ -1,7 +1,7 @@
 ---
 name: ui-review
 description: Browser-driven UI review loop. Start or reuse the project's dev servers, open the app in Chrome through the DevTools MCP, baseline-scan console and network, then work an inspect, diagnose, fix, verify-in-browser loop on the user's feedback. Use when the user says "ui review", "review the ui", "test it in the browser", or wants to see a UI change working in the real app.
-argument-hint: [route]
+argument-hint: "[route]"
 ---
 
 # ui-review, the browser-driven review loop
