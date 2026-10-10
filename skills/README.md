@@ -4,6 +4,7 @@ The upstream [`mattpocock/skills`](https://github.com/mattpocock/skills) set, co
 
 Upstream was last synced on 2026-10-10 from commit `49dd158` (v1.3.1 plus unreleased changesets). Every upstream skill is byte-for-byte upstream, apart from two renames applied to file contents, `setup-matt-pocock-skills` → `setup-skills` and `ask-matt` → `ask`, a credits block, and these additions:
 
+- `implement`: after the commit, it calls `close-ticket` when the work came from a ticket. `dispatch` gets the close result through it.
 - `grilling`: questions are numbered across the whole conversation. This is upstream PR #1224, taken before it merged. Drop the addition when upstream merges it.
 - `to-spec`: Implementation Decisions ends with a required `Schema changes:` line. The `worktree` skill reads it.
 - `setup-skills`: the Domain docs line in the `## Agent skills` block says that a change to docs only is committed straight to the trunk. The label template has a `later` row. Missing labels get their Meaning as the description. The tracker templates have an `## Idea notes` section, and the `needs-grilling` label is created on GitHub or GitLab whether or not `triage` is installed.

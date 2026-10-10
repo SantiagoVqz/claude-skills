@@ -21,3 +21,5 @@ Run typechecking regularly, single test files regularly, and the full test suite
 Once done, call the Skill tool with "code-review" to review the work.
 
 Commit your work to the current branch.
+
+When the work came from a ticket, call the Skill tool with "close-ticket" on that ticket and the commit hash.
