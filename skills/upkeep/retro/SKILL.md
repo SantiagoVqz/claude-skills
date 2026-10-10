@@ -7,7 +7,7 @@ metadata:
     skill: retro
     author: Matt Pocock
     organisation: AI Hero
-    url: "https://github.com/mattpocock/skills/blob/main/skills/in-progress/retro/SKILL.md"
+    url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/retro/SKILL.md"
 ---
 
 The user has asked for a **retrospective**. You are suggesting improvements to the coding agent's **environment** to improve future runs.

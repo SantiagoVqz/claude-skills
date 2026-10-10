@@ -38,7 +38,7 @@ Completion: one line states `head ← base` and whether the branch is new or und
 - **New**: `git rebase origin/<base>`. No review threads exist yet, so take the linear history.
 - **Under review**: `git merge origin/<base>`. A rebase discards review threads and approvals.
 
-On conflict run `/resolving-merge-conflicts`; finish the operation, never abort it.
+On conflict, call the Skill tool with "resolving-merge-conflicts"; finish the operation, never abort it.
 
 Completion: `git rev-list --count HEAD..origin/<base>` is zero.
 

@@ -1,6 +1,6 @@
 ---
 name: ui-review
-description: Browser-driven UI review. Walk the screens a change touches in Chrome against its spec and a fixed rubric, report a punch list, then fix and verify the items the user picks. Use when the user asks for a UI review, wants a branch's UI changes checked in the browser, or wants to see a change working in the real app.
+description: Browser-driven UI review. Walk the screens a change touches in Chrome against its spec and a fixed rubric, report a punch list, then fix and verify the items the user picks. Use when the user asks for a UI review, or wants a branch's UI changes checked in the browser.
 argument-hint: "[fixed-point] [route]"
 ---
 
@@ -49,7 +49,7 @@ Dispatch one subagent for the walk. It keeps screenshots out of your context, an
 
 Give the subagent this prompt, with the placeholders filled:
 
-> You walk a UI review plan in Chrome through the DevTools MCP. The app runs at `<base URL>`, and the user is signed in. Read `<skill dir>/references/rubric.md` and apply every check to every row. Read `<skill dir>/references/screenshot-budget.md` before your first screenshot. Read the Gotchas section of `<skill dir>/SKILL.md`. Save every screenshot with `filePath` under `<scratch dir>`.
+> You walk a UI review plan in Chrome through the DevTools MCP. The app runs at `<base URL>`, and the user is signed in. Read `<skill dir>/references/rubric.md` and apply every check to every row. Read `<skill dir>/references/screenshot-budget.md` before your first screenshot. Read `<skill dir>/references/gotchas.md`. Save every screenshot with `filePath` under `<scratch dir>`.
 >
 > Plan: `<rows>`. Acceptance criteria: `<criteria, verbatim>`. Benign noise, which you ignore: `<list>`.
 >
@@ -65,6 +65,8 @@ Report the coverage counts (pass, fail, blocked), the blocked reasons, the punch
 
 Each picked punch item and each piece of user feedback goes through this loop. Feedback arrives as a structured "Page Feedback" block (file:line, classes, component tree) or freeform. Add feedback to the punch list as the next ID.
 
+Read `references/gotchas.md` before the first fix.
+
 1. **Inspect the exact screen.** Console, network (filter fetch/xhr, find the failing call with its status and body), `take_snapshot`, and `evaluate_script` for precise reads. Also read the server logs for the matching error (a 500 traceback, an HMR or import error).
 2. **Diagnose the root cause first.** Read the real code. If the user reported a problem without asking for a fix, give a short diagnosis and wait. A picked punch item counts as a request for a fix. One fix per diagnosis, no stacked guesses.
 3. **Fix exactly what the item names.** Follow the repo's conventions. Adjacent restyling, redesigns and new UI elements are suggestions: offer them, and touch them only after an explicit yes.
@@ -76,16 +78,7 @@ An item is done when its assertion passes and the benign-noise list has not grow
 
 A page screenshot costs about 60 times an accessibility snapshot, and every later step re-reads it. Read `references/screenshot-budget.md` before the first screenshot of a session.
 
-## 8. Gotchas
-
-- **Snapshot `uid`s reset on every navigation or reload.** Take a fresh `take_snapshot` before referencing one, or the interaction fails with "not found / detached".
-- **Portals hide options.** Select, dropdown, and context-menu items often render in a portal that is absent from the accessibility tree. Open the trigger, then drive with keys (ArrowDown ×N, Enter). Right-click menus need a `contextmenu` `MouseEvent` dispatched through `evaluate_script`.
-- **Async navigation can report an intermediate URL.** Confirm the final state with `list_pages` or `evaluate_script`.
-- **A referenced but undefined CSS utility silently no-ops** (a Tailwind `@utility`, a plugin class). If a style "won't apply", grep that the utility exists.
-- **Server reload after an edit.** Check that the backend log shows a clean restart and the frontend log shows the HMR update with no error before you re-test.
-- **`emulate` settings persist across navigations.** After an emulated check, reset the viewport to 1280 and `colorScheme` to `"auto"`, or the next row runs at the wrong size or theme.
-
-## 9. Teardown
+## 8. Teardown
 
 When the review is done, or the session wraps, stop the servers this skill started (kill the background tasks) and `close_page` the tab. Leave servers that were already running before this skill. If a task kill does not take, kill by port:
 

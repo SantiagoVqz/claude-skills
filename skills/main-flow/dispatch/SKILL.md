@@ -36,7 +36,7 @@ Dispatch speaks only the triage roles from `triage-labels.md`, so a ticket's sta
 
 1. **Worktree.** Invoke the `worktree` skill on the spec branch. It stands the session in the spec worktree, provisioned, with the database shared or forked from the spec. It stops: relay why and stop.
 2. **Clean tree.** `git status --porcelain` must be empty. A dirty tree means a subagent died mid-ticket: stop, show the diff, and ask the human whether to keep it (commit it with the ticket ref) or drop it (`git checkout -- . && git clean -fd`).
-3. **Rebase.** `git fetch --all --prune`, then `git rebase origin/<trunk>`. The branch is unpushed until `/ship`, so the rebase is free. On conflict run `/resolving-merge-conflicts`. When the rebase moved a lockfile or added a migration, rerun `scripts/provision.sh`; without it, install dependencies the way the repo's README says.
+3. **Rebase.** `git fetch --all --prune`, then `git rebase origin/<trunk>`. The branch is unpushed until `/ship`, so the rebase is free. On conflict, call the Skill tool with "resolving-merge-conflicts". When the rebase moved a lockfile or added a migration, rerun `scripts/provision.sh`; without it, install dependencies the way the repo's README says.
 4. **Tickets.** From the tracker, list the spec's tickets with state, labels, and Blocked by. From `git log <trunk>..<spec-branch>`, mark which tickets have a commit.
 5. **Implement.** Locate the `implement` skill file: `.claude/skills/implement/SKILL.md`, else `~/.claude/skills/implement/SKILL.md`. Subagents read it by path, because a user-invoked skill cannot be reached through the Skill tool.
 
@@ -58,7 +58,7 @@ Completion: no ticket is committed-open.
 
 Take frontier tickets one at a time, in dependency order. Record `git rev-parse HEAD` as the ticket's fixed point. Dispatch one subagent per ticket and **wait for its report before starting the next**; two agents on one branch collide.
 
-> Work in this checkout on branch `<spec-branch>`. Read `<implement path>` and follow it for ticket `<ticket ref>`, whose body follows. The tracker is described in `docs/agents/issue-tracker.md`. When it says to use `/code-review`, the fixed point is `<hash>`. Commit with `<ticket ref>` in the message. Then invoke the `close-ticket` skill on `<ticket ref>` with that commit hash. Report back the commit hash and the close result (done, or the unmet criteria verbatim, or that a criterion needs a human), or the exact failure: a red suite after your remediation attempts, a conflict, a step you could not take.
+> Work in this checkout on branch `<spec-branch>`. Read `<implement path>` and follow it for ticket `<ticket ref>`, whose body follows. The tracker is described in `docs/agents/issue-tracker.md`. When it runs code-review, the fixed point is `<hash>`. Commit with `<ticket ref>` in the message. Then invoke the `close-ticket` skill on `<ticket ref>` with that commit hash. Report back the commit hash and the close result (done, or the unmet criteria verbatim, or that a criterion needs a human), or the exact failure: a red suite after your remediation attempts, a conflict, a step you could not take.
 >
 > <ticket body>
 
