@@ -1,6 +1,6 @@
 ---
 name: close-ticket
-description: "Close a ticket against its acceptance criteria once its work is committed. Reads the ticket, checks each criterion against the diff, ticks the met ones on the tracker, and closes with the commit as the closing comment; unmet criteria leave it open and come back verbatim. Use when a ticket's commit lands, from /dispatch or by hand."
+description: "Close a ticket against its acceptance criteria once its work is committed. Reads the ticket, checks each criterion against the diff, ticks the met ones on the tracker, and closes with the commit as the closing comment; unmet criteria leave it open and come back verbatim. Use when a ticket's commit lands, from /implement or by hand."
 argument-hint: "[ticket] [commit]"
 ---
 
