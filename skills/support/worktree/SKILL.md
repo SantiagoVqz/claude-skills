@@ -17,7 +17,7 @@ Code work runs in a linked worktree. The primary checkout stays on the trunk. Th
 
 Each worktree also has its own test database. `scripts/provision.sh` applies these rules.
 
-The **trunk** is the branch that PRs merge into: the default branch from `git symbolic-ref refs/remotes/origin/HEAD`, or `develop` when the repo has both `main` and `develop`.
+The **trunk** is the branch that PRs merge into: the default branch from `git symbolic-ref refs/remotes/origin/HEAD`, or `develop` when the repo has both `main` and `develop`. When `origin/HEAD` is missing, use `gh repo view --json defaultBranchRef`. Do not run `git remote set-head`, because it changes the repo config.
 
 ## Make
 
@@ -26,7 +26,7 @@ The **trunk** is the branch that PRs merge into: the default branch from `git sy
    - No worktree has it: `git fetch origin`, then `git worktree add -b <branch> .claude/worktrees/<branch with / as -> <base>`. Use `origin/<trunk>` as the base for a spec or fix branch, and the local spec branch for a ticket. Leave out `-b` when the branch exists.
    - The primary checkout has the branch: stop and say so. A branch is checked out in one place only.
 2. **Link a ticket to its spec.** For a ticket branch, run `git config branch.<ticket-branch>.spec <spec-branch>` before you provision. This line is how `provision.sh` finds the spec's database.
-3. **Enter.** `EnterWorktree` on the worktree path.
+3. **Enter.** `EnterWorktree` on the worktree path. After this, the harness refuses commands that it cannot prove stay in the worktree. Run each git command as one plain command from the worktree root, with no `cd`, no `-C` and no `&&` chain. Write files with the Write tool, not a heredoc. Pass a commit message with one `-m` flag per paragraph. A message file in the worktree can get committed.
 4. **Provision.** When `scripts/provision.sh` exists, run it in the worktree. When it fails, show the end of its output and stop. When it does not exist and the repo has gitignored `.env` files, a lockfile or a database URL, tell the user to run `/setup-skills` and stop.
 
 Completion: the session is in the worktree, and the end of the `provision.sh` output names the expected dev and test databases, or the repo needs no provisioning.
