@@ -46,7 +46,9 @@ Completion: the user confirmed the decisions log with an explicit yes.
 
 Write the spec from the decisions log with [SPEC-TEMPLATE.md](../prd/SPEC-TEMPLATE.md). `/prd` owns the template, so both skills share it. Show the draft to the user, and change it until they approve it.
 
-Completion: the user approved the draft.
+When the draft needs a term or a decision that is not in the log, ask the user about it before you publish. Add it to the log only when the user agrees.
+
+Completion: the user approved the draft, and each term in the draft is in the log.
 
 ## 5. Publish
 
@@ -62,7 +64,7 @@ Completion: the spec worktree exists and is provisioned.
 
 ## 7. Docs
 
-When the log has terms or ADR candidates, write them in the spec worktree with [DOCS-FORMAT.md](DOCS-FORMAT.md). Commit them on the spec branch: `Record terms and decisions for #<n>`. Then delete the decisions log file. The spec issue is now the record.
+Write only the terms and ADR candidates that are in the confirmed log. Add nothing else. When the log has terms or ADR candidates, write them in the spec worktree with [DOCS-FORMAT.md](DOCS-FORMAT.md). Commit them on the spec branch: `Record terms and decisions for #<n>`. Then delete the decisions log file. The spec issue is now the record.
 
 Completion: each term and each ADR from the log is committed, or the log had none.
 

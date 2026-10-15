@@ -34,9 +34,9 @@ Show the user, in one message:
 - When the repo needs provisioning: the filled CONFIG block of `provision.sh`, from [PROVISIONING.md](PROVISIONING.md).
 - Each existing file or label that you will keep as it is.
 
-Let the user edit the drafts. Ask one question at a time when something is not clear.
+Ask each choice with the question tool, one at a time: the tracker, and each existing file or label that you could keep or replace. Put your recommendation first. Then show the drafts, and ask for approval with the question tool. Give the options "Approve" and "Change". When the user picks Change, apply the edits and ask again.
 
-Completion: the user approved the drafts.
+Completion: the user picked Approve.
 
 ## 3. Write
 
