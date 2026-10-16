@@ -60,10 +60,12 @@ It needs no `/setup-skills`. It works in any repo.
 
 - **Input:** a spec issue.
 - **Process:** it cuts the spec into tickets and shows you the breakdown. You approve the breakdown before it publishes anything.
-- **Output:** tickets as sub-issues of the spec, with native blocking links. Each ticket has an `approach:` label.
+- **Output:** tickets as sub-issues of the spec, with native blocking links. Each ticket has an `approach:` label and a `Covers stories` line.
 - **Rules:**
   - A ticket fits in one context window and one worktree.
   - All schema changes go in one early ticket. Every ticket that needs the new schema is blocked by it.
+  - Each user story is in one ticket or more. `/plan` does not publish while a story has no ticket.
+  - A rerun cuts tickets only for the stories that no ticket covers. It does not change the open tickets.
 - **Next:** you run `/build` on each ticket that has no open blockers.
 
 ### `/build <ticket>`
@@ -73,10 +75,10 @@ You start each `/build` by hand, in its own terminal. You decide how many run at
 - **Input:** one ticket.
 - **Process:**
   1. It sets the ticket to in progress and assigns it to you.
-  2. It calls `worktree` to make a ticket worktree from the spec branch.
-  3. It calls the skill that the ticket's `approach:` label names: `tdd` or `diagnose`.
+  2. It calls `worktree` to make a ticket worktree from the spec branch. When the remote does not have the spec branch, it pushes the spec branch first. When no spec branch exists, it stops and tells you to push it from the machine that ran `/spec`.
+  3. It calls the skill that the ticket's `approach:` label names: `tdd`, `refactor` or `diagnose`. When that skill does not exist yet, it stops.
   4. It runs `/verify` in a subagent with a fresh context. It fixes the hard findings and runs `/verify` again one time. It reports the remaining findings to you.
-  5. It commits and merges the ticket branch into the spec branch, then runs the tests. If the merge has a conflict, it stops and shows you the conflict.
+  5. It commits and merges the ticket branch into the spec branch, then runs the tests and pushes the spec branch. If the merge has a conflict, it stops and shows you the conflict.
   6. It closes the ticket. It removes the ticket worktree, the ticket branch and the test database.
 - **Output:** the ticket's commits on the spec branch, and a closed ticket.
 - **Next:** when all tickets are closed, you run `/review`.
@@ -136,6 +138,7 @@ You do not type these. Other skills call them.
 |---|---|---|
 | `interview` | `/spec`, `/prd` | Interview one question at a time on the design tree. Show a recommendation and a progress count. Keep a decisions log. |
 | `tdd` | `/build` | Red, green, refactor at the seams that the spec agreed. |
+| `refactor` | `/build` | Change the structure and keep the behavior. The suite stays green. Built when a ticket first needs it. |
 | `worktree` | `/spec`, `/build`, `/diagnose` | Find or make the worktree, then provision it. |
 | `pr` | `/ship` | Write the PR body: summary, evidence, merge danger. |
 
@@ -158,7 +161,7 @@ You do not type these. Other skills call them.
 |---|---|---|
 | `spec` | `/spec` | `/plan`, `/review`, `/ship`, `/cleanup` |
 | `bug` | `/diagnose` | `/ship`, `/cleanup` |
-| `approach:tdd`, `approach:diagnose` | `/plan` | `/build` |
+| `approach:tdd`, `approach:refactor`, `approach:diagnose` | `/plan` | `/build` |
 | `in-progress` | `/build` | you and your team |
 
 On Linear, `/build` sets the native In Progress status. It does not use the `in-progress` label. Blocked work uses native blocking links. Done work is a closed issue.

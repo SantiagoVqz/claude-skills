@@ -29,5 +29,6 @@ Specs, tickets and bugs for this repo are GitHub issues. Use the `gh` CLI. It fi
 | `spec` | A spec. Its sub-issues are its tickets. |
 | `bug` | A bug, fixed by `/diagnose`. |
 | `approach:tdd` | `/build` uses the `tdd` skill. |
+| `approach:refactor` | `/build` uses the `refactor` skill. |
 | `approach:diagnose` | `/build` uses the `diagnose` skill. |
 | `in-progress` | A person or agent works on it now. The assignee is that person. |
