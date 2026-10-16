@@ -37,7 +37,7 @@ Run it once per repo.
 ### `/spec`
 
 - **Input:** an idea.
-- **Process:** it calls `interview` to interview you, one question at a time. It keeps a decisions log during the interview. It records new glossary terms and ADRs in the log.
+- **Process:** it calls `interview` to interview you, one question at a time. It keeps a decisions log during the interview. It records new glossary terms and ADRs in the log. When the spec touches a screen, it asks whether to prototype the look, and records the chosen variant.
 - **Output:**
   - A spec issue with the `spec` label.
   - A spec branch, `spec/<n>-<slug>`, in its own worktree, with its own dev database.
@@ -68,28 +68,37 @@ It needs no `/setup-skills`. It works in any repo.
   - A rerun cuts tickets only for the stories that no ticket covers. It does not change the open tickets.
 - **Next:** you run `/build` on each ticket that has no open blockers.
 
-### `/build <ticket>`
+### `/build <ticket> [--ui]`
 
 You start each `/build` by hand, in its own terminal. You decide how many run at the same time.
 
 - **Input:** one ticket.
 - **Process:**
-  1. It sets the ticket to in progress and assigns it to you.
-  2. It calls `worktree` to make a ticket worktree from the spec branch. When the remote does not have the spec branch, it pushes the spec branch first. When no spec branch exists, it stops and tells you to push it from the machine that ran `/spec`.
-  3. It calls the skill that the ticket's `approach:` label names: `tdd`, `refactor` or `diagnose`. When that skill does not exist yet, it stops.
-  4. It runs `/verify` in a subagent with a fresh context. It fixes the hard findings and runs `/verify` again one time. It reports the remaining findings to you.
-  5. It commits and merges the ticket branch into the spec branch, then runs the tests and pushes the spec branch. If the merge has a conflict, it stops and shows you the conflict.
-  6. It closes the ticket. It removes the ticket worktree, the ticket branch and the test database.
-- **Output:** the ticket's commits on the spec branch, and a closed ticket.
-- **Next:** when all tickets are closed, you run `/review`.
+  1. It stops when a blocker is open. When someone else has the ticket, it asks whether you take it over. It sets the ticket to in progress and assigns it to you.
+  2. It pushes the spec branch when the remote does not have it. When no spec branch exists, it stops and tells you to push it from the machine that ran `/spec`.
+  3. It calls `worktree` to make a ticket worktree from the spec branch. When the worktree has commits, it resumes from them.
+  4. It calls the skill that the ticket's `approach:` label names: `tdd`, `refactor` or `diagnose`. When that skill does not exist yet, it stops.
+  5. It runs `/verify` in a subagent with a fresh context. It fixes the hard findings and runs `/verify` again one time. When a hard finding remains, it stops. You fix it, or you override it with a reason.
+  6. It rebases onto the spec branch and runs every check.
+  7. It shows a checkpoint card: each criterion with its test, the judgment calls, and a short "Check yourself" list. You approve, ask for a change, or ask for `/ui-check`. It starts no dev server until you ask. With `--ui`, it runs `/ui-check` before the card.
+  8. It squashes the ticket into one commit on the spec branch and pushes it. It closes the ticket and removes the ticket worktree.
+- **Output:** one commit per ticket on the spec branch, and a closed ticket.
+- **Next:** `/build` on the tickets it unblocked. When all tickets are closed, you run `/review`.
 
 ### `/verify [ref]`
 
 `/build` and `/diagnose` run it in a subagent. You can also run it on any diff.
 
 - **Input:** a diff and the ticket or issue it comes from.
-- **Checks:** the repo's coding standards, correctness, and the ticket's acceptance criteria.
-- **Output:** findings. Each finding is a hard violation or a judgment call.
+- **Checks:** it runs the tests, typecheck, lint and build itself. It checks the diff against the ticket's acceptance criteria and the spec's seams, then against the repo's written rules and a list of code smells.
+- **Output:** findings. A hard finding blocks the ticket: a failed check, a criterion with no test, a test at the wrong seam, a broken written rule, or a ticket that is not a vertical slice. Everything else is a judgment call, and it reports the top five. It edits nothing.
+
+### `/ui-check [ticket | what to check]`
+
+You run it when you want a browser check. `/build --ui` runs it too. Each run starts a dev server, so it never runs on its own.
+
+- **Process:** it starts the dev server and does the main flow of the change in Chrome, five steps or fewer. It uses Claude in Chrome, or Chrome DevTools when the extension is not connected. Then it stops the server.
+- **Output:** a "Verified" list, one line per step, and a "Check yourself" list of three steps or fewer. You approve or ask for a change.
 
 ### `/review`
 
@@ -137,7 +146,7 @@ You do not type these. Other skills call them.
 | Skill | Called by | Job |
 |---|---|---|
 | `interview` | `/spec`, `/prd` | Interview one question at a time on the design tree. Show a recommendation and a progress count. Keep a decisions log. |
-| `tdd` | `/build` | Red, green, refactor at the seams that the spec agreed. |
+| `tdd` | `/build` | One red, green cycle per acceptance criterion, at the seams that the spec agreed, with a commit per green. One refactor pass at the end. |
 | `refactor` | `/build` | Change the structure and keep the behavior. The suite stays green. Built when a ticket first needs it. |
 | `worktree` | `/spec`, `/build`, `/diagnose` | Find or make the worktree, then provision it. |
 | `pr` | `/ship` | Write the PR body: summary, evidence, merge danger. |
@@ -184,7 +193,7 @@ skills/
 ├── 1-define/   spec, prd, interview, prototype
 ├── 2-plan/     plan
 ├── 3-build/    build, tdd, diagnose
-├── 4-verify/   verify, review
+├── 4-verify/   verify, ui-check, review
 ├── 5-ship/     ship, pr, cleanup
 └── support/    setup-skills, worktree, retro, writing-for-agents, unslop
 ```
