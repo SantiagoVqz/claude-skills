@@ -30,6 +30,7 @@ Call the Skill tool with `interview`. The design tree for a spec always contains
 - What is out of scope.
 - The test seams. Propose the highest existing seam, and get the user's agreement.
 - The schema changes: each migration, or none.
+- The look of each new or changed screen, when the spec touches a screen. Ask "prototype it, or keep it plain?" On prototype, call the Skill tool with `prototype`, and record the chosen variant with its link. On plain, record that the look is plain on purpose.
 
 Do domain work during the interview:
 
@@ -38,7 +39,7 @@ Do domain work during the interview:
 - **Probe**: test each relationship between concepts with a concrete scenario at its edge.
 - **Cross-check**: when the user says how something works, compare it with the code, and show each contradiction.
 
-When a question can be answered only by seeing or running something, such as how a screen looks or how a state model behaves, offer the `prototype` skill. Record its verdict in the decisions log.
+When another question can be answered only by seeing or running something, such as how a state model behaves, offer the `prototype` skill. Record its verdict in the decisions log.
 
 Completion: the user confirmed the decisions log with an explicit yes.
 
