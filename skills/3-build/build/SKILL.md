@@ -1,6 +1,6 @@
 ---
 name: build
-description: "Build one ticket in its own worktree, verify it, walk the user through it, and land it on the spec branch."
+description: "Build one ticket in its own worktree, verify it, get the user's approval, and land it on the spec branch."
 disable-model-invocation: true
 argument-hint: "<ticket> [--ui]"
 ---
@@ -38,7 +38,7 @@ Completion: the spec branch exists on the remote.
 
 Call the Skill tool with `worktree` for `ticket/<n>-<slug>`, made from the spec branch.
 
-When the worktree already has commits, this is a resume. Read `git log <spec-branch>..HEAD` and run the tests. Continue from the first acceptance criterion that no commit covers.
+When the worktree already has commits, this is a resume. Run `git status`. When a rebase is in progress, go to step 6. Otherwise read `git log <spec-branch>..HEAD` and run the tests. Continue from the first acceptance criterion that no commit covers.
 
 Completion: the session is in the ticket worktree, and you know which criteria are done.
 
@@ -58,13 +58,17 @@ Completion: the last `verify` run has no hard finding, or the user gave an overr
 
 ## 6. Rebase
 
-Run `git rebase <spec-branch>`. On a conflict, stop and show it. Then run the full suite, the typecheck and the build.
+Run `git rebase <spec-branch>`. On a conflict, call the Skill tool with `resolve-conflicts`. Then run the full suite, the typecheck and the build.
 
-Completion: the ticket branch is on the latest spec branch, and every check passes.
+When you resolved a conflict, run `verify` in a new subagent, as in step 5. The code changed, so an earlier approval no longer counts. A clean rebase keeps the approval.
+
+Completion: the ticket branch is on the latest spec branch, every check passes, and each conflict is resolved.
 
 ## 7. Checkpoint
 
-When the user passed `--ui`, call the Skill tool with `ui-check` for this ticket first.
+When the user approved before a clean rebase, go to step 8.
+
+When the user passed `--ui`, call the Skill tool with `ui-check` for this ticket first. It leaves the dev server and the tab open, so the user can look while the question waits.
 
 Then show one card:
 
@@ -80,15 +84,17 @@ Check yourself: `<run command>`
 1. <a step and what the user sees>
 ```
 
-Keep "Check yourself" to three steps or fewer, on the main flow of the ticket. Start no dev server and open no browser, unless `--ui` is set.
+Keep "Check yourself" to three steps or fewer, on the main flow of the ticket. Start no dev server and open no browser yourself. Only `ui-check` does that.
 
-Ask with the question tool: "Approve", "Change" or "Run ui-check". Leave out "Run ui-check" when it already ran. On Run ui-check, call the Skill tool with `ui-check` for this ticket, then ask again with "Approve" or "Change". On Change, make the edits, commit, run `verify` in a new subagent, and go back to step 6.
+Ask with the question tool: "Approve", "Change" or "Run ui-check". Leave out "Run ui-check" when it already ran. On Run ui-check, call the Skill tool with `ui-check` for this ticket, then ask again with "Approve" or "Change". On Change, make the edits, commit, run `verify` in a new subagent, and go back to step 6. When Change comes with no notes, ask in the chat what to change. Offer no list of options that you picked.
 
-Completion: the user picked Approve.
+A free-text answer that clearly approves, such as "looks good", counts as Approve. Start the reply with: "Taking that as Approve."
+
+Completion: the user approved. Stop the dev server and close the tab, when `ui-check` started them.
 
 ## 8. Land
 
-Call `EnterWorktree` with the path of the spec worktree. Run `git merge-base --is-ancestor <spec-branch> <ticket-branch>`. When it fails, another ticket landed first: go back to the ticket worktree and to step 6.
+Call `EnterWorktree` with the path of the spec worktree. Run `git merge-base --is-ancestor <spec-branch> <ticket-branch>`. When it fails, another ticket landed first: go back to the ticket worktree and to step 6. A clean rebase lands with no new question. A resolved conflict goes to the user again.
 
 Squash the ticket into one commit: `git merge --squash <ticket-branch>`, then `git commit -m "<ticket title> (#<n>)"`. Add `-m "Override: <reason>"` when the user gave one. Push the spec branch.
 

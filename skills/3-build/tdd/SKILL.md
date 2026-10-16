@@ -32,7 +32,9 @@ Take the acceptance criteria in order. For each criterion:
 When a new test passes on its first run, it proves nothing yet. Do one of these, and name it in the commit message:
 
 - Take a later criterion first, when that criterion makes this test fail.
-- Break the code for one run, see the test fail, and undo the break.
+- Break the code for one run, see the test fail, and undo the break. Confirm that `git diff` shows no source change before the next break.
+
+A criterion that sets a rule for the tests, such as how each test sets the clock, gets no cycle. The report names the tests that follow it.
 
 A criterion can take more than one cycle. Each cycle gets its own commit. Run the typecheck and the test file each cycle.
 

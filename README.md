@@ -79,7 +79,7 @@ You start each `/build` by hand, in its own terminal. You decide how many run at
   3. It calls `worktree` to make a ticket worktree from the spec branch. When the worktree has commits, it resumes from them.
   4. It calls the skill that the ticket's `approach:` label names: `tdd`, `refactor` or `diagnose`. When that skill does not exist yet, it stops.
   5. It runs `/verify` in a subagent with a fresh context. It fixes the hard findings and runs `/verify` again one time. When a hard finding remains, it stops. You fix it, or you override it with a reason.
-  6. It rebases onto the spec branch and runs every check.
+  6. It rebases onto the spec branch and runs every check. On a conflict, it calls `resolve-conflicts`, runs `/verify` again, and asks for your approval again.
   7. It shows a checkpoint card: each criterion with its test, the judgment calls, and a short "Check yourself" list. You approve, ask for a change, or ask for `/ui-check`. It starts no dev server until you ask. With `--ui`, it runs `/ui-check` before the card.
   8. It squashes the ticket into one commit on the spec branch and pushes it. It closes the ticket and removes the ticket worktree.
 - **Output:** one commit per ticket on the spec branch, and a closed ticket.
@@ -148,6 +148,7 @@ You do not type these. Other skills call them.
 | `interview` | `/spec`, `/prd` | Interview one question at a time on the design tree. Show a recommendation and a progress count. Keep a decisions log. |
 | `tdd` | `/build` | One red, green cycle per acceptance criterion, at the seams that the spec agreed, with a commit per green. One refactor pass at the end. |
 | `refactor` | `/build` | Change the structure and keep the behavior. The suite stays green. Built when a ticket first needs it. |
+| `resolve-conflicts` | `/build` | Resolve a rebase conflict and keep both intents. Ask you only when both sides change the same behavior. |
 | `worktree` | `/spec`, `/build`, `/diagnose` | Find or make the worktree, then provision it. |
 | `pr` | `/ship` | Write the PR body: summary, evidence, merge danger. |
 
@@ -192,7 +193,7 @@ Each skill is in the folder of its phase. The number gives the order of the flow
 skills/
 ├── 1-define/   spec, prd, interview, prototype
 ├── 2-plan/     plan
-├── 3-build/    build, tdd, diagnose
+├── 3-build/    build, tdd, resolve-conflicts, diagnose
 ├── 4-verify/   verify, ui-check, review
 ├── 5-ship/     ship, pr, cleanup
 └── support/    setup-skills, worktree, retro, writing-for-agents, unslop
