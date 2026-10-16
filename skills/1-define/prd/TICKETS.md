@@ -26,6 +26,8 @@ A wide refactor is one mechanical change, such as a column rename, that breaks c
 
 The end-to-end behavior that this ticket makes work, from the user's point of view.
 
+Covers stories: 1, 2
+
 ## Blocked by
 
 - Each blocking ticket, or "None, can start at once".
@@ -35,5 +37,7 @@ The end-to-end behavior that this ticket makes work, from the user's point of vi
 - [ ] Criterion 1
 - [ ] Criterion 2
 ```
+
+`Covers stories` names the user stories of the PRD that the ticket makes work. Each story is in one ticket or more. The acceptance criteria tell when the ticket is done.
 
 The ticket title goes in the issue title, or in the list item heading. Use the PRD's words. Leave out file paths and code: they go stale before the work ends. The one exception is a prototype snippet that states a decision more exactly than prose. Trim it to the decision and say that it came from a prototype.
