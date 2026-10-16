@@ -186,7 +186,7 @@ skills/
 ├── 3-build/    build, tdd, diagnose
 ├── 4-verify/   verify, review
 ├── 5-ship/     ship, pr, cleanup
-└── support/    setup-skills, worktree, retro, writing-for-agents
+└── support/    setup-skills, worktree, retro, writing-for-agents, unslop
 ```
 
 A skill installs by its folder name only, for example `spec`. The phase folder groups skills and is not part of the name.
