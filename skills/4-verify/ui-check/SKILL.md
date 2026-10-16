@@ -6,7 +6,7 @@ argument-hint: "[ticket | what to check]"
 
 # UI check
 
-`/ui-check` runs the app, does the main flow of a change in a browser, and reports. It changes no code. The user decides when it runs, because each run starts a dev server.
+`/ui-check` runs the app, does the main flow of a change in a browser, and reports. It changes no code. The user decides when it runs, because each run starts a dev server. The server and the tab stay open until the user answers, so the user can look for themselves.
 
 ## 1. Pick the flow
 
@@ -18,25 +18,25 @@ Completion: you have the flow, five steps or fewer.
 
 ## 2. Run
 
-Start the dev server in the current worktree, in the background. Load the Claude in Chrome tools and `browser_batch` in one ToolSearch call, and open a new tab. When the extension is not connected, use the Chrome DevTools tools.
+Start the dev server in the current worktree, in the background, with no fixed port. Read the URL from the server's ready line. Load the Claude in Chrome tools and `browser_batch` in one ToolSearch call, and open a new tab. When the extension is not connected, use the Chrome DevTools tools.
 
-Do each step of the flow in one `browser_batch` call. End each batch with a read of the page, and compare it with what the step expects.
+Do each step of the flow in one `browser_batch` call. When a step needs a ref, do one `find` call first, then the batch. End each batch with a read of the page, and compare it with what the step expects.
 
-Completion: each step passed or failed. Stop the dev server.
+Completion: each step passed or failed. The dev server and the tab stay open.
 
 ## 3. Report
 
-Write two lists, one line each, then ask with the question tool: "Approve" or "Change".
+Write two lists, one line each. When a caller such as `/build` ran you, stop here: the caller asks the question and stops the server. When the user ran you, ask with the question tool: "Approve" or "Change".
 
 ```markdown
 Verified:
 - ✓ <step> · <what you saw>
 - ✗ <step> · <what you saw instead>
 
-Check yourself: <URL> after `<run command>`
+Check yourself at <URL>:
 1. <what to do> · <what the user sees>
 ```
 
 "Check yourself" has three steps or fewer: what a browser check cannot judge, such as the look and the feel.
 
-Completion: the user picked Approve or Change. Give the answer to the caller.
+Completion: the lists are shown. When the user ran you, they answered, and you stopped the dev server and closed the tab.

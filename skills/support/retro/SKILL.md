@@ -17,7 +17,7 @@ Completion: you can list each skill that ran in the session.
 
 ## 2. Find the run folder
 
-Resolve this `SKILL.md` with `realpath`. When it is in a git repo other than the current project, that repo is the skills repo, and the run folder is `runs/` at its root. When it is not, the run folder is `.scratch/retro/` in the project. Tell the user to send the file to the owner of the skill set.
+Resolve this `SKILL.md` with `realpath`. Walk up from that path, and look for a `.git` folder with `ls`. Run no git command on that path, because the worktree guard refuses it. When you find a repo other than the current project, that repo is the skills repo, and the run folder is `runs/` at its root. When you do not, the run folder is `.scratch/retro/` in the project. Tell the user to send the file to the owner of the skill set.
 
 Completion: you know the run folder.
 
