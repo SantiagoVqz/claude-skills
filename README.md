@@ -142,12 +142,15 @@ Run it after you merge.
 - **Process:**
   1. If the input is not an issue, it creates an issue with the `bug` label.
   2. It calls `worktree` to make a fix branch, `fix/<n>-<slug>`, from the trunk.
-  3. It builds a feedback loop that fails on the bug. Then it reproduces the bug, ranks hypotheses, instruments the code, fixes the bug with a regression test, and cleans up.
-  4. It runs `/verify` in a subagent, the same as `/build`.
-- **Output:** a fix commit. The issue records the cause.
+  3. It builds a feedback loop that goes red on the bug, and minimises the repro. When a person must reproduce the bug, `/ui-check` tries first, then it asks you one step at a time.
+  4. It ranks 3 to 5 hypotheses, and you pick the first one to test. It instruments the code, fixes the cause with a regression test, and cleans up.
+  5. It runs `/verify` in a subagent, the same as `/build`.
+  6. It shows a card: cause, fix, test and judgment calls. You approve, ask for a change, or ask for `/ui-check`.
+  7. It squashes the branch into one commit, `Fix <title> (#n)`, with the cause in the message.
+- **Output:** one fix commit. A comment on the issue records the cause.
 - **Next:** `/ship`.
 
-When `/build` calls `diagnose` for an `approach:diagnose` ticket, steps 1, 2 and 4 do not run. `/build` owns them.
+When `/build` calls `diagnose` for an `approach:diagnose` ticket, steps 1, 2, 5, 6 and 7 do not run. `/build` owns them.
 
 ## Skills that other skills call
 
