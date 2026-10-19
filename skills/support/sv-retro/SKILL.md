@@ -53,8 +53,9 @@ Look for these gaps in each timeline:
 - **Fact question**: the agent asked the user for a fact that it could look up.
 - **Excuse**: the agent gave a reason to skip work. These become anti-rationalization rows.
 - **Friction**: a tool error, a retry, or a long detour.
+- **Outside skill**: a skill or agent that is not in this set ran. Record what it did that the set did not do.
 
-For each gap, decide the fix: sharpen the wording, add a step, add a row to an anti-rationalization table, cut a no-op, or change a description. A gap that is caused by the project and not by a skill gets the `project` tag and no fix.
+For each gap, decide the fix: sharpen the wording, add a step, add a row to an anti-rationalization table, cut a no-op, change a description, or, for an outside skill, add its idea to an `sv-` skill or propose a new skill. A gap that is caused by the project and not by a skill gets the `project` tag and no fix.
 
 Merge the gaps of all sessions. The same gap in more than one session is one finding, with evidence from each session. When a gap matches an open finding from step 4, link that finding and count the runs. When it matches a rejected finding, leave it out.
 
