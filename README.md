@@ -114,7 +114,7 @@ Run it when all tickets of a spec are closed. Each ticket already passed `/sv-ve
 - **Output:** a card that you approve. Then it posts the card as a comment on the spec issue, with the reviewed commit. The evidence is text only: the "Verified" lines.
 - **Next:** `/sv-ship`.
 
-### `/sv-ship [spec | bug]`
+### `/sv-ship [spec | issue]`
 
 - **Input:** a spec branch with an approved review comment, or a fix branch from `/sv-diagnose`.
 - **Process:**

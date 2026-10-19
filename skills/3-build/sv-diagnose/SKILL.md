@@ -16,7 +16,7 @@ metadata:
 
 When `/sv-build` runs this skill for an `approach:diagnose` ticket, skip the steps marked "(not under `/sv-build`)". `/sv-build` owns them.
 
-After `EnterWorktree`, run one plain shell command per call from the worktree root, with no `cd`, no `-C`, no `&&` chain and no path outside the worktree. Write files with the Write tool.
+After `EnterWorktree`, run one plain shell command per call from the worktree root: no `cd`, no `-C`, no `&&` chain, no `$(...)`, no shell variable and no path outside the worktree. A `cd` stays in effect for the rest of the session. For a subfolder, use a flag such as `pnpm --dir` or `uv --directory`. Write files with the Write tool.
 
 ## 1. Issue (not under `/sv-build`)
 

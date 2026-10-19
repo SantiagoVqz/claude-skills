@@ -170,6 +170,7 @@ You may use one of these, you may use several, it is unlikely you will use all o
 Concrete evidence that the change works, as text. Pick the shape:
 
 - **Spec PR**: one line for each user story: `<n>. <story> · <test name> · ✓ <what the walk saw>`. Then the link to the review comment.
+- **Issue PR**, for a ticket that ships alone: one line for each acceptance criterion: `<n>. <criterion> · <test name> · ✓ <what you saw>`.
 - **Fix PR**: **Before:** the regression test fails, with its failure message. **After:** it passes. Show the test as pseudocode.
 
 ### Merge Danger

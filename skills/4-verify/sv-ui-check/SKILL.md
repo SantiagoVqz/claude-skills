@@ -16,21 +16,25 @@ Write the flow as a short list of steps, the way a user does the feature from st
 
 When `/sv-review` calls you, it gives the flow: one step for each user story, with no limit on the count.
 
-Completion: you have the flow, five steps or fewer, or the flow from `/sv-review`.
+Print the flow as a numbered list before step 2. A screen width, such as 390px, is a parameter of a step, not a new step.
+
+Completion: the flow is printed, five steps or fewer, or the flow from `/sv-review`.
 
 ## 2. Run
 
-Start the dev server in the current worktree, in the background, with no fixed port. Read the URL from the server's ready line. Load the Claude in Chrome tools and `browser_batch` in one ToolSearch call, and open a new tab. When the extension is not connected, use the Chrome DevTools tools.
+Read the run section of the README or `AGENTS.md`, and start each service that the pages need first, such as the database or the API. Then start the dev server in the current worktree, in the background, with no fixed port. Read the URL from the server's ready line. Load the Claude in Chrome tools and `browser_batch` in one ToolSearch call, and open a new tab. When the extension is not connected, use the Chrome DevTools tools.
 
 Do each step of the flow in one `browser_batch` call. When a step needs a ref, do one `find` call first, then the batch. End each batch with a read of the page, and compare it with what the step expects.
 
 The DevTools tools have no batch. A step that clicks starts with one `take_snapshot` to get the uids, the same as `find` before a batch. Use `fill_form` for a step with more than one field. End each step with one `evaluate_script` read.
 
+When the app goes to a sign-in page, ask the user to sign in in that window, and wait. Type no password yourself.
+
 Completion: each step passed or failed. The dev server and the tab stay open.
 
 ## 3. Report
 
-Write two lists, one line each. When a caller such as `/sv-build` ran you, stop here: the caller asks the question and stops the server. When the user ran you, ask with the question tool: "Approve" or "Change".
+Write two lists, one line each. When a caller such as `/sv-build` ran you, stop here: the caller asks the question and stops the server. When the user ran you, or you started yourself with no caller skill, ask with the question tool: "Approve" or "Change".
 
 ```markdown
 Verified:

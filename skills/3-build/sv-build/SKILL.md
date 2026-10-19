@@ -9,7 +9,7 @@ argument-hint: "<ticket> [--ui]"
 
 `/sv-build` takes one ticket from open to closed. It ends with the ticket as one commit on the spec branch, the spec branch pushed, the ticket closed, and the ticket worktree gone. The user approves the ticket before it lands. With `--ui`, the `sv-ui-check` skill checks it in a browser first.
 
-After `EnterWorktree`, run one plain shell command per call from the worktree root, with no `cd`, no `-C`, no `&&` chain and no path outside the worktree. Write files with the Write tool.
+After `EnterWorktree`, run one plain shell command per call from the worktree root: no `cd`, no `-C`, no `&&` chain, no `$(...)`, no shell variable and no path outside the worktree. A `cd` stays in effect for the rest of the session. For a subfolder, use a flag such as `pnpm --dir` or `uv --directory`. Write files with the Write tool.
 
 ## 1. Start
 
