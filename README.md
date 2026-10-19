@@ -97,25 +97,30 @@ You start each `/build` by hand, in its own terminal. You decide how many run at
 
 You run it when you want a browser check. `/build --ui` runs it too. Each run starts a dev server, so it never runs on its own.
 
-- **Process:** it starts the dev server and does the main flow of the change in Chrome, five steps or fewer. It uses Claude in Chrome, or Chrome DevTools when the extension is not connected. Then it stops the server.
+- **Process:** it starts the dev server and does the main flow of the change in Chrome, five steps or fewer. For `/review`, it does one step per story. It uses Claude in Chrome, or Chrome DevTools when the extension is not connected. The server and the tab stay open until you answer.
 - **Output:** a "Verified" list, one line per step, and a "Check yourself" list of three steps or fewer. You approve or ask for a change.
 
-### `/review`
+### `/review <spec> [--no-ui]`
 
-- **Input:** the spec branch after all tickets are merged.
+Run it when all tickets of a spec are closed. Each ticket already passed `/verify` and your approval, so `/review` checks only what the whole spec shows.
+
 - **Checks:**
-  - **Spec coverage:** each user story has code and a test. It lists stories that are missing or partial, and behavior that the spec did not ask for.
-  - **Runtime proof:** it starts the app and does each user story. It uses a browser for UI and real requests for an API.
-- **Output:** a report, plus screenshots and output as evidence. It does not fix gaps. You make each gap a new ticket, or you record it as out of scope.
-- **Next:** `/ship` puts the evidence in the PR.
+  - **Checks of the repo:** the full suite, typecheck, lint and build.
+  - **Coverage:** each user story has tickets and a test. A story with no test is a gap.
+  - **Drift:** a subagent with a fresh context reads the whole spec diff. It looks for faults between tickets: duplication, two names for one term, a helper that one ticket ignored.
+  - **Walk:** `/ui-check` does one step per story on the merged app. `--no-ui` skips it.
+- **Gaps:** you mark each gap "Ticket" or "Out of scope". A missing story gets its own ticket. The other gaps share one follow-up ticket. When it creates a ticket, you `/build` it and run `/review` again.
+- **Partial:** when a ticket is open, it asks whether to review the closed tickets only.
+- **Output:** a card that you approve. Then it posts the card as a comment on the spec issue, with the reviewed commit. The evidence is text only: the "Verified" lines.
+- **Next:** `/ship`.
 
-### `/ship [partial]`
+### `/ship`
 
-- **Input:** a branch that passed `/review`, or a fix branch from `/diagnose`.
-- **Process:** it integrates the base branch, runs the full suite, and pushes. It writes the PR body with `pr`.
+- **Input:** a spec branch with an approved review comment, or a fix branch from `/diagnose`.
+- **Process:** it reads the latest review comment. It stops when the branch has a commit after the reviewed commit. It integrates the base branch, runs the full suite, and pushes. It writes the PR body with `pr`, and copies the "Verified" lines as evidence.
 - **Output:** one PR.
-  - A full ship says `Closes #<spec>`. `/ship` stops if a ticket is still open.
-  - `/ship partial` says `Part of #<spec>` and lists the open tickets. `/review` checks only the stories of the closed tickets.
+  - A full review gives `Closes #<spec>`.
+  - A partial review gives `Part of #<spec>` and the list of open tickets.
 - **Next:** you review and merge the PR. The merge is always yours.
 
 ### `/cleanup`
@@ -211,7 +216,3 @@ A skill installs by its folder name only, for example `spec`. The phase folder g
 ```
 
 A plugin and `npx skills add` come later. See issue #3.
-
-## Open questions
-
-- **Evidence storage:** where `/review` saves screenshots, and how `/ship` puts them in the PR body.
