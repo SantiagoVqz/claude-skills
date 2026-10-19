@@ -35,7 +35,7 @@ Completion: the session is in the worktree, and the end of the `provision.sh` ou
 
 Run this from the primary checkout after the branch is merged, into the spec branch for a ticket, or into the trunk for a spec or fix.
 
-1. Call `EnterWorktree` with the worktree path, and run `scripts/provision.sh drop`. The script drops the test database, and the dev fork when the branch owns one. A ticket leaves its spec's fork alone. Then call `ExitWorktree` with `keep` to go back to the primary checkout.
+1. Call `EnterWorktree` with the worktree path, and skip the call when the session is already there. Run `scripts/provision.sh drop`. The script drops the test database, and the dev fork when the branch owns one. A ticket leaves its spec's fork alone. Then call `ExitWorktree` with `keep` to go back to the primary checkout.
 2. `git worktree remove <path>`. When it refuses because of uncommitted or untracked files, stop and show them. Keep the files: no `--force`.
 3. `git branch -D <branch>`. It also removes the `branch.<branch>` config, with the spec link of a ticket.
 

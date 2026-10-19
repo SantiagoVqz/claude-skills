@@ -9,7 +9,7 @@ argument-hint: "[spec | bug]"
 
 `/cleanup` runs after the user merges a PR from `/ship`. It ends with the issues in the right state, the worktree and branches gone, and the primary checkout on the latest trunk. It deletes nothing before the gate passes.
 
-Run it from the primary checkout. When the session entered a worktree with `EnterWorktree`, call `ExitWorktree` with `keep` first. When the session started in the worktree of the branch, stop: a session cannot remove its own start directory. Tell the user to run `/cleanup` in a session in the primary checkout.
+Run it from the primary checkout. When the session is in a worktree, call `ExitWorktree` with `keep` first. When the session is still not in the primary checkout, stop, and tell the user to run `/cleanup` in a session there.
 
 ## 1. Find
 
@@ -21,7 +21,7 @@ Completion: you have the branch, its issue and the trunk.
 
 Run `gh pr list --head <branch> --state all --json number,url,state,body`.
 
-- **A merged PR**: go on. A rebase merge and a squash merge both show as merged.
+- **A merged PR**: go on. Read its merge commit with `gh pr view <pr> --json mergeCommit`. When that commit has two parents (`git cat-file -p <commit>` after a fetch), the PR merged with a merge commit, not rebase and merge. Name it in the report, with the repo setting that blocks it: `gh repo edit --enable-merge-commit=false`.
 - **An open PR**: stop, and give its URL.
 - **No PR**: stop. The next step is `/ship`.
 
@@ -50,9 +50,15 @@ Completion: origin does not have the branch.
 
 ## 6. Trunk
 
-Record the trunk head with `git rev-parse HEAD`. Run `git pull --ff-only`. When it does not fast-forward, stop and show why. Keep the local commits: no force.
+Record the trunk head with `git rev-parse HEAD`. Run `git pull --ff-only`.
 
-Completion: the primary checkout is on the latest trunk.
+When it does not fast-forward, list the local-only commits with `git log --oneline origin/<trunk>..<trunk>`. Ask with the question tool:
+
+- **Move to a branch** (recommended): `git branch local/<trunk>-<date> <trunk>`, then `git reset --keep origin/<trunk>`. The commits stay on the branch, and the user ships them with a PR.
+- **Rebase and push**: `git rebase origin/<trunk>`, then `git push origin <trunk>`. Only for a repo where the user pushes to the trunk.
+- **Stop**: keep everything as it is.
+
+Completion: the primary checkout is on the latest trunk, or the user picked Stop.
 
 ## 7. Migrations
 
@@ -62,4 +68,4 @@ Completion: the trunk dev database has each new migration, or the report names t
 
 ## Report
 
-PR · issues closed by keyword, by hand, or left open for a partial ship · worktree removed · branches deleted · trunk head · migrations applied · ticket worktrees left open.
+PR · merge method, when it was not rebase and merge · issues closed by keyword, by hand, or left open for a partial ship · worktree removed · branches deleted · trunk head · migrations applied · ticket worktrees left open.
