@@ -114,14 +114,19 @@ Run it when all tickets of a spec are closed. Each ticket already passed `/verif
 - **Output:** a card that you approve. Then it posts the card as a comment on the spec issue, with the reviewed commit. The evidence is text only: the "Verified" lines.
 - **Next:** `/ship`.
 
-### `/ship`
+### `/ship [spec | bug]`
 
 - **Input:** a spec branch with an approved review comment, or a fix branch from `/diagnose`.
-- **Process:** it reads the latest review comment. It stops when the branch has a commit after the reviewed commit. It integrates the base branch, runs the full suite, and pushes. It writes the PR body with `pr`, and copies the "Verified" lines as evidence.
+- **Process:**
+  1. It reads the latest review comment. It stops when the branch has a commit after the reviewed commit.
+  2. It rebases onto the trunk. A clean rebase keeps the review. On a conflict, it calls `resolve-conflicts`. A spec then goes back to `/review`. A fix gets a fresh `/verify` and goes on.
+  3. It runs every check, and writes the PR body with `pr`. The evidence is text: story, test and the "Verified" line.
+  4. You approve the title and the body. Then it pushes and opens the PR, ready for review.
+  5. When the repo has CI, it watches the checks. It reports a failure and fixes nothing.
 - **Output:** one PR.
-  - A full review gives `Closes #<spec>`.
+  - A full review or a fix gives `Closes #<n>`.
   - A partial review gives `Part of #<spec>` and the list of open tickets.
-- **Next:** you review and merge the PR. The merge is always yours.
+- **Next:** you merge with rebase and merge, so each ticket stays one commit on the trunk. Then `/cleanup`.
 
 ### `/cleanup`
 
