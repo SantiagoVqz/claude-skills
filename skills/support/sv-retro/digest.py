@@ -85,7 +85,8 @@ def timeline(path: Path, start: int) -> None:
                 if block.get("name") == "Skill":
                     print(f"{n} {side}SKILL {tool_input.get('skill')} {short(tool_input.get('args', ''), TEXT_MAX)}")
                 elif block.get("name") in ("Agent", "Task"):
-                    print(f"{n} {side}SUBAGENT {short(tool_input.get('description', ''), TEXT_MAX)}")
+                    kind_name = tool_input.get("subagent_type") or "general"
+                    print(f"{n} {side}SUBAGENT {kind_name} {short(tool_input.get('description', ''), TEXT_MAX)}")
                 elif block.get("name") == "AskUserQuestion":
                     print(f"{n} {side}ASK {short(json.dumps(tool_input.get('questions', '')), TEXT_MAX)}")
             elif btype == "tool_result" and block.get("is_error"):
