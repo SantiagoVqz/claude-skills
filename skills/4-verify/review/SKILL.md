@@ -35,7 +35,9 @@ Completion: every check passes.
 
 For each story in scope, find the closed tickets that name it in `Covers stories`, and the tests that prove it. A story with no code or no test is a hard finding. Record each hard finding as a gap for step 7.
 
-Completion: each story in scope has its tickets and its tests, or a gap.
+Read the close comment of each closed ticket. Each judgment call that it lists as open is a gap for step 7.
+
+Completion: each story in scope has its tickets and its tests, or a gap, and each open judgment call from the tickets is a gap.
 
 ## 5. Diff review
 
@@ -69,7 +71,7 @@ Show each gap on one line. Ask with the question tool for each gap: "Ticket" or 
 
 Write each ticket with [TICKETS.md](../prd/TICKETS.md), the file in the folder of the `prd` skill, with `--parent <spec>` and one approach label from the table in `plan`. Create it as `tracker.md` says.
 
-When you created a ticket, the spec is not done. Stop the dev server and close the tab. Post the out-of-scope gaps as a comment on the spec issue, and stop. The report names the next step: `/build <n>` for each new ticket, then `/review` again.
+When you created a ticket, the spec is not done. Stop the dev server, and close the tab as `ui-check` says. Post the out-of-scope gaps as a comment on the spec issue, and stop. The report names the next step: `/build <n>` for each new ticket, then `/review` again.
 
 Completion: each gap is in a ticket or out of scope.
 
@@ -79,6 +81,8 @@ Show one card:
 
 ```markdown
 ### Review of #<spec> · <short commit> · full | partial
+
+Checks: <each check from step 3> passed
 
 Stories:
 - <n>. <story> · #<ticket> · <test name>
@@ -95,7 +99,7 @@ Check yourself at <URL>:
 1. <what to do> · <what the user sees>
 ```
 
-Leave out "Verified" and the URL when step 6 was skipped. Leave out "Open tickets" for a full review. Keep "Check yourself" to three steps or fewer.
+Leave out "Verified" and the URL when step 6 was skipped. Leave out "Open tickets" for a full review. Keep "Check yourself" to three steps or fewer. The card has only these parts. Any other note is a gap: go to step 7.
 
 Ask with the question tool: "Approve" or "Change". On Change, each note from the user is a gap: go to step 7. When Change comes with no notes, ask in the chat what to change. A free-text answer that clearly approves counts as Approve. Start the reply with: "Taking that as Approve." When the question returns no answer, ask it again before any other action.
 
@@ -103,7 +107,7 @@ Completion: the user approved.
 
 ## 9. Post
 
-Post the card as a comment on the spec issue, as `tracker.md` says. Its first line starts with `### Review of #<spec>`, and it has the full commit hash of the spec branch head. `/ship` finds the comment by this line, and stops when the head moved after it. Stop the dev server and close the tab.
+Post the card as a comment on the spec issue, as `tracker.md` says. Its first line starts with `### Review of #<spec>`, and it has the full commit hash of the spec branch head. `/ship` finds the comment by this line, and stops when the head moved after it. Stop the dev server, and close the tab as `ui-check` says.
 
 Completion: the comment is on the spec issue, and no dev server from this review runs.
 

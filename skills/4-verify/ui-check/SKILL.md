@@ -24,7 +24,7 @@ Start the dev server in the current worktree, in the background, with no fixed p
 
 Do each step of the flow in one `browser_batch` call. When a step needs a ref, do one `find` call first, then the batch. End each batch with a read of the page, and compare it with what the step expects.
 
-The DevTools tools have no batch. Use `fill_form` for a step with more than one field. End each step with one `evaluate_script` read, not a full snapshot.
+The DevTools tools have no batch. A step that clicks starts with one `take_snapshot` to get the uids, the same as `find` before a batch. Use `fill_form` for a step with more than one field. End each step with one `evaluate_script` read.
 
 Completion: each step passed or failed. The dev server and the tab stay open.
 

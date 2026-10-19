@@ -104,7 +104,7 @@ Completion: the spec branch on the remote has the ticket commit.
 
 ## 9. Close
 
-Close the ticket as `tracker.md` says, with the commit hash in the comment. Remove the ticket worktree with the `worktree` skill.
+Close the ticket as `tracker.md` says. The comment has the commit hash, and each judgment call from the card that no change fixed, under "Open judgment calls:". `/review` makes each one a gap. Remove the ticket worktree with the `worktree` skill.
 
 Completion: the ticket is closed, and `git worktree list` does not show the ticket worktree.
 
