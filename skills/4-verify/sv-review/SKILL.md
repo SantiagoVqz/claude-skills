@@ -9,13 +9,15 @@ argument-hint: "<spec> [--no-ui]"
 
 `/sv-review` checks what only the whole spec shows. Each ticket already passed `sv-verify` and the user's approval, so `/sv-review` does not check a ticket's acceptance criteria again. It ends with the user's approval and one review comment on the spec issue. `/sv-ship` needs that comment. `/sv-review` fixes nothing. Each gap becomes a ticket or goes out of scope.
 
-After `EnterWorktree`, run one plain shell command per call from the worktree root, with no `cd`, no `-C`, no `&&` chain and no path outside the worktree. Write files with the Write tool.
+After `EnterWorktree`, run one plain shell command per call from the worktree root: no `cd`, no `-C`, no `&&` chain, no `$(...)`, no shell variable and no path outside the worktree. A `cd` stays in effect for the rest of the session. For a subfolder, use a flag such as `pnpm --dir` or `uv --directory`. Write files with the Write tool.
 
 ## 1. Load
 
 Read the `## Agent skills` block in `AGENTS.md`, then `docs/agents/tracker.md`. When the block is missing, tell the user to run `/sv-setup-skills`, and stop. Read the spec issue with its numbered user stories, and each of its tickets.
 
 When a ticket is open, ask with the question tool: "Review closed only" or "Stop". On Review closed only, the review is **partial**: it covers only the stories in the `Covers stories` lines of the closed tickets.
+
+Find the latest comment on the spec issue that starts with `### Review of #<spec>`. After step 2, compare its hash with `git rev-parse HEAD`. When they match, the review is current: tell the user that the next step is `/sv-ship <spec>`, and stop.
 
 Completion: you have the stories in scope, and you know whether the review is partial.
 

@@ -2,14 +2,14 @@
 name: sv-ship
 description: "Open the PR for a reviewed spec branch or a fix branch: rebase on the trunk, run the checks, write the body, and watch CI."
 disable-model-invocation: true
-argument-hint: "[spec | bug]"
+argument-hint: "[spec | issue]"
 ---
 
 # Ship
 
 `/sv-ship` turns a branch into one PR that the team can read. It ends with the PR open and ready for review, CI finished, and a short summary for the user. The merge is always the user's, with rebase and merge, so that each ticket stays one commit on the trunk.
 
-After `EnterWorktree`, run one plain shell command per call from the worktree root, with no `cd`, no `-C`, no `&&` chain and no path outside the worktree. Write files with the Write tool.
+After `EnterWorktree`, run one plain shell command per call from the worktree root: no `cd`, no `-C`, no `&&` chain, no `$(...)`, no shell variable and no path outside the worktree. A `cd` stays in effect for the rest of the session. For a subfolder, use a flag such as `pnpm --dir` or `uv --directory`. Write files with the Write tool.
 
 ## 1. Load
 
@@ -18,7 +18,7 @@ Read the `## Agent skills` block in `AGENTS.md`, then `docs/agents/tracker.md`. 
 Find the target from the argument, or from the current branch:
 
 - **Spec**: an issue with the `spec` label, and its branch `spec/<n>-<slug>`.
-- **Bug**: an issue with the `bug` label, and its branch `fix/<n>-<slug>`.
+- **Issue**: a bug, or a ticket whose spec has no branch, with its branch `fix/<n>-<slug>`.
 
 Completion: you have the issue, its branch and the trunk, as the `sv-worktree` skill finds it.
 
@@ -32,9 +32,9 @@ For a spec, read the latest comment on the spec issue that starts with `### Revi
 
 Take full or partial from the comment. A partial review lists the open tickets.
 
-A bug needs no review comment. `/sv-diagnose` ran `sv-verify` on the fix.
+An issue needs no review comment. For a bug, `/sv-diagnose` ran `sv-verify` on the fix. For a ticket, run `sv-verify` now in a subagent with a fresh context, with the ticket and the diff `origin/<trunk>...HEAD`. A hard finding stops `/sv-ship`.
 
-Completion: the branch head is the reviewed commit, and you know full or partial, or the target is a bug.
+Completion: the branch head is the reviewed commit, and you know full or partial, or the target is an issue that passed `sv-verify`.
 
 ## 3. Rebase
 
@@ -42,7 +42,7 @@ Call `EnterWorktree` with the path of the worktree that has the branch. When the
 
 - **Clean**: go to step 4. The review still counts.
 - **Conflict on a spec**: call the Skill tool with `sv-resolve-conflicts`. The code changed, so the review no longer counts. Push nothing, and stop. The next step is `/sv-review <spec>`.
-- **Conflict on a bug**: call the Skill tool with `sv-resolve-conflicts`. Then run `sv-verify` in a subagent with a fresh context, with the bug issue and the diff `origin/<trunk>...HEAD`. A hard finding stops `/sv-ship`.
+- **Conflict on an issue**: call the Skill tool with `sv-resolve-conflicts`. Then run `sv-verify` in a subagent with a fresh context, with the issue and the diff `origin/<trunk>...HEAD`. A hard finding stops `/sv-ship`.
 
 Completion: the branch is on the latest trunk, and each conflict is resolved, or `/sv-ship` stopped.
 
@@ -56,9 +56,9 @@ Completion: every check passes.
 
 Call the Skill tool with `sv-pr` to write the body. Give it:
 
-- **The title**: the title of the spec or bug issue.
-- **The evidence**: for a spec, the Stories and Verified lines of the review comment, and its link. For a bug, the regression test.
-- **The closing line**: `Closes #<n>` for a full spec or a bug. `Part of #<spec>` for a partial spec, with the list of open tickets.
+- **The title**: the title of the spec or the issue.
+- **The evidence**: for a spec, the Stories and Verified lines of the review comment, and its link. For a bug, the regression test. For a ticket, its acceptance criteria with their tests.
+- **The closing line**: `Closes #<n>` for a full spec or an issue. `Part of #<spec>` for a partial spec, with the list of open tickets.
 - **The merge line**: `Merge with rebase and merge.`
 
 Completion: you have the title and a body with each of these parts.
@@ -85,4 +85,4 @@ Start with a short summary, three lines or fewer. Do not show the PR body.
 - <what changed> · because <why, from the spec's problem or the bug's cause>
 ```
 
-Then: PR URL · full, partial or bug · CI result · next step: merge with rebase and merge, then `/sv-cleanup`.
+Then: PR URL · full, partial or issue · CI result · next step: merge with rebase and merge, then `/sv-cleanup`.

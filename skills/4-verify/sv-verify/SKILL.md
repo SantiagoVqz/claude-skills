@@ -21,11 +21,12 @@ A finding is **hard** or a **judgment call**. A hard finding blocks the ticket. 
 Use the diff and the ticket that the caller gave. When you run on your own:
 
 - **Ticket**: the argument, or the number in a `ticket/<n>-` or `fix/<n>-` branch name.
-- **Diff**: `<ref>...HEAD`. With no ref, use the spec branch for a ticket branch, and the trunk for any other branch.
+- **Base**: the ref. With no ref, use the spec branch for a ticket branch. For any other branch, use `git merge-base origin/<trunk> HEAD`, because a local trunk can be ahead of the branch base.
+- **Diff**: `git diff <base>`. It includes the work that is not committed yet.
 
-Read the ticket with its acceptance criteria, and its parent spec with the testing decisions. Run `git rev-parse <ref>` and `git diff --stat <ref>...HEAD`.
+Read the ticket with its acceptance criteria, and its parent spec with the testing decisions. Run `git diff --stat <base>` and `git status --short`. Read each untracked file: `git diff` does not show it.
 
-Completion: the ref resolves, the diff is not empty, and you have the acceptance criteria.
+Completion: the base resolves, the diff is not empty, you have the acceptance criteria, and you know each untracked file.
 
 ## 2. Run the checks
 
@@ -50,10 +51,10 @@ For an `approach:refactor` ticket, the behavior must stay the same. Replace the 
 **Standards**: does the diff follow the rules of the repo?
 
 - Find the written rules: `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `CODING_STANDARDS.md` and the ADRs for the area.
-- Then look for the smells in [SMELLS.md](SMELLS.md). A written rule wins over a smell.
+- Then read `SMELLS.md` in the folder of this skill with the Read tool, and look for its smells. A written rule wins over a smell.
 - Skip what a linter or a formatter already enforces.
 
-Completion: each criterion, each test and each written rule is checked.
+Completion: each criterion, each test and each written rule is checked, and you read each changed or new test file.
 
 ## 4. Sort
 
@@ -74,8 +75,11 @@ Completion: each finding is hard or a judgment call, and you have five judgment 
 
 | Excuse | Answer |
 |---|---|
+| "A test of a class name is tautological, and I checked it in the browser." | Report the criterion as hard, with the browser evidence. The user decides. |
+| "The code diff reads clean." | Read each changed and new test file before you call the diff clean. |
+| "Check and lint passed earlier in this session." | Run each check again in this verify run. Edits since then can break it. |
 
-No rows yet. Add a row only when `/sv-retro` finds a new excuse.
+Add a row only when `/sv-retro` finds a new excuse.
 
 ## Report
 
@@ -88,4 +92,4 @@ No rows yet. Add a row only when `/sv-retro` finds a new excuse.
 and <n> more
 ```
 
-Write "None" under a heading that has no findings. Write each finding on one line. Leave out the "and <n> more" line when you kept every judgment call.
+Print this block in each run, before the caller commits. Write "None" under a heading that has no findings. Write each finding on one line. Leave out the "and <n> more" line when you kept every judgment call.
