@@ -16,7 +16,7 @@ Read the repo's current state:
 - `gh auth status`: `gh` can write to this repo.
 - `AGENTS.md` and `CLAUDE.md` at the root: which exist, whether one has an `## Agent skills` block, and whether `CLAUDE.md` imports `@AGENTS.md`.
 - `docs/agents/`: files from an earlier run.
-- `GLOSSARY.md` and `docs/adr/`.
+- The **glossary file**: `GLOSSARY.md`, or `CONTEXT.md` when the repo keeps its terms there. With neither, it is `GLOSSARY.md`. And `docs/adr/`.
 - `gh label list`: labels that already exist.
 - What a new worktree lacks: gitignored `.env` files (`git ls-files --others --ignored --exclude-standard`), a lockfile, a database URL in an env file. When the repo has none of these, it needs no provisioning.
 - `scripts/provision.sh` and `.claude/hooks/provision-worktree.sh`: files from an earlier run.
@@ -40,7 +40,7 @@ Completion: the user picked Approve.
 
 ## 3. Write
 
-**Docs.** Copy [tracker-github.md](tracker-github.md) to `docs/agents/tracker.md` and [domain.md](domain.md) to `docs/agents/domain.md`. When a file exists, keep the user's edits and add only what is missing.
+**Docs.** Copy [tracker-github.md](tracker-github.md) to `docs/agents/tracker.md` and [domain.md](domain.md) to `docs/agents/domain.md`. Write the glossary file from step 1 in place of `<glossary>`. When a file exists, keep the user's edits and add only what is missing.
 
 **Labels.** Create each label from the table in `tracker-github.md`. Use its Meaning as the description: `gh label create <name> --description "<meaning>" --force`. `--force` updates a label that exists, so a rerun is safe.
 
@@ -60,7 +60,7 @@ Specs, tickets and bugs are GitHub issues. Before you create, read, link, label 
 
 ### Domain docs
 
-Before you explore the code, read `GLOSSARY.md` and the ADRs in `docs/adr/` for the area. The rules are in `docs/agents/domain.md`.
+Before you explore the code, read `<glossary>` and the ADRs in `docs/adr/` for the area. The rules are in `docs/agents/domain.md`.
 
 ### Worktrees
 

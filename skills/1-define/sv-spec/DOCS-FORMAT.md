@@ -1,8 +1,8 @@
 # Glossary and ADR format
 
-## GLOSSARY.md
+## Glossary
 
-One file at the repo root. Create it when the first term is settled.
+One file at the repo root, with the name that `docs/agents/domain.md` gives. Create it when the first term is settled.
 
 ```markdown
 # <Project name>

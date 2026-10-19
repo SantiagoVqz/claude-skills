@@ -34,7 +34,7 @@ Completion: the session is in the fix worktree.
 
 ## 3. Loop
 
-Read `GLOSSARY.md` and the ADRs for the area. Then build the loop. Try these in order:
+Read the glossary that `docs/agents/domain.md` names, and the ADRs for the area. Then build the loop. Try these in order:
 
 1. A failing test at the seam that reaches the bug.
 2. A `curl` script against a running dev server.

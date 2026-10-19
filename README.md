@@ -41,7 +41,7 @@ Run it once per repo.
 - **Output:**
   - A spec issue with the `spec` label.
   - A spec branch, `spec/<n>-<slug>`, in its own worktree, with its own dev database.
-  - The `GLOSSARY.md` and ADR changes, committed on the spec branch.
+  - The glossary and ADR changes, committed on the spec branch.
 - **Next:** `/sv-plan` reads the spec issue.
 
 ### `/sv-prd`

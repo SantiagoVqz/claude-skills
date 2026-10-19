@@ -1,6 +1,6 @@
 # Spec template
 
-Write the spec or PRD body with this template. Use the words that the repo already uses, from `GLOSSARY.md` when it has one. Leave out file paths and code: they go stale before the work ends. The one exception is a prototype snippet that states a decision more exactly than prose, such as a state machine or a type shape. Trim it to the decision and say that it came from a prototype.
+Write the spec or PRD body with this template. Use the words that the repo already uses, from its glossary when it has one. Leave out file paths and code: they go stale before the work ends. The one exception is a prototype snippet that states a decision more exactly than prose, such as a state machine or a type shape. Trim it to the decision and say that it came from a prototype.
 
 ```markdown
 ## Problem

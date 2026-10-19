@@ -15,7 +15,7 @@ TDD is the red, green loop. Each cycle is a **tracer bullet**: one failing test,
 
 ## 1. Prepare
 
-Read the ticket, its parent spec, `GLOSSARY.md` and the ADRs for the area. Use the glossary words in test names.
+Read the ticket, its parent spec, the glossary that `docs/agents/domain.md` names, and the ADRs for the area. Use the glossary words in test names.
 
 Find the **seams** in the spec's testing decisions. A seam is the public boundary where a test observes behavior. Write tests only at these seams. When a criterion cannot be tested at an agreed seam, stop and ask the user. Propose the new seam in one line: what it catches and what it misses.
 
