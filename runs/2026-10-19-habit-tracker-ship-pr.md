@@ -4,6 +4,10 @@ Transcript: /Users/santivqz/.claude/projects/-Users-santivqz-Documents-Developer
 
 `/ship 1` shipped spec #1 after a full review. The branch needed no rebase. All checks passed, the user approved the body, and PR #5 opened. The repo has no CI.
 
+## Sessions
+
+- ~/.claude/projects/-Users-santivqz-Documents-Developer-Personal-learning-habit-tracker/ae830d01-ce53-4312-9c31-952af5fadfbe.jsonl · lines 1-361
+
 ## Findings
 
 ### F1 · ship · step 3 · EnterWorktree fails when the session is already in the worktree

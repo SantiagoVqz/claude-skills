@@ -4,6 +4,10 @@ Transcript: /Users/santivqz/.claude/projects/-Users-santivqz-Documents-Developer
 
 `/cleanup 1` tore down spec #1 after PR #5 merged. It stopped at step 6 on a diverged trunk. Then the user approved a rebase and a push, and the cleanup finished. This file covers lines 362 to the end. The `ship` and `pr` part of the session is in `2026-10-19-habit-tracker-ship-pr.md`.
 
+## Sessions
+
+- ~/.claude/projects/-Users-santivqz-Documents-Developer-Personal-learning-habit-tracker/ae830d01-ce53-4312-9c31-952af5fadfbe.jsonl · lines 362-786
+
 ## Findings
 
 ### F1 · cleanup · step 6 · The stop gives the user no next step

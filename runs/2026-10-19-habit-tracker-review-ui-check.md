@@ -4,6 +4,10 @@ Transcript: ~/.claude/projects/-Users-santivqz-Documents-Developer-Personal-lear
 
 This run covers lines 2486 to 3046. `/review 1` did a full review of spec #1 at `112fb11`. The checks passed, each of the 8 stories had a ticket and a test, and the ui-check walk passed 8 of 8 in DevTools. The user put the 3 drift findings out of scope, approved the card, and the agent posted it on #1.
 
+## Sessions
+
+- ~/.claude/projects/-Users-santivqz-Documents-Developer-Personal-learning-habit-tracker--claude-worktrees-spec-1-habit-tracker/5a0e088a-bd05-4cf5-ac64-f6b29eb94bb2.jsonl · lines 1-3046
+
 ## Findings
 
 ### F1 · review · step 7 and step 9 · "Close the tab" ignores the DevTools rule
