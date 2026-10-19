@@ -34,6 +34,12 @@ Use this template for writing the PR body:
 **Blast Radius:** <one-word description>
 
 <optional: potential ramifications of merge>
+
+---
+
+<closing line, such as Closes #<n>>
+<merge line, when the caller gives one>
+<attribution line, when the session gives one>
 ```
 
 ## Sections
