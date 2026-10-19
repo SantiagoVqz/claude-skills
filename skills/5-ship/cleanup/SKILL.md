@@ -1,73 +1,65 @@
 ---
 name: cleanup
-description: "Post-merge teardown for a landed spec: confirm the spec branch landed, verify the spec issue and its tickets closed, delete the local and remote branches, and leave the checkout on a refreshed trunk."
+description: "Tear down a merged spec or fix branch: check the merged PR, close the issues, remove the worktree and branches, and refresh the trunk."
 disable-model-invocation: true
-argument-hint: "[spec-branch | spec]"
+argument-hint: "[spec | bug]"
 ---
 
-# cleanup — post-merge spec teardown
+# Cleanup
 
-One spec = one branch off the trunk, landed by the human. Tickets are commits on that branch, closed by `close-ticket` as they land. Run this once per spec after the branch lands.
+`/cleanup` runs after the user merges a PR from `/ship`. It ends with the issues in the right state, the worktree and branches gone, and the primary checkout on the latest trunk. It deletes nothing before the gate passes.
 
-**Trunk** = the branch this repo merges into (`develop` on a git-flow repo, `main` otherwise). Default to the default branch (`git symbolic-ref refs/remotes/origin/HEAD`); a repo carrying both `main` and `develop` is running git-flow, so the trunk is `develop`. Teardown that hardcodes `main` on a `develop` repo leaves the checkout stale and the next branch off the wrong base.
+Run it from the primary checkout. When the session is in a worktree, call `ExitWorktree` with `keep` first.
 
-## Identify scope
+## 1. Find
 
-- **Target** from `$ARGUMENTS`: a spec branch, or a spec that maps to one. Else infer from context: the current branch, or the one you were just working on.
-- **Spec branch**: `<type>/<spec-number>-<slug>`, the spec's only branch, created by `/dispatch` or by hand.
-- **Trunk**: per the rule above; confirm with the user if ambiguous.
+The target is the argument, or the branch you just shipped: `spec/<n>-<slug>` or `fix/<n>-<slug>`. Find the trunk as the `worktree` skill does.
 
-Completion: you can name the spec branch and the trunk before touching anything.
+Completion: you have the branch, its issue and the trunk.
 
-## Gate: confirm the work landed
+## 2. Gate
 
-Nothing is deleted until the spec branch is on the trunk. A spec lands either through a PR or by a direct merge, so take whichever signal exists:
+Run `gh pr list --head <branch> --state all --json number,url,state,body`.
 
-```bash
-gh pr list --head <spec-branch> --state merged --json number,url,mergedAt   # if the spec went through a PR
-git log <trunk> --oneline --grep '<spec-number>' | head                       # commits from the branch, on the trunk
-```
+- **A merged PR**: go on. A rebase merge and a squash merge both show as merged.
+- **An open PR**: stop, and give its URL.
+- **No PR**: stop. The next step is `/ship`.
 
-(GitLab: `glab mr list` equivalents per the tracker doc.)
+Completion: the branch has a merged PR.
 
-- A merged PR, or the branch's commits present on the trunk: proceed.
-- Neither, or a PR still **open**: stop and say so. Squash-merges rewrite hashes and defeat both checks, so where the trunk was squashed, the user's confirmation that the branch landed is the gate. Only override on explicit user instruction, and say so in the report.
+## 3. Issues
 
-## Verify the spec issue and its tickets closed
+Read the closing line of the PR body.
 
-`close-ticket` closes each ticket as it commits, and `/ship` puts `Closes #<spec>` in the PR body, so this is normally a verification pass. That keyword fires only when the PR merges into the repository's **default branch**:
+- **`Closes #<n>`**: read the issue and, for a spec, each of its tickets. Close each one that is still open, as `tracker.md` says: the tickets first, then the spec. The keyword fires only on a merge into the default branch, so when the trunk is not the default branch, a close by hand is the normal path.
+- **`Part of #<spec>`**: a partial ship. The spec and its open tickets stay open.
 
-```bash
-gh pr view <n> --json body --jq '.body | scan("[Cc]loses #[0-9]+")'
-gh issue view <n> --json number,state          # for the spec and each ticket
-```
+Completion: each issue is in the state that the closing line gives, and you know which closed by keyword and which by hand.
 
-List the spec's tickets from the tracker (sub-issues, or issues whose Parent names the spec; `.scratch/<slug>/issues/*.md` locally) so a ticket missing from the PR body is not missed.
+## 4. Worktree
 
-- Trunk **is** the default branch: the issues should already be closed. Verify rather than assume. A ticket the human finished by hand, or a PR body that lost a keyword, leaves that issue open silently.
-- Trunk is `develop` but the default branch is `main`: the keywords never fired; closing by hand here is the normal path.
+Call the Skill tool with `worktree` to remove the worktree of the branch. Ticket worktrees of the spec stay. The next `/build` on such a ticket makes a new spec branch and rebases the ticket onto it.
 
-Close anything still open, `gh issue close <n> --reason completed`, tickets first, then the spec, and **name each one in the report**. On a **local markdown** tracker: set every ticket file's Status to `done`, then mark the spec file `done`.
+Completion: `git worktree list` does not show the branch, and the local branch is gone.
 
-Completion: every ticket and the spec issue are closed, and the report says which closed by keyword and which by hand.
+## 5. Remote branch
 
-## Teardown
+Run `git ls-remote --exit-code --heads origin <branch>`. When the branch is there, run `git push origin --delete <branch>`. GitHub can delete it on merge, so a missing branch is normal.
 
-You cannot delete a branch that a worktree has checked out. A spec branch lives in its own linked worktree (`git worktree list`), provisioned by `scripts/provision.sh` where the repo has one. Run this from the primary checkout; standing in the spec worktree, `ExitWorktree` first.
+Completion: origin does not have the branch.
 
-```bash
-(cd <worktree> && scripts/provision.sh db drop)   # only if the script exists: drops the fork, if any, and the test database
-git worktree remove <worktree>                     # refuses on uncommitted or untracked files: stop and surface it, never --force
-git checkout <trunk> && git pull --ff-only
-git branch -D <spec-branch>                    # -D: a squash-merge makes -d refuse; the gate above already proved it landed
-git ls-remote --exit-code --heads origin <spec-branch> >/dev/null 2>&1 \
-  && git push origin --delete <spec-branch> || echo "remote branch already gone"
-```
+## 6. Trunk
 
-A spec branch with no worktree skips the first two lines.
+Record the trunk head with `git rev-parse HEAD`. Run `git pull --ff-only`. When it does not fast-forward, stop and show why. Keep the local commits: no force.
 
-`--ff-only` errors on local divergence instead of forging a merge commit; surface that rather than papering over it. If the merged branch added a schema migration and the local dev DB never applied it, apply it now so the next session doesn't break on a missing column. Report failures, don't force-fix.
+Completion: the primary checkout is on the latest trunk.
+
+## 7. Migrations
+
+Run `git diff --name-only <old head> HEAD`. When it shows new migrations, run the migrate command from `AGENTS.md` or `package.json` on the trunk dev database. When the repo has no such command, name the migrations in the report.
+
+Completion: the trunk dev database has each new migration, or the report names them.
 
 ## Report
 
-Trunk · how the branch landed (merged PR, or commits on trunk) · tickets closed (N by keyword, M by hand, listed) · spec issue closed (by keyword or by hand) · worktree removed (path) or n/a · databases dropped (fork and test, test only, or n/a) · branches deleted (local / remote, or "remote already gone") · trunk refreshed (new HEAD) · migration applied or n/a. Call out anything skipped, PR still open, open tickets, dirty worktree, non-ff trunk, so nothing is silently left behind.
+PR · issues closed by keyword, by hand, or left open for a partial ship · worktree removed · branches deleted · trunk head · migrations applied · ticket worktrees left open.

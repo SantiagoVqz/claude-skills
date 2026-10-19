@@ -38,7 +38,7 @@ Completion: the spec branch exists on the remote.
 
 Call the Skill tool with `worktree` for `ticket/<n>-<slug>`, made from the spec branch.
 
-When the worktree already has commits, this is a resume. Run `git status`. When a rebase is in progress, go to step 6. Otherwise read `git log <spec-branch>..HEAD` and run the tests. Continue from the first acceptance criterion that no commit covers.
+When the worktree already has commits, this is a resume. Run `git status`. When a rebase is in progress, go to step 6. When `git merge-base --is-ancestor <spec-branch> HEAD` fails, rebase as in step 6 first, because a partial ship can leave the ticket on an old spec branch. Then read `git log <spec-branch>..HEAD` and run the tests. Continue from the first acceptance criterion that no commit covers.
 
 Completion: the session is in the ticket worktree, and you know which criteria are done.
 
