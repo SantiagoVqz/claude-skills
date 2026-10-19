@@ -1,6 +1,6 @@
 ---
 name: ui-check
-description: "Drive the app in a browser to check a change, then give the user a short list of what passed and what to check by hand. Use when the user runs /ui-check, or /build runs with --ui."
+description: "Drive the app in a browser to check a change, then give the user a short list of what passed and what to check by hand. Use when the user runs /ui-check, /build runs with --ui, or /review walks the stories."
 argument-hint: "[ticket | what to check]"
 ---
 
@@ -14,7 +14,9 @@ Read the target: the ticket and its acceptance criteria, or the text the user ga
 
 Write the flow as a short list of steps, the way a user does the feature from start to end. Cover the acceptance criteria that a browser can show. A criterion that a browser cannot show stays out.
 
-Completion: you have the flow, five steps or fewer.
+When `/review` calls you, it gives the flow: one step for each user story, with no limit on the count.
+
+Completion: you have the flow, five steps or fewer, or the flow from `/review`.
 
 ## 2. Run
 
