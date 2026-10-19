@@ -22,6 +22,8 @@ Start the dev server in the current worktree, in the background, with no fixed p
 
 Do each step of the flow in one `browser_batch` call. When a step needs a ref, do one `find` call first, then the batch. End each batch with a read of the page, and compare it with what the step expects.
 
+The DevTools tools have no batch. Use `fill_form` for a step with more than one field. End each step with one `evaluate_script` read, not a full snapshot.
+
 Completion: each step passed or failed. The dev server and the tab stay open.
 
 ## 3. Report
@@ -40,3 +42,5 @@ Check yourself at <URL>:
 "Check yourself" has three steps or fewer: what a browser check cannot judge, such as the look and the feel.
 
 Completion: the lists are shown. When the user ran you, they answered, and you stopped the dev server and closed the tab.
+
+DevTools cannot close the last open page. Navigate it to `about:blank` in place of a close.

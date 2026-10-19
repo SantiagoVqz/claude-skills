@@ -27,7 +27,7 @@ Completion: each conflict has two intents, one sentence each.
 
 ## 3. Resolve
 
-Resolve each hunk so that both intents work. Add no behavior that neither side asked for.
+Resolve each hunk so that both intents work. Add no behavior that neither side asked for. When the code of one side replaces the code of the other side, keep each check and each error that the replaced code had.
 
 When both sides change the same behavior in different ways, both intents cannot work. Do not pick one. Ask the user with the question tool, with one option for each side. Each option shows its intent and its ticket in one line.
 

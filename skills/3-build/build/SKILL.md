@@ -52,7 +52,7 @@ Completion: you showed the approach skill's report, and it names a test for each
 
 Start a subagent with a fresh context. Tell it to call the Skill tool with `verify`, with the ticket number and the diff `<spec-branch>...HEAD`.
 
-Fix each hard finding, commit, and run `verify` in a new subagent one more time. When a hard finding is still there, stop. Show the findings. The ticket stays in progress and the worktree stays. The user fixes it, or overrides it with a reason. Keep the reason for the commit message in step 8.
+Fix only the hard findings before the checkpoint. Each judgment call goes on the card, also one that you caused. Fix each hard finding, commit, and run `verify` in a new subagent one more time. When a hard finding is still there, stop. Show the findings. The ticket stays in progress and the worktree stays. The user fixes it, or overrides it with a reason. Keep the reason for the commit message in step 8.
 
 Completion: the last `verify` run has no hard finding, or the user gave an override reason.
 
@@ -60,7 +60,7 @@ Completion: the last `verify` run has no hard finding, or the user gave an overr
 
 Run `git rebase <spec-branch>`. On a conflict, call the Skill tool with `resolve-conflicts`. Then run the full suite, the typecheck and the build.
 
-When you resolved a conflict, run `verify` in a new subagent, as in step 5. The code changed, so an earlier approval no longer counts. A clean rebase keeps the approval.
+When you resolved a conflict, run `verify` in a new subagent, as in step 5. The code changed, so an earlier approval and an earlier `ui-check` run no longer count. A clean rebase keeps both.
 
 Completion: the ticket branch is on the latest spec branch, every check passes, and each conflict is resolved.
 
@@ -89,6 +89,8 @@ Keep "Check yourself" to three steps or fewer, on the main flow of the ticket. S
 Ask with the question tool: "Approve", "Change" or "Run ui-check". Leave out "Run ui-check" when it already ran. On Run ui-check, call the Skill tool with `ui-check` for this ticket, then ask again with "Approve" or "Change". On Change, make the edits, commit, run `verify` in a new subagent, and go back to step 6. When Change comes with no notes, ask in the chat what to change. Offer no list of options that you picked.
 
 A free-text answer that clearly approves, such as "looks good", counts as Approve. Start the reply with: "Taking that as Approve."
+
+When a question in this step returns no answer, such as after an interrupt, ask it again before any other action.
 
 Completion: the user approved. Stop the dev server and close the tab, when `ui-check` started them.
 
