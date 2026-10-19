@@ -11,7 +11,7 @@ The skill set improves from evidence, not from memory. `/retro` reads the sessio
 
 ## 1. Read the session
 
-Run `python3 -I <this skill's folder>/digest.py [transcript]`. With no argument, it reads the current session. The output is a timeline: user messages, commands, skills, subagents, questions and tool errors, each with its transcript line number. Open the transcript at a line when you need the full text.
+Run `python3 -I <this skill's folder>/digest.py [transcript]`. With no argument, it reads the current session. For the current session, pass no path: a path from an earlier retro breaks after `ExitWorktree` moves the transcript. Pass a path only for another session. The output is a timeline: user messages, commands, skills, subagents, questions and tool errors, each with its transcript line number. Open the transcript at a line when you need the full text.
 
 Completion: you can list each skill that ran in the session.
 
