@@ -11,7 +11,7 @@ argument-hint: "[idea | issue]"
 
 ## 1. Explore
 
-Read the idea from the argument, or from the issue that it names. Then read the area of the code that the idea touches. Read `GLOSSARY.md`, the ADRs for that area, and `AGENTS.md` or `CLAUDE.md` when the repo has them. Use the words that the repo already uses. When the repo has none of these files, work from the code alone.
+Read the idea from the argument, or from the issue that it names. Then read the area of the code that the idea touches. Read the glossary, `GLOSSARY.md` or `CONTEXT.md`, the ADRs for that area, and `AGENTS.md` or `CLAUDE.md` when the repo has them. Use the words that the repo already uses. When the repo has none of these files, work from the code alone.
 
 Completion: you can describe in a few lines how the area works today.
 

@@ -46,7 +46,7 @@ Completion: each story in scope has its tickets and its tests, or a gap, and eac
 Start a subagent with a fresh context. Give it the spec issue, the diff `<trunk>...<spec-branch>`, and this task: find **drift**, the faults that come from many tickets on one branch.
 
 - The same logic in two tickets.
-- Two names for one term of `GLOSSARY.md`.
+- Two names for one term of the glossary.
 - A helper that one ticket added and another ticket did not use.
 - A written rule of `AGENTS.md`, `CLAUDE.md` or the ADRs that the files break together, but no single ticket breaks.
 - Behavior that no story asked for.

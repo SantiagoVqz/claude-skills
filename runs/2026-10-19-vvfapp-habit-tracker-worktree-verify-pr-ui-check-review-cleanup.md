@@ -124,9 +124,9 @@ What happened: The relative link `[SMELLS.md](SMELLS.md)` caused a call to a too
 Evidence: d852f3a0:1415: "Error: No such tool available: SmellsRead"
 Fix: sharpen wording: write "Read `SMELLS.md` in the folder of this skill with the Read tool."
 
-### F15 · project · vvfapp keeps its glossary in CONTEXT.md
+### F15 · setup-skills · vvfapp keeps its glossary in CONTEXT.md
 
-Status: open: setup-skills records the glossary path, in the next commit
+Status: applied, as a glossary path that setup-skills records
 Seen in: d852f3a0, first time
 What happened: The pr skill uses the terms in `GLOSSARY.md`. vvfapp has its glossary in `CONTEXT.md`.
 Evidence: d852f3a0:365: "sed -n 70,100p CONTEXT.md"

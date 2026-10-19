@@ -11,7 +11,7 @@ The user's attention is the scarce resource. Ask **one question per message**, a
 
 ## 1. Prepare
 
-- Read what already bears on the plan: the code in the area, `GLOSSARY.md`, the ADRs, and the issue or text the user gave.
+- Read what already bears on the plan: the code in the area, the glossary, the ADRs, and the issue or text the user gave.
 - Open the **decisions log**. In a git repo, write it to `.scratch/interview/<slug>.md`, and add `.scratch/` to `.git/info/exclude` when git does not already ignore it. Outside a repo, keep the log in the conversation. The log has four sections: Decisions, Terms, ADR candidates, Out of scope.
 
 Completion: you can name the root of the design tree, and the log exists.

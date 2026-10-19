@@ -17,7 +17,7 @@ Completion: you know how to create and label an issue in this repo.
 
 ## 2. Explore
 
-Read the idea from the argument, or from the issue that it names. Then read the area of the code that the idea touches, `GLOSSARY.md`, and the ADRs for that area.
+Read the idea from the argument, or from the issue that it names. Then read the area of the code that the idea touches, the glossary that `docs/agents/domain.md` names, and the ADRs for that area.
 
 Completion: you can describe in a few lines how the area works today.
 
@@ -34,7 +34,7 @@ Call the Skill tool with `sv-interview`. The design tree for a spec always conta
 
 Do domain work during the interview:
 
-- **Challenge**: when the user uses a word that conflicts with `GLOSSARY.md`, say so at once and ask which meaning is correct.
+- **Challenge**: when the user uses a word that conflicts with the glossary, say so at once and ask which meaning is correct.
 - **Sharpen**: when a word is vague, propose one exact term.
 - **Probe**: test each relationship between concepts with a concrete scenario at its edge.
 - **Cross-check**: when the user says how something works, compare it with the code, and show each contradiction.

@@ -4,7 +4,7 @@ The glossary and the ADRs record this project's words and its hard decisions. `/
 
 ## Read before you explore
 
-- `GLOSSARY.md` at the repo root.
+- `<glossary>` at the repo root. This is the glossary file. Each skill that names the glossary means this file.
 - The ADRs in `docs/adr/` that touch the area you work in.
 
 A missing file means that nothing is recorded yet. Continue without it.
