@@ -128,13 +128,13 @@ Run it when all tickets of a spec are closed. Each ticket already passed `/verif
   - A partial review gives `Part of #<spec>` and the list of open tickets.
 - **Next:** you merge with rebase and merge, so each ticket stays one commit on the trunk. Then `/cleanup`.
 
-### `/cleanup`
+### `/cleanup [spec | bug]`
 
 Run it after you merge.
 
-- **Input:** the merged branch.
-- **Process:** it confirms that the branch landed and that the issues closed. It removes the worktree and drops the branch's databases. It deletes the branches, refreshes the trunk, and applies the new migrations to the trunk dev database.
-- **Partial ship:** it leaves the spec issue and the open tickets open. The next `/build` on the spec makes a new spec branch from the trunk.
+- **Input:** a spec or fix branch with a merged PR. It stops on an open PR or no PR.
+- **Process:** it closes the issues that the PR closes and that are still open. It removes the worktree with `worktree`, deletes the local and remote branches, refreshes the trunk, and applies the new migrations to the trunk dev database.
+- **Partial ship:** it leaves the spec issue and the open tickets open. Their ticket worktrees stay. The next `/build` on the spec makes a new spec branch from the trunk and rebases the ticket onto it.
 
 ### `/diagnose <bug>`
 
