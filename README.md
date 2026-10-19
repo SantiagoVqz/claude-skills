@@ -21,7 +21,7 @@ Bug:      /diagnose ──► /ship ──► you merge ──► /cleanup
              └─ runs /verify
 
 Once per repo:  /setup-skills
-After a run:    /retro
+End of the day: /retro
 ```
 
 ## Commands
@@ -191,7 +191,7 @@ On Linear, `/build` sets the native In Progress status. It does not use the `in-
 
 ## How the set grows
 
-- After each session in which skills ran, run `/retro`. It reads the transcript and writes the findings to `runs/` in this repo, one file per run, with evidence and a proposed fix.
+- Run `/retro` at the end of a day of work. It reads each session since the last retro, in each project, where skills ran. It writes the findings to one file in `runs/` in this repo, with evidence and a proposed fix. The Sessions list of each run file records the lines it read, so no line is read twice.
 - A finding that repeats across runs is fixed first. A fix commit names the finding ID and sets its status.
 - Fix the skill after each run. Do not fix it by prompting again.
 - Add a skill only when a run shows a need for it.
