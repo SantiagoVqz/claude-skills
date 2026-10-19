@@ -160,7 +160,7 @@ You do not type these. Other skills call them.
 |---|---|---|
 | `interview` | `/spec`, `/prd` | Interview one question at a time on the design tree. Show a recommendation and a progress count. Keep a decisions log. |
 | `tdd` | `/build` | One red, green cycle per acceptance criterion, at the seams that the spec agreed, with a commit per green. One refactor pass at the end. |
-| `refactor` | `/build` | Change the structure and keep the behavior. The suite stays green. Built when a ticket first needs it. |
+| `refactor` | `/build` | Change the structure and keep the behavior, one named step at a time. Pin tests come first, and no expected value changes. |
 | `resolve-conflicts` | `/build` | Resolve a rebase conflict and keep both intents. Ask you only when both sides change the same behavior. |
 | `worktree` | `/spec`, `/build`, `/diagnose` | Find or make the worktree, then provision it. |
 | `pr` | `/ship` | Write the PR body: summary, evidence, merge danger. |
@@ -195,7 +195,7 @@ On Linear, `/build` sets the native In Progress status. It does not use the `in-
 - A finding that repeats across runs is fixed first. A fix commit names the finding ID and sets its status.
 - Fix the skill after each run. Do not fix it by prompting again.
 - Add a skill only when a run shows a need for it.
-- Add a row to an anti-rationalization table only when a run shows a new excuse. These tables are in `tdd`, `diagnose`, `verify` and `review`.
+- Add a row to an anti-rationalization table only when a run shows a new excuse. These tables are in `tdd`, `refactor`, `diagnose`, `verify` and `review`.
 - Put each engineering principle in the one skill where it applies.
 
 ## Layout
@@ -206,7 +206,7 @@ Each skill is in the folder of its phase. The number gives the order of the flow
 skills/
 ├── 1-define/   spec, prd, interview, prototype
 ├── 2-plan/     plan
-├── 3-build/    build, tdd, resolve-conflicts, diagnose
+├── 3-build/    build, tdd, refactor, resolve-conflicts, diagnose
 ├── 4-verify/   verify, ui-check, review
 ├── 5-ship/     ship, pr, cleanup
 └── support/    setup-skills, worktree, retro, writing-for-agents, unslop

@@ -45,6 +45,8 @@ Read the diff once for each heading. Keep the two headings apart, so that one do
 - The result can be checked from outside: through the UI, an API or a command. A ticket that changes one layer only, such as storage with no UI, is not a vertical slice.
 - Behavior that the ticket did not ask for is a judgment call.
 
+For an `approach:refactor` ticket, the behavior must stay the same. Replace the first item and the vertical slice item with these: no expected value in an existing test changed, each test change follows a rename or a move, and each acceptance criterion is met in the structure of the code.
+
 **Standards**: does the diff follow the rules of the repo?
 
 - Find the written rules: `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `CODING_STANDARDS.md` and the ADRs for the area.
@@ -61,7 +63,8 @@ A finding is hard when it is one of these:
 - An acceptance criterion has no code, or no test proves it.
 - A test is at a seam that the spec did not agree, or it is tautological.
 - The diff breaks a written rule of the repo.
-- The ticket is not a vertical slice.
+- The ticket is not a vertical slice. This does not apply to a refactor ticket.
+- A refactor ticket changed an expected value in an existing test.
 
 Everything else is a judgment call. Keep the five that matter most.
 
