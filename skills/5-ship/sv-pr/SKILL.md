@@ -1,5 +1,5 @@
 ---
-name: pr
+name: sv-pr
 description: "Use when writing a PR body."
 metadata:
   credits:
@@ -22,8 +22,8 @@ Use this template for writing the PR body:
 
 ## Evidence
 
-- **Before:** <screenshot/output/failing test run>
-  **After:** <screenshot/output/passing test run>
+<spec: one line per story, then the review link>
+<fix: the regression test, before and after>
 
 ## Merge Danger
 
@@ -34,11 +34,17 @@ Use this template for writing the PR body:
 **Blast Radius:** <one-word description>
 
 <optional: potential ramifications of merge>
+
+---
+
+<closing line, such as Closes #<n>>
+<merge line, when the caller gives one>
+<attribution line, when the session gives one>
 ```
 
 ## Sections
 
-Skip all preambles and keep prose brief. Use the user's domain language from `GLOSSARY.md`.
+Skip all preambles and keep prose brief. Use the user's domain language from the glossary: `GLOSSARY.md`, or `CONTEXT.md`.
 
 ### Summary
 
@@ -161,11 +167,11 @@ You may use one of these, you may use several, it is unlikely you will use all o
 
 ### Evidence
 
-Concrete evidence that the change works. Show a before and after.
+Concrete evidence that the change works, as text. Pick the shape:
 
-Screenshots are S-tier - when the environment is set up for it and the change is visual.
-
-Execution-based evidence is A-tier. Test results, console output. Show the exact test that now fails and passes, using pseudocode.
+- **Spec PR**: one line for each user story: `<n>. <story> · <test name> · ✓ <what the walk saw>`. Then the link to the review comment.
+- **Issue PR**, for a ticket that ships alone: one line for each acceptance criterion: `<n>. <criterion> · <test name> · ✓ <what you saw>`.
+- **Fix PR**: **Before:** the regression test fails, with its failure message. **After:** it passes. Show the test as pseudocode.
 
 ### Merge Danger
 
