@@ -121,7 +121,7 @@ Run it when all tickets of a spec are closed. Each ticket already passed `/verif
   1. It reads the latest review comment. It stops when the branch has a commit after the reviewed commit.
   2. It rebases onto the trunk. A clean rebase keeps the review. On a conflict, it calls `resolve-conflicts`. A spec then goes back to `/review`. A fix gets a fresh `/verify` and goes on.
   3. It runs every check, and writes the PR body with `pr`. The evidence is text: story, test and the "Verified" line.
-  4. You approve the title and the body. Then it pushes and opens the PR, ready for review.
+  4. It pushes and opens the PR, ready for review. You get a short summary of what changed and why, not the body.
   5. When the repo has CI, it watches the checks. It reports a failure and fixes nothing.
 - **Output:** one PR.
   - A full review or a fix gives `Closes #<n>`.
