@@ -9,7 +9,7 @@ argument-hint: "[spec | bug]"
 
 `/cleanup` runs after the user merges a PR from `/ship`. It ends with the issues in the right state, the worktree and branches gone, and the primary checkout on the latest trunk. It deletes nothing before the gate passes.
 
-Run it from the primary checkout. When the session is in a worktree, call `ExitWorktree` with `keep` first.
+Run it from the primary checkout. When the session entered a worktree with `EnterWorktree`, call `ExitWorktree` with `keep` first. When the session started in the worktree of the branch, stop: a session cannot remove its own start directory. Tell the user to run `/cleanup` in a session in the primary checkout.
 
 ## 1. Find
 

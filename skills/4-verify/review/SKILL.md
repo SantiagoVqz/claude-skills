@@ -21,13 +21,13 @@ Completion: you have the stories in scope, and you know whether the review is pa
 
 ## 2. Enter the spec worktree
 
-Call `EnterWorktree` with the path of the worktree that has `spec/<spec>-<slug>`. When no worktree has it, call the Skill tool with `worktree` for that branch. Run `git pull --ff-only`. Find the trunk as the `worktree` skill does.
+Call `EnterWorktree` with the path of the worktree that has `spec/<spec>-<slug>`. When the current directory is already that worktree, skip the call. When no worktree has it, call the Skill tool with `worktree` for that branch. Run `git pull --ff-only`. Find the trunk as the `worktree` skill does.
 
 Completion: the session is in the spec worktree, and the branch matches origin.
 
 ## 3. Run the checks
 
-Run the full suite, the typecheck, the lint and the build. A failure is a hard finding. Show its output, and stop.
+Run the full suite, the typecheck, the lint and the build. When the repo has no script for a check, skip that check and name it on the card. A failure is a hard finding. Show its output, and stop.
 
 Completion: every check passes.
 

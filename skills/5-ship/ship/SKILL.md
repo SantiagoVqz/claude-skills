@@ -38,7 +38,7 @@ Completion: the branch head is the reviewed commit, and you know full or partial
 
 ## 3. Rebase
 
-Call `EnterWorktree` with the path of the worktree that has the branch. Run `git fetch origin`, then `git rebase origin/<trunk>`.
+Call `EnterWorktree` with the path of the worktree that has the branch. When the current directory is already that worktree, skip the call. Run `git fetch origin`, then `git rebase origin/<trunk>`.
 
 - **Clean**: go to step 4. The review still counts.
 - **Conflict on a spec**: call the Skill tool with `resolve-conflicts`. The code changed, so the review no longer counts. Push nothing, and stop. The next step is `/review <spec>`.
@@ -48,7 +48,7 @@ Completion: the branch is on the latest trunk, and each conflict is resolved, or
 
 ## 4. Run the checks
 
-Run the full suite, the typecheck, the lint and the build. A failure stops `/ship`. Show its output.
+Run the full suite, the typecheck, the lint and the build. When the repo has no script for a check, skip that check and name it in the report. A failure stops `/ship`. Show its output.
 
 Completion: every check passes.
 
@@ -71,7 +71,7 @@ Completion: the PR is open, ready for review, and `git status` is clean.
 
 ## 7. Watch CI
 
-Skip this step when the repo has no `.github/workflows` folder.
+Run `git ls-files .github/workflows`. Skip this step when the output is empty.
 
 Run `gh pr checks <pr> --watch` in the background, and wait for it to end. When a check fails, show the job name and the end of `gh run view <run> --log-failed`. Fix nothing. A fix is a commit after the review, so the user decides: a CI fix, or a gap for `/build`.
 
