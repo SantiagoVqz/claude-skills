@@ -7,7 +7,7 @@ argument-hint: "[spec | bug]"
 
 # Ship
 
-`/ship` turns a branch into one PR that the team can read. It ends with the PR open and ready for review, and CI finished. The user approves the PR body before the PR opens. The merge is always the user's, with rebase and merge, so that each ticket stays one commit on the trunk.
+`/ship` turns a branch into one PR that the team can read. It ends with the PR open and ready for review, CI finished, and a short summary for the user. The merge is always the user's, with rebase and merge, so that each ticket stays one commit on the trunk.
 
 After `EnterWorktree`, run one plain shell command per call from the worktree root, with no `cd`, no `-C`, no `&&` chain and no path outside the worktree. Write files with the Write tool.
 
@@ -63,19 +63,13 @@ Call the Skill tool with `pr` to write the body. Give it:
 
 Completion: you have the title and a body with each of these parts.
 
-## 6. Approve
-
-Show the title and the full body in the chat. Ask with the question tool: "Approve" or "Change". On Change, edit the body, show it again and ask again. When Change comes with no notes, ask in the chat what to change. A free-text answer that clearly approves counts as Approve. Start the reply with: "Taking that as Approve." When the question returns no answer, ask it again before any other action.
-
-Completion: the user approved the title and the body.
-
-## 7. Open
+## 6. Open
 
 Run `git push --force-with-lease origin <branch>`. Write the body to a file in the worktree root. Run `gh pr create --base <trunk> --head <branch> --title "<title>" --body-file <file>`. When the branch already has an open PR, run `gh pr edit <pr> --body-file <file>` in its place. Then delete the file.
 
-Completion: the PR is open, ready for review, with the approved body, and `git status` is clean.
+Completion: the PR is open, ready for review, and `git status` is clean.
 
-## 8. Watch CI
+## 7. Watch CI
 
 Skip this step when the repo has no `.github/workflows` folder.
 
@@ -85,4 +79,10 @@ Completion: each check passed, or you showed each failure.
 
 ## Report
 
-PR URL · full, partial or bug · CI result · next step: merge with rebase and merge, then `/cleanup`.
+Start with a short summary, three lines or fewer. Do not show the PR body.
+
+```markdown
+- <what changed> · because <why, from the spec's problem or the bug's cause>
+```
+
+Then: PR URL · full, partial or bug · CI result · next step: merge with rebase and merge, then `/cleanup`.
