@@ -30,9 +30,9 @@ Completion: the base resolves, the diff is not empty, you have the acceptance cr
 
 ## 2. Run the checks
 
-Find the test, typecheck, lint and build commands in `package.json`, the README or `AGENTS.md`. Run each one. Trust no earlier report.
+Find the test, typecheck, lint and build commands in `package.json`, the README or `AGENTS.md`. Run the typecheck, the lint and the build. Run the test files that the diff adds or changes, and each test file that imports a module that the diff changes. Run the full suite when the caller asks for it, or when you run on your own. `/sv-build` runs the full suite after its rebase, so each verify round skips it. Trust no earlier report.
 
-Completion: each check passed or failed, and you have the output of each failure.
+Completion: each check passed or failed, each run has finished, and you have the output of each failure.
 
 ## 3. Review
 
