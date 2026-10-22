@@ -9,7 +9,7 @@ argument-hint: "<spec> [--no-ui]"
 
 `/sv-review` checks what only the whole spec shows. Each ticket already passed `sv-verify` and the user's approval, so `/sv-review` does not check a ticket's acceptance criteria again. It ends with the user's approval and one review comment on the spec issue. `/sv-ship` needs that comment. `/sv-review` fixes nothing. Each gap becomes a ticket or goes out of scope.
 
-After `EnterWorktree`, run one plain shell command per call from the worktree root: no `cd`, no `-C`, no `&&` chain, no `$(...)`, no shell variable and no path outside the worktree. A `cd` stays in effect for the rest of the session. For a subfolder, use a flag such as `pnpm --dir` or `uv --directory`. Write files with the Write tool.
+After `EnterWorktree`, run one plain shell command per call, from the worktree root, on paths in the worktree. For a subfolder, use a flag such as `pnpm --dir` or `uv --directory`, because a `cd` stays in effect for the rest of the session. Change a file with the Edit tool, and make a new file with the Write tool. Quote each argument that holds `*`, `[` or `]`. The guard refuses only some other forms, such as a `&&` chain, `$(...)` or a heredoc, so a command that ran is no proof that its form is safe.
 
 ## 1. Load
 

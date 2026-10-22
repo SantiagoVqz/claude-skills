@@ -15,8 +15,9 @@ Specs, tickets and bugs for this repo are GitHub issues. Use the `gh` CLI. It fi
 - **List a spec's tickets**: `gh issue view <spec> --json subIssues`.
 - **Block**: `gh issue edit <ticket> --add-blocked-by <n>,<n>`. A ticket is ready when every issue in its `blockedBy` is closed.
 - **Start**: `gh issue edit <n> --add-label in-progress --add-assignee @me`.
+- **Edit the body**: `gh issue edit <n> --body-file <file>`.
 - **Comment**: `gh issue comment <n> --body-file <file>`.
-- **Close**: `gh issue close <n> --reason completed --comment "..."`. Remove `in-progress` first.
+- **Close**: remove `in-progress`. Write the comment to a file with the Write tool. Run `gh issue comment <n> --body-file <file>`, then `gh issue close <n> --reason completed`. Delete the file.
 
 ## Closing keywords
 
