@@ -16,7 +16,7 @@ If the question is about logic/state rather than what something looks like, this
 A UI prototype is much easier to judge when it's **butting up against the rest of the app**: real header, real sidebar, real data, real density. A variant on a blank page is a vacuum: every variant looks fine in isolation.
 
 - **Host page.** When the variants belong inside an existing page, or would naturally live inside one (a new section of the dashboard, a new card on the settings screen, a new step in an existing flow), read that page's code and rebuild its chrome (header, sidebar, neighbouring sections) around each variant. Use a bare page only when the thing has no plausible home in the app.
-- **Styling.** When the project's design system is synced to claude.ai/design, build with it. Otherwise match the project's styling from the code or screenshots the user gives.
+- **Styling.** Build to the fidelity bar in the [SKILL](SKILL.md), so each variant passes for a shipped screen. When the project's design system is synced to claude.ai/design, build with it.
 - **Content.** Fill every variant with realistic sample data at the real page's density, since an empty artifact flatters every layout.
 
 ## Process
@@ -68,4 +68,5 @@ Once a variant has won, capture the answer (which variant and why) the way the [
 - **Variants that differ only in colour or copy.** That's a tweak, not a prototype. Real variants disagree about structure.
 - **Sharing too much code between variants.** A shared `<Header>` is fine; a shared `<Layout>` defeats the point. Each variant should be free to throw out the layout.
 - **Wiring variants to real mutations.** Read-only prototypes are fine. If a variant needs to mutate, point it at an in-memory stub: the question is "what should this look like", not "does the backend work".
+- **Wireframe-grade variants.** Grey boxes, placeholder text and default browser styles hide the real differences. Each variant uses the project's real look.
 - **Promoting the prototype directly to production.** The variant code was written under prototype constraints (no tests, minimal error handling). Rewrite it properly when you fold it in.
