@@ -16,25 +16,27 @@ metadata:
 
 When `/sv-build` runs this skill for an `approach:diagnose` ticket, skip the steps marked "(not under `/sv-build`)". `/sv-build` owns them.
 
+When you stop, put the symptom and the path of each attachment in the stop message, so that the next run needs no new input from the user.
+
 After `EnterWorktree`, run one plain shell command per call, from the worktree root, on paths in the worktree. For a subfolder, use a flag such as `pnpm --dir` or `uv --directory`, because a `cd` stays in effect for the rest of the session. Change a file with the Edit tool, and make a new file with the Write tool. Quote each argument that holds `*`, `[` or `]`. The guard refuses only some other forms, such as a `&&` chain, `$(...)` or a heredoc, so a command that ran is no proof that its form is safe.
 
 ## 1. Issue (not under `/sv-build`)
 
-Read the `## Agent skills` block in `AGENTS.md`, then `docs/agents/tracker.md`. When the block is missing, tell the user to run `/sv-setup-skills`, and stop.
+Read the `## Agent skills` block in `AGENTS.md`, then `docs/agents/tracker.md`. When the block is missing, read `NO-SETUP.md` in the folder of the `sv-setup-skills` skill, and go on with its sources.
 
-When the input is a Sentry link or an error, create an issue with the `bug` label. The body has the symptom, redacted, and the steps to see it. Set the issue to in progress, as `tracker.md` says.
+When the input is a Sentry link, an error or a screenshot, create an issue with the `bug` label. The body has the symptom, redacted, and the steps to see it. Step 4 adds the exact symptom. Set the issue to in progress, as `tracker.md` says.
 
-Completion: the bug is an issue in progress, and you have its number.
+Completion: the bug is an issue in progress, and you have its number, or the repo has no tracker and the report keeps the issue text.
 
 ## 2. Worktree (not under `/sv-build`)
 
-Call the Skill tool with `sv-worktree` for `fix/<n>-<slug>`, made from the trunk.
+Call the Skill tool with `sv-worktree` for `fix/<n>-<slug>`, made from the trunk. When it reports blocked, follow the Worktree line of `NO-SETUP.md`.
 
-Completion: the session is in the fix worktree.
+Completion: the session is in the fix worktree, or on the fix branch or the current branch as `NO-SETUP.md` says.
 
 ## 3. Loop
 
-Read the glossary that `docs/agents/domain.md` names, and the ADRs for the area. Then build the loop. Try these in order:
+Read the glossary that `docs/agents/domain.md` names, or that `NO-SETUP.md` names, and the ADRs for the area. The fix keeps the meaning of each glossary term. Then build the loop. Try these in order:
 
 1. A failing test at the seam that reaches the bug.
 2. A `curl` script against a running dev server.
@@ -53,18 +55,18 @@ For a bug that does not occur each time, raise the rate: run the trigger many ti
 
 When you cannot build a loop, stop. List what you tried. Ask the user for access to an environment that shows the bug, a captured artifact, or approval for temporary instrumentation in production.
 
-Completion: you have one command, and you ran it at least once. It is:
+Completion: you read the glossary and the ADRs for the area. You have one command, and you ran it at least once. It is:
 
 - **Red**: it runs the code path of the bug and asserts the user's exact symptom.
 - **Deterministic**: each run gives the same result, or a pinned high rate.
 - **Fast**: seconds, not minutes.
 - **Agent-run**: you run it with no human, except through the human loop.
 
-Do not read code to build a theory before this command exists.
+Before this command exists, read only the code that the loop calls.
 
 ## 4. Reproduce and minimise
 
-Run the loop, and see it go red. Confirm that the failure is the user's symptom, not a different failure near it. Record the exact symptom.
+Run the loop, and see it go red. Confirm that the failure is the user's symptom, not a different failure near it. Record the exact symptom. When step 1 created the issue, add the exact symptom, redacted, to its body, as `tracker.md` says.
 
 Then cut one part at a time: inputs, callers, config, data and steps. Run the loop after each cut. Keep only the parts that the failure needs.
 
@@ -107,20 +109,20 @@ Completion: the loop is green, and the regression test passes, or the missing se
 ## 8. Cleanup
 
 - Search for the debug prefix with `git grep`. Remove each hit.
-- Delete the throwaway harnesses and scripts.
 - Run the loop from step 3 one more time.
+- Delete each harness and script that the regression test replaces. When the loop itself is a harness, move it out of the repo, such as to the scratchpad, and keep it until step 11.
 
-Completion: `git grep` finds no debug prefix, no throwaway file is left, and the loop is green.
+Completion: `git grep` finds no debug prefix, the loop is green, and no throwaway file is left in the repo.
 
 ## 9. Verify (not under `/sv-build`)
 
-Start a subagent with a fresh context. Tell it to call the Skill tool with `sv-verify`, with the bug issue and the diff `origin/<trunk>...HEAD`. Fix only the hard findings, commit, and run `sv-verify` in a new subagent one more time. When a hard finding is still there, stop and show the findings. Each judgment call goes on the card.
+Start a subagent with a fresh context. Tell it to call the Skill tool with `sv-verify`, with the bug issue, the base `git merge-base origin/<trunk> HEAD`, and a request for the full suite. The base also covers work that is not committed. Fix only the hard findings, commit, and run `sv-verify` in a new subagent one more time. When a hard finding is still there, stop and show the findings. Each judgment call goes on the card.
 
 Completion: the last `sv-verify` run has no hard finding.
 
 ## 10. Card (not under `/sv-build`)
 
-Show one card:
+Write the card in your message, before the question. The question tool does not show it, and the user approves what they can read.
 
 ```markdown
 ### #<n> <title>
@@ -137,17 +139,17 @@ Check yourself: `<run command>`
 
 Keep "Check yourself" to three steps or fewer.
 
-Ask with the question tool: "Approve", "Change" or "Run ui-check". Leave out "Run ui-check" when it already ran on the fix. On Run ui-check, call the Skill tool with `sv-ui-check` for this bug, then ask again with "Approve" or "Change". On Change, make the edits, commit, run `sv-verify` in a new subagent, and show the card again. When Change comes with no notes, ask in the chat what to change. A free-text answer that clearly approves counts as Approve. Start the reply with: "Taking that as Approve." When the question returns no answer, ask it again before any other action.
+Ask with the question tool: "Approve", "Change" or "Run ui-check". Leave out "Run ui-check" when it already ran on the fix. On Run ui-check, call the Skill tool with `sv-ui-check` for this bug, then ask again with "Approve" or "Change". On Change, make the edits, commit, run `sv-verify` in a new subagent, and show the card again. When Change comes with no notes, ask in the chat what to change. A free-text answer that clearly approves counts as Approve. Only for a free-text answer, start the reply with: "Taking that as Approve." When the question returns no answer, ask it again before any other action.
 
-Completion: the user approved. Stop the dev server, and close the tab as `sv-ui-check` says, when `sv-ui-check` started them.
+Completion: the card is in the chat above the question, and the user approved. Stop the dev server, and close the tab as `sv-ui-check` says, when `sv-ui-check` started them.
 
 ## 11. Record
 
-Squash the branch into one commit, except under `/sv-build`, which squashes when it lands the ticket. Run `git merge-base HEAD origin/<trunk>`, then `git reset --soft <base>`. Commit with `-m "Fix <title> (#<n>)"`, then `-m "Cause: <the confirmed hypothesis>"`.
+Squash the branch into one commit, except under `/sv-build`, which squashes when it lands the ticket, and except for work that `NO-SETUP.md` keeps uncommitted. Run `git merge-base HEAD origin/<trunk>`, then `git reset --soft <base>`. Commit with `-m "Fix <title> (#<n>)"`, then `-m "Cause: <the confirmed hypothesis>"`.
 
-Comment on the issue, as `tracker.md` says: the cause, the loop command, and the missing seam when there is one.
+Comment on the issue, as `tracker.md` says: the cause, the loop command, and the missing seam when there is one. When the loop is a harness, put its text, redacted, in the comment, then delete the harness.
 
-Completion: the branch has one commit over the trunk, or `/sv-build` runs this skill, and the issue has the cause.
+Completion: the branch has one commit over the trunk, or `/sv-build` runs this skill, or the work is uncommitted as `NO-SETUP.md` says. The issue has the cause, or the report has it when the repo has no tracker.
 
 ## Redact
 
@@ -157,9 +159,11 @@ Redact each secret in each command, output and artifact that you show: write `<R
 
 | Excuse | Answer |
 |---|---|
+| "The setup is missing, so I make the worktree by hand." | Call the `sv-worktree` skill. When it reports blocked, follow `NO-SETUP.md`. |
+| "The question options describe the fix." | The user approves the card. Write it in the message first. |
 
-No rows yet. Add a row only when `/sv-retro` finds a new excuse.
+Add a row only when `/sv-retro` finds a new excuse.
 
 ## Report
 
-Issue · cause · commit · missing seam, if any · next step: `/sv-ship <n>`.
+Issue · cause · commit, or the changed files when the work is uncommitted · missing seam, if any · each fallback from `NO-SETUP.md` · next step: `/sv-ship <n>`, or the next step that `NO-SETUP.md` gives.

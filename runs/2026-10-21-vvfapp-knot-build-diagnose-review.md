@@ -32,7 +32,7 @@ Fix: sharpen wording: in step 3, write "Read `git diff <base>...HEAD` in full. F
 
 ### F3 · sv-tdd · step 1, and sv-diagnose · step 3 · The glossary and the ADRs are not read, and seams are not named
 
-Status: open
+Status: applied
 Seen in: 8b1d0077, 46161423, 2338aae5, d13fd348 (4 sessions), first time
 What happened: The agent did not read the glossary and the ADRs for the area, or grepped the glossary for a few terms only. It did not write a seam for each criterion. In 46161423, a word from the glossary's Avoid list went into names and a UI label and cost two verify rounds. In 8b1d0077, a seam case from the spec got no test. In d13fd348, the fix broke a glossary term.
 Evidence: 46161423:209: "grep -n -i \"direcci\|emitida\|recibida\|maquiladora\|planta\|pendiente\" CONTEXT.md"; 46161423:1339: "CONTEXT.md:388 \"Participante, _Avoid_: parte, contraparte\""; 8b1d0077:1040: "No test checks a pieza in `GET /api/cajas`."; 2338aae5:143: "Now the cliente route" (no read of CONTEXT.md or docs/adr in lines 111-190); d13fd348:491: "CONTEXT.md says \"adjacent seats\""
@@ -96,7 +96,7 @@ Fix: cut a no-op: make the sv-tdd report the criterion · test list, and change 
 
 ### F11 · sv-diagnose · step 1 · A missing setup stops the run and drops the bug
 
-Status: open
+Status: applied
 Seen in: 92edf03f, d13fd348 (2 sessions), first time
 What happened: In 92edf03f the skill stopped, and the user had to run setup and then send the screenshot again. In d13fd348 the user overrode the stop in advance. The fallback to `CLAUDE.md` and `docs/agents/issue-tracker.md` then worked through sv-diagnose and sv-ship.
 Evidence: 92edf03f:61: "then run `/sv-diagnose` again with the screenshot. I stopped at step 1"; d13fd348:8: "even if we don't have the skills setup here, just go ahead and run the process."
@@ -128,7 +128,7 @@ Fix: sharpen wording: change the sv-tdd step 3 completion to "the full suite pas
 
 ### F15 · sv-diagnose · step 2, and sv-cleanup · step 4 · The worktree is made and removed by hand
 
-Status: open
+Status: applied
 Seen in: d13fd348, first time
 What happened: The agent used the conventions of the repo's own /knot-implement instead of sv-worktree. It entered the worktree with `cd`, not EnterWorktree, so the session had no guard. It removed the worktree with a chain, and the test database stayed.
 Evidence: d13fd348:35: "I'll follow `docs/agents/issue-tracker.md` and the `/knot-implement` worktree conventions."; d13fd348:216: "cd /Users/santivqz/.../fix-558-seating-stale-party && ..."; d13fd348:715: "The worktree's test database is still in the main container."
@@ -192,7 +192,7 @@ Fix: sharpen wording: in sv-ui-check, make "print the flow as a numbered list" t
 
 ### F23 · sv-diagnose · step 8 · Step 8 deletes the harness and then runs the loop again
 
-Status: open
+Status: applied
 Seen in: d13fd348, first time
 What happened: The loop was a throwaway replay script. Step 8 says to delete the harnesses and then to run the loop again, which cannot both happen. Step 11 asks for the loop command, but the issue comment could only describe a deleted script.
 Evidence: d13fd348:496: "rm .../replay_save.py ..."; d13fd348:523: "A replay script sent the stored plan through `save_seating_plan`"
@@ -200,7 +200,7 @@ Fix: sharpen wording: "Run the loop one more time. Then delete each harness that
 
 ### F24 · sv-diagnose · steps 1 to 3 · The order fits a ticket, not a screenshot
 
-Status: open
+Status: applied
 Seen in: d13fd348, first time
 What happened: The agent made the loop and saw it fail before it filed the issue, so the issue had the exact symptom. That was better than the skill order. The agent also read history and logic away from the symptom path before the loop existed.
 Evidence: d13fd348:139: "RED: 422 The party for Jose Eugenio Puente does not fit at that table"; d13fd348:161: "gh issue create --label bug"; d13fd348:89: "Inspect recent guest commits and frontend party size logic"
