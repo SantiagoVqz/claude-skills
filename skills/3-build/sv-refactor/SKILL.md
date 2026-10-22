@@ -15,7 +15,7 @@ A refactor changes the structure and keeps the behavior. The suite is the proof:
 
 ## 1. Prepare
 
-Read the ticket, its parent spec, the glossary that `docs/agents/domain.md` names, and the ADRs for the area. Use the glossary words in new names.
+Read the ticket, its parent spec, the glossary that `docs/agents/domain.md` names, and the ADRs for the area. When the repo has no `docs/agents/domain.md`, find the glossary as `NO-SETUP.md` in the folder of the `sv-setup-skills` skill says. Use the glossary words in new names.
 
 Read the code that the ticket changes, with its callers. For each piece that you plan to remove or merge, find why it exists: read `git log -L` or `git blame` for it. This is **Chesterton's fence**: when you cannot say why a piece exists, keep it, and ask the user.
 

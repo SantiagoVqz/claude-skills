@@ -24,7 +24,7 @@ Fix: sharpen wording: test what the guard refuses today, and state only that. Ch
 
 ### F2 · sv-tdd · step 3 · The refactor step says the code reads clean, then verify finds duplication
 
-Status: open
+Status: applied
 Seen in: 8b1d0077, 9a970d79, 2338aae5 (3 sessions), first time
 What happened: The agent read a sample of the code, or only fixed lint, and said that no refactor was needed. Each time, verify then found duplication: a copied loader, a copied formatter, or four checks that decide the same case in four ways. Each copy shipped as a judgment call.
 Evidence: 8b1d0077:1015: "The diff reads clean. I see no refactor worth a commit."; 8b1d0077:1040: "Four checks decide \"is a pieza\" in four ways"; 9a970d79:670: "The code reads clean, no refactor commit needed."; 9a970d79:705: "`pesos` rebuilds the es-MX narrowSymbol formatter that Dinero.svelte already has."; 2338aae5:600: "Refactor: format the cliente page spec with Prettier"; 2338aae5:639: "`remisionesDe` copies proveedores/[id]/+page.server.ts:54 line for line"
@@ -152,7 +152,7 @@ Fix: sharpen wording: after a fix for a word or a name, grep `git diff <spec-bra
 
 ### F18 · sv-tdd · step 2 · Work that no criterion covers is built with no test and no name
 
-Status: open
+Status: applied
 Seen in: 9a970d79, first time
 What happened: The ticket asked for the variant C layout, but no criterion covered it. The agent built it in one untested commit and also changed the price bar and the page width. Nobody asked for those changes, and verify flagged them.
 Evidence: 9a970d79:652: commit "Lay the caja form out in one narrow column"; 9a970d79:705: "The sticky price bar lost `lg:hidden`"
@@ -160,7 +160,7 @@ Fix: add a step: when the ticket asks for work that no criterion covers, name it
 
 ### F19 · sv-tdd · step 2 · The test changes a literal from the spec with no question
 
-Status: open
+Status: applied
 Seen in: 8b1d0077, first time
 What happened: The spec gives the label "Pieza suajada 160 × 120 mm". The agent wrote the test and the code with the material added. The user learned about it only from the card.
 Evidence: 8b1d0077:38: "the label reads \"Pieza suajada 160 × 120 mm\""; 8b1d0077:970: "The label of a pieza drops the alto and keeps the material"
@@ -168,7 +168,7 @@ Fix: add a step: in Red, write "When the ticket or the spec gives a literal, the
 
 ### F20 · sv-tdd · step 2 · A "still works" criterion gets no cycle and no rule
 
-Status: open
+Status: applied
 Seen in: 9a970d79, first time
 What happened: Criterion 4 said that marks and overrides still work. The agent cited the existing tests and made no Green commit, so the step 2 completion was not met. This ticket had also moved the selectors of those tests.
 Evidence: 9a970d79:549: "The marks and override tests already pass unchanged."
@@ -176,7 +176,7 @@ Fix: sharpen wording: "A criterion that keeps existing behavior gets no cycle wh
 
 ### F21 · sv-tdd · step 2 · Undo of a deliberate break leaves a diff, and the typecheck runs too often
 
-Status: open
+Status: applied
 Seen in: 2338aae5, first time
 What happened: An Edit undo left a whitespace diff, and the agent restored the file with `git checkout`. Later breaks used `git checkout --` and were clean. The typecheck ran in cycles that changed only tests.
 Evidence: 2338aae5:361: "Whitespace left over from the undo. Restore the file from the commit."

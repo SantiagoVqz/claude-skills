@@ -15,36 +15,50 @@ TDD is the red, green loop. Each cycle is a **tracer bullet**: one failing test,
 
 ## 1. Prepare
 
-Read the ticket, its parent spec, the glossary that `docs/agents/domain.md` names, and the ADRs for the area. Use the glossary words in test names.
+Read the ticket, its parent spec, the glossary that `docs/agents/domain.md` names, and the ADRs for the area. When the repo has no `docs/agents/domain.md`, find the glossary as `NO-SETUP.md` in the folder of the `sv-setup-skills` skill says. Look up in the glossary, and in its Avoid lists, each noun that you will use in a test, a component or a label, and each English word of the spec. Use the glossary words.
 
 Find the **seams** in the spec's testing decisions. A seam is the public boundary where a test observes behavior. Write tests only at these seams. When a criterion cannot be tested at an agreed seam, stop and ask the user. Propose the new seam in one line: what it catches and what it misses.
 
-Completion: you can name the seam for each acceptance criterion.
+When the ticket asks for work that no criterion covers, such as a layout, name each piece in one line: `Build: <what>`.
+
+Completion: you wrote one line for each acceptance criterion, `<criterion> · <seam> · <test file>`, and one line for each `Build:` piece. You looked up each noun and each English word in the glossary.
 
 ## 2. Loop
 
 Take the acceptance criteria in order. For each criterion:
 
-1. **Red**: write one test at the seam. Run it. It must fail, and the failure message must be about the missing behavior, not a typo or an import.
+1. **Red**: write one test at the seam. Run it. It must fail, and the failure message must be about the missing behavior, not a typo or an import. When the ticket or the spec gives a literal, such as a label or a message, the test uses that literal. When you think the literal is wrong, ask the user before the green.
 2. **Green**: write the least code that makes it pass. Add nothing for a later criterion.
 3. **Commit**: `Green: <criterion>`.
 
 When a new test passes on its first run, it proves nothing yet. Do one of these, and name it in the commit message:
 
 - Take a later criterion first, when that criterion makes this test fail.
-- Break the code for one run, see the test fail, and undo the break. Confirm that `git diff` shows no source change before the next break.
+- Break a committed file for one run, see the test fail, and undo the break with `git checkout -- <file>`.
 
 A criterion that sets a rule for the tests, such as how each test sets the clock, gets no cycle. The report names the tests that follow it.
 
-A criterion can take more than one cycle. Each cycle gets its own commit. Run the typecheck and the test file each cycle.
+A criterion that keeps existing behavior, such as "marks still work", gets no cycle when existing tests cover it. The report names those tests. Run them after the last change. When this ticket changed those tests, say so in the report.
 
-Completion: each acceptance criterion has a passing test and a `Green:` commit.
+A criterion can take more than one cycle. Each cycle gets its own commit. Run the test file in each cycle, and the typecheck in each cycle that changes source.
+
+After the last cycle, build each `Build:` piece from step 1 in its own commit: `Build: <what>`. Change only what the piece names.
+
+Completion: each acceptance criterion has a passing test and a `Green:` commit, or names the existing tests that cover it, and each `Build:` piece has its commit.
 
 ## 3. Refactor
 
-Read all the code that the ticket added. Remove duplication, fix names, and move code to where it belongs. Run the full suite after each change, and keep it green. Commit each change: `Refactor: <what>`.
+Read `git diff <base>...HEAD` in full. Under `/sv-build`, the base is the spec branch. Then look for the duplication that a read of the diff alone does not show:
 
-Completion: the full suite passes, and you have no more changes to make.
+- For each new helper, search the codebase for one that does the same job.
+- Compare the new code with the code of the earlier tickets of the same spec.
+- List each place that branches on the new case. Several checks that decide one case are one decision.
+
+Remove duplication, fix names, and move code to where it belongs. Commit each change: `Refactor: <what>`. Run the test files of each change after it. Formatting is the linter's job, so a format change is no refactor.
+
+Then run the full suite once, and wait for its result.
+
+Completion: the full suite passed after the last change, and that run has finished. A run in the background counts only when its result is in. You have no more changes to make.
 
 ## Good tests
 
@@ -58,9 +72,16 @@ A good test checks behavior through a public interface. It reads like a line of 
 
 | Excuse | Answer |
 |---|---|
+| "The code reads clean, so no refactor is needed." | Name the diff that you read and the helpers that you searched for. |
+| "The rest of the code writes the literal another way." | The spec is the contract. Ask the user before the green. |
 
-No rows yet. Add a row only when `/sv-retro` finds a new excuse.
+Add a row only when `/sv-retro` finds a new excuse.
 
 ## Report
 
-Each acceptance criterion with its test name · the commits · each seam question that the user answered.
+Print the report in your message before you return to the caller:
+
+- Each acceptance criterion with its test name, or with the existing tests that cover it.
+- Each `Build:` piece.
+- The commits.
+- Each seam question and each literal question that the user answered.
