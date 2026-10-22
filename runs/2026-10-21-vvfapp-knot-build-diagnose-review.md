@@ -16,7 +16,7 @@ Five vvfapp sessions built tickets 233, 234, 236 and 237 with sv-build and sv-td
 
 ### F1 · sv-build, sv-worktree, sv-review, sv-tdd · shell rules · Files are changed by heredoc scripts, and the guard refuses only some of them
 
-Status: open
+Status: applied
 Seen in: 8b1d0077, 9a970d79, 46161423, 2338aae5, e03bd75e (5 sessions), first time
 What happened: After EnterWorktree, the agent changed source files with `python3 - <<'EOF'`, `sed -i` and `cat >>` scripts, and it ran `&&` and `;` chains. The skills say that the guard refuses these. The guard let most of them run. It refused a `cat >>` heredoc twice. In one session the Edit tool then found a file changed behind its back.
 Evidence: 8b1d0077:358: "uv --directory backend run python - <<'EOF' ... p=pathlib.Path(\"tests/test_cajas.py\")"; 8b1d0077:641: "the file had been modified on disk since you last read it"; 9a970d79:526: "python3 - <<'EOF' p='frontend/src/lib/components/ResultadoCaja.svelte'"; 46161423:695: "this command is too complex to verify that it stays inside the worktree. Refusing to run it"; 2338aae5:225: "Refusing to run it"; e03bd75e:805: "mkdir -p ... && mv .ficha.json ..."
@@ -72,7 +72,7 @@ Fix: add a step: in step 8, write "When the spec branch has no worktree, make it
 
 ### F8 · sv-build · step 9, and sv-setup-skills · tracker-github.md · The Close command does not fit a multi-line comment
 
-Status: open
+Status: applied
 Seen in: 8b1d0077, 46161423 (2 sessions), first time
 What happened: The tracker template gives `gh issue close --comment "..."`. The guard refused the multi-line form in 8b1d0077. In 46161423 the agent tried a `--comment-file` flag, which does not exist. Both sessions then posted the comment from a file and closed the issue after it.
 Evidence: 8b1d0077:1157: "what it run[s] cannot be shown not to be git. Refusing to run it"; 46161423:1989: "unknown flag: --comment-file"
