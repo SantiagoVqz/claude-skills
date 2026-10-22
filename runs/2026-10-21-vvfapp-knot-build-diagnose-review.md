@@ -224,7 +224,7 @@ Fix: add a step before the worktree step: "Stop each dev server and background t
 
 ### F27 · sv-setup-skills · steps 1 and 2 · The summary is skipped, and two choices go in one question call
 
-Status: open
+Status: applied
 Seen in: 92edf03f, first time
 What happened: The agent explored for about eight calls with no message, and the harness sent a nudge. It sent no summary. Then it asked two choices in one call. The user rejected the call and interrupted, with no reason given.
 Evidence: 92edf03f:116: "The user hasn't heard from you in a while"; 92edf03f:120: one AskUserQuestion with "Provision" and "domain.md"; 92edf03f:125: "[Request interrupted by user for tool use]"
@@ -232,7 +232,7 @@ Fix: sharpen wording: "At the end of step 1, send one line that names the tracke
 
 ### F28 · sv-setup-skills · step 1 · No path for the repo's own provision.sh or for files of another skill set
 
-Status: open
+Status: applied
 Seen in: 92edf03f, first time
 What happened: KNOT has its own `scripts/provision.sh`, which an ADR requires. PROVISIONING.md assumes the template. The agent spent about seven reads on the clash. The repo also had tracker docs and labels from another skill set, and step 1 looks only for files of an earlier sv run.
 Evidence: 92edf03f:120: "the Knot script follows ADR 0012, and the sv template conflicts with it"; 92edf03f:39: "domain.md issue-tracker.md knowledge-base.md triage-labels.md"
