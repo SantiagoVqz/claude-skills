@@ -33,7 +33,7 @@ Completion: the user confirmed the decisions log with an explicit yes.
 
 ## 3. Draft
 
-Write the PRD from the decisions log with [SPEC-TEMPLATE.md](SPEC-TEMPLATE.md). Show the draft to the user, and change it until they approve it.
+Write the PRD from the decisions log with [SPEC-TEMPLATE.md](SPEC-TEMPLATE.md). Show the draft to the user, and change it until they approve it. In the chat, show the user stories by their numbers and count only, because the user settled their text in the interview. The PRD has the full text.
 
 Completion: the user approved the draft.
 

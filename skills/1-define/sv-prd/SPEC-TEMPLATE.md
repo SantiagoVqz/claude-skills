@@ -40,6 +40,6 @@ Anything else a builder needs. Delete this section when it is empty.
 
 ## Rules
 
-- **User stories**: one story per behavior that a user can see. Each story must describe something that a person can do and check, because the work is accepted story by story. In a repo with the full flow, `/sv-review` proves each story at runtime. Cover the whole feature, edge cases included.
+- **User stories**: one story per main behavior that a user can see. Each story must describe something that a person can do and check, because the work is accepted story by story. In a repo with the full flow, `/sv-review` proves each story at runtime. Cover the whole feature with the fewest stories that do it. An edge case goes in the acceptance criteria of the ticket that covers its story.
 - **Schema changes**: the line is always present. The ticket breakdown reads it and puts all migrations in one early ticket. `/sv-plan` and `/sv-prd` both cut tickets this way.
 - **Testing decisions**: test external behavior only. Prefer an existing seam to a new one, and the highest seam to a lower one. The best number of seams is one.
