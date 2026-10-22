@@ -47,7 +47,7 @@ Lay it out with a clean hierarchy, top to bottom:
 
 Choose scenarios that demonstrate the awkward cases, the ones hard to reason about on paper: the happy path, a tricky edge case, an attempt at something that should be illegal.
 
-Keep it beautiful but restrained: clean typography, generous spacing, one accent colour. No animations, no gimmicks: nothing that competes with the state and the buttons.
+Build it to the fidelity bar in the [SKILL](SKILL.md): when the project has a UI, use its fonts, colours and components, so the demo reads like the product. Without a UI to match, use clean typography, generous spacing and one accent colour. Keep motion out, so nothing competes with the state and the buttons.
 
 ### 4. Hand it over
 
