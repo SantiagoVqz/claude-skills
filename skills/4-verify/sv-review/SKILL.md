@@ -29,9 +29,11 @@ Completion: the session is in the spec worktree, and the branch matches origin.
 
 ## 3. Run the checks
 
-Run the full suite, the typecheck, the lint and the build. When the repo has no script for a check, skip that check and name it on the card. A failure is a hard finding. Show its output, and stop.
+Run the full suite, the typecheck, the lint and the build, one at a time. When the repo has no script for a check, skip that check and name it on the card.
 
-Completion: every check passes.
+A failure in the code of the branch is a hard finding. Show its output, and stop. A failure that comes from the test environment, such as rows left in the test database or an env var from `.env`, may be fixed in the test environment only. Then run the whole check again, and put the cause, the failed test and the rerun on the card.
+
+Completion: every check passes in one full run, and each environment fix is recorded for the card.
 
 ## 4. Coverage
 
@@ -62,7 +64,7 @@ Skip this step with `--no-ui`, or when no story in scope has a screen.
 
 Call the Skill tool with `sv-ui-check`. Give it the stories in scope as the flow, one step for each story. It leaves the dev server and the tab open. A failed step is a gap for step 7.
 
-Completion: each story in scope has a ✓ or ✗ line, or the step was skipped.
+Completion: the Verified list is in the chat, with one ✓ or ✗ line for each story in scope, or the step was skipped.
 
 ## 7. Gaps
 
@@ -79,15 +81,16 @@ Completion: each gap is in a ticket or out of scope.
 
 ## 8. Card
 
-Show one card:
+Write the card in your message, before the question. The question tool does not show it, and the user approves what they can read.
 
 ```markdown
 ### Review of #<spec> · <short commit> · full | partial
 
 Checks: <each check from step 3> passed
+Environment fixes: <cause> · <failed test> · <rerun result>
 
-Stories:
-- <n>. <story> · #<ticket> · <test name>
+Stories: <covered> of <in scope> covered
+- <n>. <story> · out of scope
 
 Verified:
 - ✓ <story step> · <what you saw>
@@ -101,15 +104,15 @@ Check yourself at <URL>:
 1. <what to do> · <what the user sees>
 ```
 
-Leave out "Verified" and the URL when step 6 was skipped. Leave out "Open tickets" for a full review. Keep "Check yourself" to three steps or fewer. The card has only these parts. Any other note is a gap: go to step 7.
+List under "Stories" only the stories that went out of scope in step 7. Leave out "Environment fixes" when step 3 had none, "Verified" and the URL when step 6 was skipped, and "Open tickets" for a full review. Keep "Check yourself" to three steps or fewer. The card has only these parts. Any other note is a gap: go to step 7.
 
-Ask with the question tool: "Approve" or "Change". On Change, each note from the user is a gap: go to step 7. When Change comes with no notes, ask in the chat what to change. A free-text answer that clearly approves counts as Approve. Start the reply with: "Taking that as Approve." When the question returns no answer, ask it again before any other action.
+Ask with the question tool: "Approve" or "Change". On Change, each note from the user is a gap: go to step 7. When Change comes with no notes, ask in the chat what to change. A free-text answer that clearly approves counts as Approve. Only for a free-text answer, start the reply with: "Taking that as Approve." When the question returns no answer, ask it again before any other action.
 
-Completion: the user approved.
+Completion: the card is in the chat above the question, and the user approved.
 
 ## 9. Post
 
-Post the card as a comment on the spec issue, as `tracker.md` says. Its first line starts with `### Review of #<spec>`, and it has the full commit hash of the spec branch head. `/sv-ship` finds the comment by this line, and stops when the head moved after it. Stop the dev server, and close the tab as `sv-ui-check` says.
+Post the card as a comment on the spec issue, as `tracker.md` says. Under the card, add the full story list from step 4 in a `<details>` block, one line each: `<n>. <story> · #<ticket> · <test name>`. `/sv-ship` takes it as the PR evidence. The comment's first line starts with `### Review of #<spec>`, and it has the full commit hash of the spec branch head. `/sv-ship` finds the comment by this line, and stops when the head moved after it. Stop the dev server, and close the tab as `sv-ui-check` says.
 
 Completion: the comment is on the spec issue, and no dev server from this review runs.
 
@@ -117,8 +120,9 @@ Completion: the comment is on the spec issue, and no dev server from this review
 
 | Excuse | Answer |
 |---|---|
+| "The failure predates the spec." | Name the cause, the failed test and the rerun on the card. |
 
-No rows yet. Add a row only when `/sv-retro` finds a new excuse.
+Add a row only when `/sv-retro` finds a new excuse.
 
 ## Report
 

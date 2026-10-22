@@ -57,7 +57,7 @@ Completion: every check passes.
 Call the Skill tool with `sv-pr` to write the body. Give it:
 
 - **The title**: the title of the spec or the issue.
-- **The evidence**: for a spec, the Stories and Verified lines of the review comment, and its link. For a bug, the regression test. For a ticket, its acceptance criteria with their tests.
+- **The evidence**: for a spec, the story list and the Verified lines of the review comment, and its link. For a bug, the regression test. For a ticket, its acceptance criteria with their tests.
 - **The closing line**: `Closes #<n>` for a full spec or an issue. `Part of #<spec>` for a partial spec, with the list of open tickets.
 - **The merge line**: `Merge with rebase and merge.`
 

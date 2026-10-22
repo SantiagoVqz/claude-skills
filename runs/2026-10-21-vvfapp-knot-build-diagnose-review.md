@@ -48,7 +48,7 @@ Fix: project.
 
 ### F5 · sv-ui-check · step 2 · The walk starts with no data
 
-Status: open
+Status: applied
 Seen in: e03bd75e, 2338aae5 (2 sessions), first time
 What happened: The worktree database had no clientes, cajas or remisiones. In both sessions the agent asked the user how to get data. In 2338aae5 it then spent about 200 transcript lines on forms. It also guessed the database user.
 Evidence: e03bd75e:529: "clientes 0 cotizaciones 0 cajas 0"; e03bd75e:513: "could you please provision some data in general so we can visualize the app."; 2338aae5:826: "the local data has no clientes or remisiones. How should I get sample data?"; 2338aae5:723: "role \"postgres\" does not exist"
@@ -56,7 +56,7 @@ Fix: add a step: before the first browser step, check that the database holds th
 
 ### F6 · sv-ui-check · step 2 · The DevTools paragraph does not cover the common failures
 
-Status: open
+Status: applied
 Seen in: e03bd75e, 2338aae5 (2 sessions), first time
 What happened: A Chrome process from another session held the DevTools profile. In 2338aae5 the agent hit that error three times and asked three questions. The agent set input values with `evaluate_script`, which did not trigger the app's handlers. It guessed a route that does not exist. Screenshots and snapshots with a scratchpad path were refused. A script ran before the navigation ended. An expired Clerk session first looked like an app failure.
 Evidence: 2338aae5:821: "The browser is already running for .../chrome-devtools-mcp/chrome-profile"; 2338aae5:885: "fails the same way for the third time"; e03bd75e:665: "The click did not open the disclosure. I open it by script."; e03bd75e:859: "That URL is not a route."; 2338aae5:1167: "is not within any of the configured workspace roots"; 2338aae5:1215: "Cannot set properties of null"; e03bd75e:729: "The session dropped: the reload landed on sign-in."
@@ -104,7 +104,7 @@ Fix: sharpen wording: in step 1 of sv-diagnose and sv-ship, write "When the user
 
 ### F12 · sv-review · step 3, and sv-build · step 6 · No rule for a check that fails because of the test environment
 
-Status: open
+Status: applied
 Seen in: e03bd75e, 46161423 (2 sessions), first time
 What happened: Suites failed for causes outside the branch: rows left in the test database, the leaked secret, and a test that fails under load. sv-review says to stop on a failure. The agent fixed the environment and reran. In 46161423 it called the checks done from reruns of the failed files only. Both reported it openly, but neither skill gives the rule.
 Evidence: e03bd75e:270: "I empty that database, which only the tests use, and rerun."; e03bd75e:375: "That predates this spec. I rerun with it blanked"; 46161423:1893: "With the two reruns, every backend test has passed once without interference."
@@ -112,7 +112,7 @@ Fix: sharpen wording: in both steps, write "A failure in code on the branch is a
 
 ### F13 · sv-diagnose · step 10 · The card is not printed before the Approve question
 
-Status: open
+Status: applied
 Seen in: d13fd348, first time
 What happened: The agent asked Approve, Change or Run ui-check with no card in the chat. The user approved without the cause, the fix or the judgment calls. One judgment call said that the fix leaves part of the issue undone. The final report then pointed to "the card" that the user never saw.
 Evidence: d13fd348:495: "Deleting the throwaway harnesses now, then the card."; d13fd348:509: AskUserQuestion "How do you want to proceed with the #558 fix?" with no text before it; d13fd348:491: "The diff still drops the 422 `detail`"; d13fd348:528: "The \"Check yourself\" steps on the card cover that."
@@ -184,7 +184,7 @@ Fix: sharpen wording: "Break a committed file for one run, and undo the break wi
 
 ### F22 · sv-review · step 6, and sv-ui-check · step 1 · The flow and the result are not printed as lists
 
-Status: open
+Status: applied
 Seen in: e03bd75e, 2338aae5 (2 sessions), first time
 What happened: In 2338aae5, sv-ui-check never printed the flow before the run. In e03bd75e, sv-review gave prose for the stories and no ✓ or ✗ line for each story, and step 7 then stopped before the card.
 Evidence: 2338aae5:1147: "Now running the flow.\n\nStep 1, the cliente page at 1280px."; e03bd75e:652: "Stories 1, 2, 3 and 5 hold"
@@ -240,7 +240,7 @@ Fix: add a step: in PROVISIONING.md, add an "Existing script" section. Keep a sc
 
 ### F29 · sv-build · step 7 · "Taking that as Approve." after a click on Approve
 
-Status: open
+Status: applied
 Seen in: 46161423, first time
 What happened: The user picked the Approve option, and the agent still used the phrase meant for free text.
 Evidence: 46161423:1908: "Taking that as Approve."
