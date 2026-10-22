@@ -166,7 +166,7 @@ You do not type these. Other skills call them.
 | `sv-worktree` | `/sv-spec`, `/sv-build`, `/sv-diagnose` | Find or make the worktree, then provision it. |
 | `sv-pr` | `/sv-ship` | Write the PR body: summary, evidence, merge danger. |
 
-`sv-prototype` is optional. Use it during `/sv-spec` when a question needs a demo to answer. It publishes the variants as one artifact.
+`sv-prototype` is optional. Run it on its own, or let `/sv-spec` and `/sv-prd` call it when a question needs a demo to answer. It builds each prototype as one Claude artifact, for a UI question and for a logic question.
 
 ## Branches, worktrees and databases
 
