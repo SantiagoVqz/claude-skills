@@ -38,6 +38,6 @@ Covers stories: 1, 2
 - [ ] Criterion 2
 ```
 
-`Covers stories` names the user stories of the PRD that the ticket makes work. Each story is in one ticket or more. The acceptance criteria tell when the ticket is done.
+`Covers stories` names the user stories of the PRD that the ticket makes work. Each story is in one ticket or more. The acceptance criteria tell when the ticket is done, and include the edge cases of its stories, such as an empty list or a value at its limit.
 
 The ticket title goes in the issue title, or in the list item heading. Use the PRD's words. Leave out file paths and code: they go stale before the work ends. The one exception is a prototype snippet that states a decision more exactly than prose. Trim it to the decision and say that it came from a prototype.
