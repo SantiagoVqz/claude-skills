@@ -64,7 +64,7 @@ Fix: sharpen wording: in the DevTools paragraph, write: "When a tool answers 'Th
 
 ### F7 · sv-build · step 8 · No rule for a spec branch that has no worktree
 
-Status: open
+Status: applied
 Seen in: 8b1d0077, 46161423 (2 sessions), first time
 What happened: Step 8 says to enter the spec worktree, but none existed. In both sessions the agent made one with a plain `git worktree add`, outside sv-worktree.
 Evidence: 8b1d0077:1079: "The spec branch has no worktree yet, so I'll make one."; 46161423:1908: "no spec worktree exists yet, so I make one from the primary checkout."
@@ -80,7 +80,7 @@ Fix: sharpen wording: in sv-build step 9 and in the template, write "Write the c
 
 ### F9 · sv-worktree · Make step 1, and sv-build · step 2 · No case for a spec branch that is only on the remote
 
-Status: open
+Status: applied
 Seen in: 8b1d0077, 46161423 (2 sessions), first time
 What happened: sv-build step 2 says that the ticket starts from `origin/<spec-branch>`. sv-worktree says to use the local spec branch. Neither skill covers a spec branch that exists only on the remote. Both sessions made the tracking branch by hand.
 Evidence: 8b1d0077:64: "spec branch exists only on the remote"; 8b1d0077:84: "git branch --track spec/231-pieza-suajada origin/spec/231-pieza-suajada && git worktree add ..."
@@ -88,7 +88,7 @@ Fix: sharpen wording: in sv-worktree Make step 1, write "When the spec branch is
 
 ### F10 · sv-build · step 4, and sv-tdd · Report · The approach skill's report is not shown
 
-Status: open
+Status: applied
 Seen in: 9a970d79, 2338aae5 (2 sessions), first time
 What happened: sv-tdd ended with no report, and sv-build step 4 counted as done. The step 7 card later gave the same criterion-to-test list, so the user lost nothing.
 Evidence: 9a970d79:694: "The build is done, and a fresh subagent is now running `sv-verify` on the diff."; 2338aae5:600-607: the Refactor commit, then verify starts with no report.
@@ -120,7 +120,7 @@ Fix: sharpen wording: in step 10, write "Print the card as chat text before the 
 
 ### F14 · sv-build · step 5, and sv-tdd · step 3 · Verify starts while the build's checks still run
 
-Status: open
+Status: applied
 Seen in: 46161423, first time
 What happened: The agent sent the TDD report and started verify while the full backend suite still ran in the background. Two pytest runs then shared one test database and stuck for 43 minutes. The user approved a kill. The agent then told later verify runs to skip backend tests, which goes against sv-verify step 2.
 Evidence: 46161423:1304: "The backend suite will report when done. Meanwhile I start the `sv-verify` run"; 46161423:1625: "Two pytest runs share the ticket test database and are stuck ... 43 min"; 46161423:1677: "Do NOT run any backend pytest"
@@ -136,7 +136,7 @@ Fix: add an Excuses row to sv-diagnose and sv-cleanup: "The setup is missing, so
 
 ### F16 · sv-build · step 5 · A criterion that asks for sv-ui-check becomes a hard finding that no step closes
 
-Status: open
+Status: applied
 Seen in: 2338aae5, first time
 What happened: Criterion 7 asked for an sv-ui-check run, and the user did not pass `--ui`. Verify reported the missing check as hard. The agent went on with the hard finding open, then ran sv-ui-check before the card. The result was right, but it went outside steps 5 and 7.
 Evidence: 2338aae5:639: "There is no sv-ui-check evidence yet"; 2338aae5:648: "No code change fixes it; `sv-ui-check` does"
@@ -144,7 +144,7 @@ Fix: add a step: in step 1, when a criterion names sv-ui-check or a browser chec
 
 ### F17 · sv-build · step 5 · A hard finding is fixed a second time and not stopped
 
-Status: open
+Status: applied
 Seen in: 46161423, first time
 What happened: The second verify still found the forbidden word, in one test name. Step 5 says to stop. The agent fixed it and ran a third verify. The first fix missed the name because its grep used a short list of patterns.
 Evidence: 46161423:1366: "grep -rn \"RemisionesDeParte\|otraParte\|...\""; 46161423:1700: "Real miss: one test name still says \"parte\". Fixing it."
@@ -208,7 +208,7 @@ Fix: sharpen wording: for an input that is a screenshot, a Sentry link or an err
 
 ### F25 · sv-cleanup · step 7 · The migration check uses a guessed folder
 
-Status: open
+Status: applied
 Seen in: d13fd348, first time
 What happened: The agent grepped for `alembic/versions`. KNOT keeps its migrations in `backend/migrations/versions`, so the check could find nothing.
 Evidence: d13fd348:717: "grep -i alembic/versions"; d13fd348:730: "**Migrations:** none came in with this pull."
@@ -216,7 +216,7 @@ Fix: sharpen wording: "Find the migration folder from `AGENTS.md` or from `scrip
 
 ### F26 · sv-cleanup · new step · Servers and background tasks of the branch are not stopped
 
-Status: open
+Status: applied
 Seen in: d13fd348, first time
 What happened: The agent checked only the ports and said that the session started no dev server. A background dev server task still ran from before a /clear, and the worktree was removed under it.
 Evidence: d13fd348:850: "This session never started one"; d13fd348:880: "So I was wrong earlier"
