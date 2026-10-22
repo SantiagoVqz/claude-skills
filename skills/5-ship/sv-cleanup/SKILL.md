@@ -36,19 +36,25 @@ Read the closing line of the PR body.
 
 Completion: each issue is in the state that the closing line gives, and you know which closed by keyword and which by hand.
 
-## 4. Worktree
+## 4. Servers
+
+Stop each dev server and background task that runs from the worktree. Check the background tasks of this session, and each process whose working directory is in the worktree: `lsof -d cwd` lists them. A task can survive a `/clear`, so look also when you think this session started none.
+
+Completion: no process has its working directory in the worktree.
+
+## 5. Worktree
 
 Call the Skill tool with `sv-worktree` to remove the worktree of the branch. Ticket worktrees of the spec stay. The next `/sv-build` on such a ticket makes a new spec branch and rebases the ticket onto it.
 
 Completion: `git worktree list` does not show the branch, and the local branch is gone.
 
-## 5. Remote branch
+## 6. Remote branch
 
 Run `git ls-remote --exit-code --heads origin <branch>`. When the branch is there, run `git push origin --delete <branch>`. GitHub can delete it on merge, so a missing branch is normal.
 
 Completion: origin does not have the branch.
 
-## 6. Trunk
+## 7. Trunk
 
 Record the trunk head with `git rev-parse HEAD`. Run `git pull --ff-only`.
 
@@ -60,12 +66,20 @@ When it does not fast-forward, list the local-only commits with `git log --oneli
 
 Completion: the primary checkout is on the latest trunk, or the user picked Stop.
 
-## 7. Migrations
+## 8. Migrations
 
-Run `git diff --name-only <old head> HEAD`. When it shows new migrations, run the migrate command from `AGENTS.md` or `package.json` on the trunk dev database. When the repo has no such command, name the migrations in the report.
+Find the migration folder in `AGENTS.md`, or in the config of the migration tool, such as `script_location` in `alembic.ini`. Run `git diff --name-only <old head> HEAD -- <folder>`. When it shows new migrations, run the migrate command from `AGENTS.md` or `package.json` on the trunk dev database. When the repo has no such command, name the migrations in the report.
 
 Completion: the trunk dev database has each new migration, or the report names them.
 
+## Excuses
+
+| Excuse | Answer |
+|---|---|
+| "The worktree was made by hand, so I remove it by hand." | Call the `sv-worktree` skill. Its Remove also drops the test database. |
+
+Add a row only when `/sv-retro` finds a new excuse.
+
 ## Report
 
-PR · merge method, when it was not rebase and merge · issues closed by keyword, by hand, or left open for a partial ship · worktree removed · branches deleted · trunk head · migrations applied · ticket worktrees left open.
+PR · merge method, when it was not rebase and merge · issues closed by keyword, by hand, or left open for a partial ship · servers stopped · worktree removed · branches deleted · trunk head · migrations applied · ticket worktrees left open.

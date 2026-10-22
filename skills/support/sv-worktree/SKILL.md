@@ -25,7 +25,7 @@ The **trunk** is the branch that PRs merge into: the default branch from `git sy
 
 1. **Locate.** Read `git worktree list --porcelain`. When you know only the issue number, match any `<type>/<n>-` branch in it and in `git branch -a` before you make a new one. Take the case that matches:
    - A worktree has the branch: use its path, and go on to steps 2 to 4.
-   - No worktree has it: `git fetch origin`, then `git worktree add -b <branch> .claude/worktrees/<branch with / as -> <base>`. Use `origin/<trunk>` as the base for a spec or fix branch, and the local spec branch for a ticket. Leave out `-b` when the branch exists.
+   - No worktree has it: `git fetch origin`, then `git worktree add -b <branch> .claude/worktrees/<branch with / as -> <base>`. Use `origin/<trunk>` as the base for a spec or fix branch, and the local spec branch for a ticket. When the spec branch is only on the remote, run `git branch --track <spec-branch> origin/<spec-branch>` first. Leave out `-b` when the branch exists.
    - The primary checkout has the branch: stop and say so. A branch is checked out in one place only.
 2. **Link a ticket to its spec.** For a ticket branch, run `git config branch.<ticket-branch>.spec <spec-branch>` before you provision. This line is how `provision.sh` finds the spec's database.
 3. **Enter.** `EnterWorktree` on the worktree path. Only `EnterWorktree` puts the guard on the session, so never enter with `cd`. After this, the harness refuses commands that it cannot prove stay in the worktree. This covers every shell command, not only git. Run one plain command per call, from the worktree root, on paths in the worktree. For a subfolder, use a flag such as `pnpm --dir` or `uv --directory`, because a `cd` stays in effect for the rest of the session. Change a file with the Edit tool, and make a new file with the Write tool. Quote each argument that holds `*`, `[` or `]`. The guard refuses only some other forms, such as a `&&` chain, `$(...)` or a heredoc, so a command that ran is no proof that its form is safe. Pass a commit message with one `-m` flag per paragraph. A message file in the worktree can get committed.
@@ -40,6 +40,7 @@ Run this from the primary checkout after the branch is merged, into the spec bra
 1. Call `EnterWorktree` with the worktree path, and skip the call when the session is already there. Run `scripts/provision.sh drop`. The script drops the test database, and the dev fork when the branch owns one. A ticket leaves its spec's fork alone. Then call `ExitWorktree` with `keep` to go back to the primary checkout.
 2. `git worktree remove <path>`. When it refuses because of uncommitted or untracked files, stop and show them. Keep the files: no `--force`.
 3. `git branch -D <branch>`. It also removes the `branch.<branch>` config, with the spec link of a ticket.
+4. `git worktree prune`, for the records of worktrees whose folder is gone.
 
 Completion: `git worktree list` does not show the path, and the branch is gone.
 
