@@ -5,6 +5,15 @@ Install two files so that every linked worktree gets env files, dependencies, fr
 - [provision.sh](provision.sh) → `scripts/provision.sh`. It sets up the worktree that it runs in. Only its CONFIG block and its DATABASE block change per repo.
 - [hook.sh](hook.sh) → `.claude/hooks/provision-worktree.sh`. It runs `provision.sh` when a session opens in a linked worktree, and after `EnterWorktree`.
 
+## Existing script
+
+When `scripts/provision.sh` exists and has no ENGINE header, it is the repo's own script, and an ADR can require it. Keep it. Check the contract that `sv-worktree` needs:
+
+- With no argument, it provisions the worktree that it runs in, and the end of its output names the dev and test databases.
+- With `drop`, it removes the databases that the worktree owns.
+
+Add only the mode that is missing, in the style of the script. Then install the hook and run the check below. Show the change in the confirm step.
+
 ## Fill the CONFIG
 
 Find each value in the repo. Ask the user only for the values that you cannot find.
