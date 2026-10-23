@@ -1,6 +1,6 @@
 ---
 name: sv-diagnose
-description: "Find and fix the cause of a bug or a performance regression with a red feedback loop, ranked hypotheses and a regression test. Use when the user runs /sv-diagnose, or /sv-build runs an approach:diagnose ticket."
+description: "Find and fix the cause of a bug or a performance regression with a red feedback loop, ranked hypotheses and a regression test. Use when the user runs /sv-diagnose, or /sv-build runs approach:diagnose work."
 argument-hint: "<sentry link | error | issue>"
 metadata:
   credits:
@@ -14,7 +14,7 @@ metadata:
 
 `/sv-diagnose` takes a bug from a symptom to one fix commit. The **loop** is the skill: one command that goes **red** on this bug and green when it is fixed. With a **tight** loop, the cause falls out of the steps that follow. With no loop, reading code gives only a guess.
 
-When `/sv-build` runs this skill for an `approach:diagnose` ticket, skip the steps marked "(not under `/sv-build`)". `/sv-build` owns them.
+When `/sv-build` runs this skill for an `approach:diagnose` phase or ticket, skip the steps marked "(not under `/sv-build`)". `/sv-build` owns them.
 
 When you stop, put the symptom and the path of each attachment in the stop message, so that the next run needs no new input from the user.
 
@@ -149,7 +149,7 @@ Completion: the card is in the chat above the question, and the user approved. S
 
 ## 11. Record
 
-Squash the branch into one commit, except under `/sv-build`, which squashes when it lands the ticket, and except for work that `NO-SETUP.md` keeps uncommitted. Run `git merge-base HEAD origin/<trunk>`, then `git reset --soft <base>`. Commit with `-m "Fix <title> (#<n>)"`, then `-m "Cause: <the confirmed hypothesis>"`.
+Squash the branch into one commit, except under `/sv-build`, which squashes when it lands the phase, and except for work that `NO-SETUP.md` keeps uncommitted. Run `git merge-base HEAD origin/<trunk>`, then `git reset --soft <base>`. Commit with `-m "Fix <title> (#<n>)"`, then `-m "Cause: <the confirmed hypothesis>"`.
 
 Comment on the issue, as `tracker.md` says: the cause, the loop command, and the missing seam when there is one. When the loop is a harness, put its text, redacted, in the comment, then delete the harness.
 

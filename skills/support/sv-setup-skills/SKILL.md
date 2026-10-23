@@ -63,7 +63,7 @@ Completion: the user picked Approve.
 
 ### Tracker
 
-Ideas, specs, tickets and bugs are GitHub issues. To file an issue, use the `sv-issue` skill. Before you read, link, label or close an issue, read `docs/agents/tracker.md`.
+Ideas, specs, tasks and bugs are GitHub issues. To file an issue, use the `sv-issue` skill. Before you read, link, label or close an issue, read `docs/agents/tracker.md`.
 
 ### Domain docs
 

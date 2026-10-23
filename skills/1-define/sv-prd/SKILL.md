@@ -20,7 +20,7 @@ Completion: you can describe in a few lines how the area works today.
 Call the Skill tool with `sv-interview`. The design tree for a PRD always contains these decisions, so the interview is not done until each one is settled:
 
 - The problem, and the user who has it.
-- The user stories.
+- What each user can do and check. You write the user stories from these answers in step 3.
 - What is out of scope.
 - The test seams. Propose the highest existing seam, and get the user's agreement.
 - The schema changes: each migration, or none.
@@ -29,11 +29,11 @@ When a question can be answered only by seeing or running something, such as how
 
 The log can hold terms and ADR candidates. Use the settled terms in the PRD. The glossary and ADR files stay as they are.
 
-Completion: the user confirmed the decisions log with an explicit yes.
+Completion: the interview returned the decisions log, with each decision above settled.
 
 ## 3. Draft
 
-Write the PRD from the decisions log with [SPEC-TEMPLATE.md](SPEC-TEMPLATE.md). Show the draft to the user, and change it until they approve it. In the chat, show the user stories by their numbers and count only, because the user settled their text in the interview. The PRD has the full text.
+Write the PRD from the decisions log with [SPEC-TEMPLATE.md](SPEC-TEMPLATE.md). This is the one approval of the PRD. In the chat, show only what the user approves, one short line each: the problem, the scope, out of scope, the seams, the schema changes, and the story count with a title of a few words for each. The PRD has the full text. Change it until the user approves it.
 
 Completion: the user approved the draft.
 

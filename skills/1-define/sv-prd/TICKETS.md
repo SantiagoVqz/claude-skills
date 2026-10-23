@@ -1,12 +1,12 @@
 # Ticket rules
 
-Cut a PRD or spec into **tickets** with these rules. `/sv-prd` owns this file. `/sv-plan` reads it too, and adds its own labels on top.
+Cut a PRD into **tickets** with these rules. `/sv-prd` owns this file. A spec gets phases from `/sv-build`, not tickets. `sv-issue` and `sv-review` read the `Lone ticket` section.
 
 ## Slices
 
 Each ticket is a **vertical slice**: it goes through every layer that its stories touch, such as schema, API, UI and tests. A finished ticket is demoable or checkable on its own.
 
-**One ticket by default.** Each ticket pays a fixed cost in `/sv-build`: a worktree, a database, the verify runs, the full suite and a checkpoint card. Code in two tickets is written in two contexts, so the second ticket copies the first. Cut the whole PRD or spec as one ticket. Split it only at a **boundary**:
+**One ticket by default.** Each ticket pays a fixed cost: its own branch, its own review and its own context. Code in two tickets is written in two contexts, so the second ticket copies the first. Cut the whole PRD as one ticket. Split it only at a **boundary**:
 
 | Boundary | Split when |
 |---|---|
@@ -58,5 +58,5 @@ A **lone ticket** is a one-off change that has no parent spec. `/sv-build` build
 
 - Use the template above without the `Covers stories` and `Boundary` lines.
 - In "What to build", say what the user sees now and what the user sees after the change.
-- Give it one approach label from the table in `sv-plan`.
+- Give it one approach label from the table in `PLAN.md`, in the folder of the `sv-build` skill.
 - Put related changes in one ticket, by the one-ticket rule above.

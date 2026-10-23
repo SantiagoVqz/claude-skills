@@ -24,9 +24,9 @@ The summaries here are for orientation. Before you say what a skill does, or tha
 Find the facts below. Use git, `gh` and the files. Ask the user only for a fact that the repo cannot give.
 
 - **Setup**: `AGENTS.md` has an `## Agent skills` block, or it does not.
-- **Branch**: the current branch, and its kind from the name: `spec/<n>-<slug>`, `ticket/<n>-<slug>`, `fix/<n>-<slug>`, the trunk, or other.
+- **Branch**: the current branch, and its kind from the name: `spec/<n>-<slug>`, `fix/<n>-<slug>`, the trunk, or other.
 - **Git operation**: a rebase or a merge stops on a conflict, or none is in progress.
-- **Issue**: for a spec, ticket or fix branch, the state of issue `<n>`. For a spec, its open tickets and their blockers.
+- **Issue**: for a spec or fix branch, or a spec named in the request, the state of issue `<n>`. For a spec, whether it has a `### Review of` comment with the hash of the branch head. For a project, its child specs and their blockers.
 - **PR**: for a spec or fix branch, an open PR, a merged PR, or none.
 - **Request**: what the user wants, in one line.
 
@@ -42,15 +42,15 @@ File or track work for later (idea, bug) ──────► /sv-issue
 Branch has a merged PR ────────────────────────► /sv-cleanup
 Branch has an open PR ─────────────────────────► you merge, then /sv-cleanup
 Something is broken (error, Sentry, bug) ──────► /sv-diagnose
-fix/ branch, fix committed, no PR ─────────────► /sv-ship
+fix/ branch, review comment at the head ───────► /sv-ship
 fix/ branch, issue has an approach: label ─────► /sv-build <issue> (it resumes)
+fix/ branch, bug fix committed, no PR ─────────► /sv-ship
 fix/ branch, no fix commit yet ────────────────► /sv-diagnose <issue>
-ticket/ branch ────────────────────────────────► /sv-build <ticket> (it resumes)
-spec/ branch
-  ├── spec issue has no tickets ───────────────► /sv-plan
-  ├── an open ticket has no open blockers ─────► /sv-build <ticket>
-  ├── all tickets closed, no review comment ───► /sv-review
-  └── review comment approved ─────────────────► /sv-ship
+Project issue ─────────────────────────────────► /sv-build <child spec with no open blocker>
+Spec issue
+  ├── review comment at the branch head ───────► /sv-ship <spec>
+  ├── commits after the review comment ────────► /sv-review <spec>
+  └── no review comment ───────────────────────► /sv-build <spec> (it plans or resumes)
 New idea or feature
   ├── no setup, or the user wants a PRD only ──► /sv-prd
   ├── no setup, the user wants the full flow ──► /sv-setup-skills, then /sv-spec
@@ -91,16 +91,18 @@ When the user asks for a step out of order, name the command that the flow puts 
 ## The flows
 
 ```text
-Feature:  /sv-spec ──► /sv-plan ──► /sv-build (one per ticket) ──► /sv-review ──► /sv-ship ──► you merge ──► /sv-cleanup
+Feature:  /sv-spec ──► /sv-build (plan, all phases, then sv-review) ──► /sv-ship ──► you merge ──► /sv-cleanup
+Project:  /sv-spec ──► the Feature flow from /sv-build, once per child spec, in blocking order
 Bug:      /sv-diagnose ──► /sv-ship ──► you merge ──► /sv-cleanup
 One-off:  /sv-issue ──► /sv-build ──► /sv-ship ──► you merge ──► /sv-cleanup
 No setup: /sv-prd ──► you start the tickets
 ```
 
 - `/sv-build` and `/sv-diagnose` run `/sv-verify` themselves. The user runs it by hand only on another diff.
-- `/sv-build` calls `sv-tdd`, `sv-refactor` or `sv-diagnose` from the `approach:` label of the ticket.
+- `/sv-build` calls `sv-tdd`, `sv-refactor` or `sv-diagnose` from the approach of each phase, in a subagent, then calls `sv-review`.
 - `/sv-issue` files an idea, a bug or a task with the context that the conversation has, so the next skill starts from the issue. When the user wants to track several parts of a request, route the whole request to `/sv-issue`: it files each part and the blocking edges between them.
 - Route a task or ticket to `/sv-build`, which picks the approach skill.
-- `/sv-spec`, `/sv-plan`, `/sv-build`, `/sv-review`, `/sv-ship` and `/sv-cleanup` need `/sv-setup-skills`. `/sv-prd`, `/sv-issue`, `/sv-diagnose`, `sv-tdd` and `sv-refactor` run without it.
-- Each `/sv-build` runs in its own session. The user picks how many run at the same time.
+- `/sv-spec`, `/sv-build`, `/sv-review`, `/sv-ship` and `/sv-cleanup` need `/sv-setup-skills`. `/sv-prd`, `/sv-issue`, `/sv-diagnose`, `sv-tdd` and `sv-refactor` run without it.
+- `/sv-spec` makes no branch. `/sv-build` makes the branch and its worktree.
+- Each `/sv-build` runs in its own session. Two specs can build at the same time, in two sessions.
 - Skills with no slash in this file are called by other skills. The user can also run them directly.
