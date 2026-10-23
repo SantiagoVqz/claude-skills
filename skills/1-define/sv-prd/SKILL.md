@@ -51,11 +51,11 @@ Completion: the PRD is in the place the user chose, and you have its issue numbe
 Ask the user whether to cut the PRD into tickets. When the answer is no, go to step 6.
 
 1. Cut the PRD into tickets with [TICKETS.md](TICKETS.md).
-2. Show the breakdown as a numbered list. For each ticket, give the title, the tickets that block it, and what it delivers.
+2. Show the breakdown as a numbered list. For each ticket, give the title, the tickets that block it, its boundary, and what it delivers.
 3. Ask whether the size is right, whether each blocking edge is real, and whether to merge or split a ticket. Change the breakdown until the user approves it.
 4. Publish the tickets in the same place as the PRD, blockers first:
    - **GitHub issue**: call the Skill tool with `sv-issue`, and hand it the tickets as one list, with the PRD as their parent and their blockers by ref. Give a ticket a label only when a fitting label already exists.
-   - **Markdown**: add a `## Tickets` section to the end of the PRD output. Write each ticket as a numbered item with its title, its blockers by number, what to build, and its acceptance criteria.
+   - **Markdown**: add a `## Tickets` section to the end of the PRD output. Write each ticket as a numbered item with its title, its blockers by number, its boundary, what to build, and its acceptance criteria.
 
 Completion: every approved ticket is published with its blocking edges, or the user said no to tickets.
 

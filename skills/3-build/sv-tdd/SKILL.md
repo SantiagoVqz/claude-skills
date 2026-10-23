@@ -15,13 +15,15 @@ TDD is the red, green loop. Each cycle is a **tracer bullet**: one failing test,
 
 ## 1. Prepare
 
-Read the ticket, its parent spec, the glossary that `docs/agents/domain.md` names, and the ADRs for the area. When the repo has no `docs/agents/domain.md`, find the glossary as `NO-SETUP.md` in the folder of the `sv-setup-skills` skill says. Look up in the glossary, and in its Avoid lists, each noun that you will use in a test, a component or a label, and each English word of the spec. Use the glossary words.
+Read the ticket, its parent spec when it has one, the glossary that `docs/agents/domain.md` names, and the ADRs for the area. When the repo has no `docs/agents/domain.md`, find the glossary as `NO-SETUP.md` in the folder of the `sv-setup-skills` skill says. Look up in the glossary, and in its Avoid lists, each noun that you will use in a test, a component or a label, and each English word of the spec. Use the glossary words.
 
-Find the **seams** in the spec's testing decisions. A seam is the public boundary where a test observes behavior. Write tests only at these seams. When a criterion cannot be tested at an agreed seam, stop and ask the user. Propose the new seam in one line: what it catches and what it misses.
+Find the **seams** in the spec's testing decisions. A seam is the public boundary where a test observes behavior. For a ticket with no parent spec, the agreed seams are the ones that the existing tests of the area use. Write tests only at these seams. When a criterion cannot be tested at an agreed seam, stop and ask the user. Propose the new seam in one line: what it catches and what it misses.
 
 When the ticket asks for work that no criterion covers, such as a layout, name each piece in one line: `Build: <what>`.
 
-Completion: you wrote one line for each acceptance criterion, `<criterion> · <seam> · <test file>`, and one line for each `Build:` piece. You looked up each noun and each English word in the glossary.
+Read the code in parts. Find the lines that a criterion names with `grep -n`, and read those lines with their function. Read a whole file only when it is the seam or its test file.
+
+Completion: your message shows one line for each acceptance criterion, `<criterion> · <seam> · <test file>`, and one line for each `Build:` piece, before the first red. You looked up each noun and each English word in the glossary.
 
 ## 2. Loop
 
@@ -48,17 +50,17 @@ Completion: each acceptance criterion has a passing test and a `Green:` commit, 
 
 ## 3. Refactor
 
-Read `git diff <base>...HEAD` in full. Under `/sv-build`, the base is the spec branch. Then look for the duplication that a read of the diff alone does not show:
+Read `git diff <base>...HEAD` in full. Under `/sv-build`, the base is the base that `/sv-build` names: the spec branch, or the trunk for a lone ticket. Then look for the duplication that a read of the diff alone does not show:
 
 - For each new helper, search the codebase for one that does the same job.
-- Compare the new code with the code of the earlier tickets of the same spec.
+- Compare the new code with the code of the earlier tickets of the same spec, when the ticket has a spec.
 - List each place that branches on the new case. Several checks that decide one case are one decision.
 
 Remove duplication, fix names, and move code to where it belongs. Commit each change: `Refactor: <what>`. Run the test files of each change after it. Formatting is the linter's job, so a format change is no refactor.
 
-Then run the full suite once, and wait for its result.
+Then run the repo's formatter and lint on the diff, and commit any change: `Format: <files>`. Then run the full suite once, and wait for its result.
 
-Completion: the full suite passed after the last change, and that run has finished. A run in the background counts only when its result is in. You have no more changes to make.
+Completion: the formatter and lint pass, the full suite passed after the last change, and that run has finished. A run in the background counts only when its result is in. You have no more changes to make.
 
 ## Good tests
 
@@ -74,6 +76,7 @@ A good test checks behavior through a public interface. It reads like a line of 
 |---|---|
 | "The code reads clean, so no refactor is needed." | Name the diff that you read and the helpers that you searched for. |
 | "The rest of the code writes the literal another way." | The spec is the contract. Ask the user before the green. |
+| "I know the seams, so the list can wait." | Print the seam list before the first red. The user and verify read it. |
 
 Add a row only when `/sv-retro` finds a new excuse.
 
