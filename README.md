@@ -247,7 +247,7 @@ On Linear, `/sv-build` sets the native In Progress status. It does not use the `
 
 ## How the set grows
 
-- Run `/sv-retro` at the end of a day of work. It reads each session since the last retro, in each project, where skills ran. It writes the findings to one file in `runs/` in this repo, with evidence and a proposed fix. The Sessions list of each run file records the lines it read, so no line is read twice.
+- Run `/sv-retro` at the end of a day of work. It reads each session since the last retro, in each project, where skills ran. It writes the findings to one file in `runs/` in this repo, with evidence and a proposed fix. Git ignores `runs/`, because a run file quotes the sessions of private projects. The Sessions list of each run file records the lines it read, so no line is read twice.
 - A finding that repeats across runs is fixed first. A fix commit names the finding ID and sets its status.
 - Fix the skill after each run. Do not fix it by prompting again.
 - Add a skill only when a run shows a need for it.
