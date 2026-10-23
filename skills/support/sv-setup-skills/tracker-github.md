@@ -1,12 +1,13 @@
 # Tracker: GitHub
 
-Specs, tickets and bugs for this repo are GitHub issues. Use the `gh` CLI. It finds the repo from `git remote`.
+Ideas, specs, tickets and bugs for this repo are GitHub issues. Use the `gh` CLI. It finds the repo from `git remote`.
 
 ## Shapes
 
 - **Spec**: an issue with the `spec` label.
 - **Ticket**: a sub-issue of its spec, with one `approach:` label.
 - **Bug**: an issue with the `bug` label and no parent.
+- **Idea**: an issue with the `idea` label, not yet a spec.
 
 ## Operations
 
@@ -29,6 +30,7 @@ Specs, tickets and bugs for this repo are GitHub issues. Use the `gh` CLI. It fi
 |---|---|
 | `spec` | A spec. Its sub-issues are its tickets. |
 | `bug` | A bug, fixed by `/sv-diagnose`. |
+| `idea` | An idea, not yet a spec. `/sv-spec` or `/sv-prd` takes it. |
 | `approach:tdd` | `/sv-build` uses the `sv-tdd` skill. |
 | `approach:refactor` | `/sv-build` uses the `sv-refactor` skill. |
 | `approach:diagnose` | `/sv-build` uses the `sv-diagnose` skill. |

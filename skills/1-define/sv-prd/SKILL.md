@@ -41,7 +41,7 @@ Completion: the user approved the draft.
 
 Ask the user where the PRD goes. Use the question tool. Offer these options:
 
-- **GitHub issue**: offer it only when `gh repo view --json viewerPermission` shows `WRITE`, `MAINTAIN` or `ADMIN`. Create the issue with `gh issue create --title "..." --body-file <file>`. Run `gh label list` first. Add a label only when a fitting label already exists.
+- **GitHub issue**: offer it only when `gh repo view --json viewerPermission` shows `WRITE`, `MAINTAIN` or `ADMIN`. Call the Skill tool with `sv-issue` to create the issue. Give it a label only when a fitting label already exists.
 - **Markdown**: for Linear, Jira or a doc, where the user pastes it. In a git repo, write the PRD to `.scratch/prd/<slug>.md`, and add `.scratch/` to `.git/info/exclude` when git does not already ignore it. Outside a git repo, print the PRD in the chat.
 
 Completion: the PRD is in the place the user chose, and you have its issue number, its file path, or the chat message.
@@ -54,7 +54,7 @@ Ask the user whether to cut the PRD into tickets. When the answer is no, go to s
 2. Show the breakdown as a numbered list. For each ticket, give the title, the tickets that block it, and what it delivers.
 3. Ask whether the size is right, whether each blocking edge is real, and whether to merge or split a ticket. Change the breakdown until the user approves it.
 4. Publish the tickets in the same place as the PRD, blockers first:
-   - **GitHub issue**: create each ticket with `gh issue create --title "..." --body-file <file> --parent <prd>`. Then add each blocking edge with `gh issue edit <ticket> --add-blocked-by <n>,<n>`. Use only labels that already exist.
+   - **GitHub issue**: call the Skill tool with `sv-issue`, and hand it the tickets as one list, with the PRD as their parent and their blockers by ref. Give a ticket a label only when a fitting label already exists.
    - **Markdown**: add a `## Tickets` section to the end of the PRD output. Write each ticket as a numbered item with its title, its blockers by number, what to build, and its acceptance criteria.
 
 Completion: every approved ticket is published with its blocking edges, or the user said no to tickets.

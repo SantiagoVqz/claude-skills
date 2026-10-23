@@ -40,6 +40,7 @@ Say yes to accept, or give your answer.
 - Write the question so that "yes" accepts your recommendation.
 - When the options are few and discrete, use the question tool so the user picks one. Use text for open questions.
 - When the caller names required decisions, each one gets its own question. For content such as user stories, show your draft in the question and ask the user to change it. Show a long list in groups of five or fewer, one group per question. Settle each required decision in step 2, so that the close only confirms it.
+- When the user asks to file a follow-up, call the Skill tool with `sv-issue` for it. Then send the open question again with its number.
 - **Facts are your job. Decisions are the user's.** When a question needs a fact from the code, the tracker or the docs, look it up. For a wide search, send a subagent. Ask the user only for what they decide.
 
 Completion: one question is sent, and you wait for the answer.

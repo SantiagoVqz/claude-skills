@@ -7,11 +7,13 @@ The set has two entry points:
 - `/sv-spec` starts a feature.
 - `/sv-diagnose` starts a bug fix.
 
+`/sv-issue` files work for later: an idea, a bug, a task or a follow-up. Each entry point can start from its issue.
+
 Each phase has one command. Each command reads the output of the command before it. The tracker holds the work: GitHub Issues or Linear.
 
 ## The flow
 
-`/sv-prd` is the setup-free path. It writes a PRD, and tickets if you want them, in any repo. `/sv-diagnose`, `sv-tdd` and `sv-refactor` also run with no setup: they use the fallbacks in `NO-SETUP.md`, in the folder of `sv-setup-skills`.
+`/sv-prd` is the setup-free path. It writes a PRD, and tickets if you want them, in any repo. `/sv-issue`, `/sv-diagnose`, `sv-tdd` and `sv-refactor` also run with no setup: they use the fallbacks in `NO-SETUP.md`, in the folder of `sv-setup-skills`.
 
 ```text
 Feature:  /sv-spec ──► /sv-plan ──► /sv-build (one per ticket) ──► /sv-review ──► /sv-ship ──► you merge ──► /sv-cleanup
@@ -25,6 +27,20 @@ End of the day: /sv-retro
 ```
 
 ## Commands
+
+### `/sv-issue [idea | bug | task] [what it is]`
+
+Run it when you want to track work, or when you start work that has no issue. `/sv-spec`, `/sv-prd`, `/sv-plan`, `/sv-diagnose` and `sv-interview` also call it to publish their issues.
+
+- **Input:** your words, and what the conversation already found: an `/sv-ask` route, a diagnosis, a screenshot. One request can hold several issues.
+- **Process:**
+  1. It finds the kind of each issue: idea, bug or task. It fills the template of the kind from the conversation and the code, and asks three questions at most for each issue.
+  2. It finds the order between the issues, such as a bug that must be fixed before an idea.
+  3. It searches the open issues for duplicates.
+  4. It shows each draft. You approve before it files anything.
+- **Output:** each issue with its label and blocking edges. An idea gets `idea`, a bug gets `bug`, and a task gets one `approach:` label. A bug body has the symptom, the steps, the facts, the hypotheses to rank, the open question for the fix and where to look. A screenshot goes in as text, and you drag the image in after.
+- **Follow-ups:** say "file a follow-up" during an interview. It files the issue from the conversation, then the interview goes on.
+- **Next:** `/sv-spec <n>` for an idea, `/sv-diagnose <n>` for a bug, `/sv-build <n>` for a task.
 
 ### `/sv-setup-skills`
 
@@ -141,7 +157,7 @@ Run it after you merge.
 
 - **Input:** a Sentry link, a pasted error, or an issue.
 - **Process:**
-  1. If the input is not an issue, it creates an issue with the `bug` label. With no setup, it uses `NO-SETUP.md`: with no tracker it keeps the issue text in the report.
+  1. If the input is not an issue, it creates an issue with the `bug` label through `sv-issue`. If the input is an issue, it starts from its facts, hypotheses and places to look. With no setup, it uses `NO-SETUP.md`: with no tracker it keeps the issue text in the report.
   2. It calls `sv-worktree` to make a fix branch, `fix/<n>-<slug>`, from the trunk. When the repo is not set up for worktrees, it makes the branch in a clean primary checkout, or leaves the fix uncommitted.
   3. It builds a feedback loop that goes red on the bug, and minimises the repro. When a person must reproduce the bug, `/sv-ui-check` tries first, then it asks you one step at a time.
   4. It ranks 3 to 5 hypotheses, and you pick the first one to test. It instruments the code, fixes the cause with a regression test, and cleans up.
@@ -183,9 +199,10 @@ You do not type these. Other skills call them.
 
 | Label | Set by | Read by |
 |---|---|---|
+| `idea` | `/sv-issue` | `/sv-spec`, `/sv-prd` |
 | `spec` | `/sv-spec` | `/sv-plan`, `/sv-review`, `/sv-ship`, `/sv-cleanup` |
-| `bug` | `/sv-diagnose` | `/sv-ship`, `/sv-cleanup` |
-| `approach:tdd`, `approach:refactor`, `approach:diagnose` | `/sv-plan` | `/sv-build` |
+| `bug` | `/sv-issue`, `/sv-diagnose` | `/sv-ship`, `/sv-cleanup` |
+| `approach:tdd`, `approach:refactor`, `approach:diagnose` | `/sv-plan`, `/sv-issue` | `/sv-build` |
 | `in-progress` | `/sv-build` | you and your team |
 
 On Linear, `/sv-build` sets the native In Progress status. It does not use the `in-progress` label. Blocked work uses native blocking links. Done work is a closed issue.
@@ -210,7 +227,7 @@ skills/
 ├── 3-build/    sv-build, sv-tdd, sv-refactor, sv-resolve-conflicts, sv-diagnose
 ├── 4-verify/   sv-verify, sv-ui-check, sv-review
 ├── 5-ship/     sv-ship, sv-pr, sv-cleanup
-└── support/    sv-setup-skills, sv-worktree, sv-retro, sv-writing-for-agents, sv-unslop
+└── support/    sv-issue, sv-setup-skills, sv-worktree, sv-retro, sv-writing-for-agents, sv-unslop
 ```
 
 A skill installs by its folder name only, for example `sv-spec`. The phase folder groups skills and is not part of the name.

@@ -74,7 +74,7 @@ Completion: the user picked Approve.
 
 ## 5. Publish
 
-Create the tickets in order, blockers first, so that each blocker has a number before the ticket that it blocks. Use the template in `TICKETS.md`, the `--parent <spec>` flag and the approach label. Then add each blocking edge.
+Call the Skill tool with `sv-issue`, and hand it the approved tickets as one list. Each ticket has a ref such as `T1`, its title, its body from the template in `TICKETS.md`, the spec as its parent, its approach label, and its blockers by ref or number.
 
 Completion: each approved ticket is a sub-issue of the spec, with its label and its blocking edges.
 

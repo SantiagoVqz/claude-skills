@@ -24,7 +24,7 @@ After `EnterWorktree`, run one plain shell command per call, from the worktree r
 
 Read the `## Agent skills` block in `AGENTS.md`, then `docs/agents/tracker.md`. When the block is missing, read `NO-SETUP.md` in the folder of the `sv-setup-skills` skill, and go on with its sources.
 
-When the input is a Sentry link, an error or a screenshot, create an issue with the `bug` label. The body has the symptom, redacted, and the steps to see it. Step 4 adds the exact symptom. Set the issue to in progress, as `tracker.md` says.
+When the input is a Sentry link, an error or a screenshot, call the Skill tool with `sv-issue` to create a bug issue, with its bug template and the `bug` label. Step 4 adds the exact symptom. When the input is an issue, read it. Its `Where to look` feeds the loop, and its `Hypotheses to rank` go into the ranking of step 5 with your own. Then set the issue to in progress, as `tracker.md` says.
 
 Completion: the bug is an issue in progress, and you have its number, or the repo has no tracker and the report keeps the issue text.
 
