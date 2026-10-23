@@ -56,6 +56,7 @@ New idea or feature
   ├── no setup, the user wants the full flow ──► /sv-setup-skills, then /sv-spec
   └── setup done ──────────────────────────────► /sv-spec
 A one-off change with a known result ──────────► /sv-issue task, then /sv-build <issue>
+Research, look up or compare a topic ─────────► /sv-research
 A design question that talk cannot settle ─────► sv-prototype
 Stress-test a plan or decision ────────────────► sv-interview
 Check a diff ──────────────────────────────────► /sv-verify

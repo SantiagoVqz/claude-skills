@@ -53,6 +53,19 @@ Run it when you want to track work, or when you start work that has no issue. `/
 - **Follow-ups:** say "file a follow-up" during an interview. It files the issue from the conversation, then the interview goes on.
 - **Next:** `/sv-spec <n>` for an idea, `/sv-diagnose <n>` for a bug, `/sv-build <n>` for a task.
 
+### `/sv-research <question>`
+
+Run it before you build or integrate something, such as a connection to SAT e-invoicing. It finds how the integration works, the options, the APIs to use and the risks. It needs no setup. Other skills can call it.
+
+- **Input:** a question.
+- **Process:**
+  1. It reads the stack of the app, so that each option and SDK fits it.
+  2. It picks the kind. An integration gets four researchers in parallel: process, options, APIs and operation. A lookup has one owner of the facts, and it gets one researcher. Another survey gets 3 to 5 researchers. Each kind except a lookup gets one writer.
+  3. Each researcher follows each claim to the primary source that owns it, and cites it.
+  4. It runs one more round for gaps at most. A gap that stays open goes into the report.
+- **Output:** a cited report at `docs/research/<slug>.md`, or where the repo already keeps such notes. The answer comes first. An integration report then has the options table, the APIs, the steps to build and the risks. The report stays uncommitted.
+- **Next:** `/sv-issue idea` or `/sv-spec`, with the report as input.
+
 ### `/sv-setup-skills`
 
 Run it once per repo.
@@ -265,7 +278,7 @@ skills/
 ├── 3-build/    sv-build, sv-tdd, sv-refactor, sv-resolve-conflicts, sv-diagnose
 ├── 4-verify/   sv-verify, sv-ui-check, sv-review
 ├── 5-ship/     sv-ship, sv-pr, sv-cleanup
-└── support/    sv-ask, sv-issue, sv-setup-skills, sv-worktree, sv-retro, sv-writing-for-agents, sv-unslop
+└── support/    sv-ask, sv-issue, sv-research, sv-setup-skills, sv-worktree, sv-retro, sv-writing-for-agents, sv-unslop
 ```
 
 A skill installs by its folder name only, for example `sv-spec`. The phase folder groups skills and is not part of the name.
