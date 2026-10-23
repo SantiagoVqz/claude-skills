@@ -2,14 +2,14 @@
 name: sv-cleanup
 description: "Tear down a merged spec or fix branch: check the merged PR, close the issues, remove the worktree and branches, and refresh the trunk."
 disable-model-invocation: true
-argument-hint: "[spec | bug]"
+argument-hint: "[spec | issue]"
 ---
 
 # Cleanup
 
 `/sv-cleanup` runs after the user merges a PR from `/sv-ship`. It ends with the issues in the right state, the worktree and branches gone, and the primary checkout on the latest trunk. It deletes nothing before the gate passes.
 
-Run it from the primary checkout. When the session is in a worktree, call `ExitWorktree` with `keep` first. When the session is still not in the primary checkout, stop, and tell the user to run `/sv-cleanup` in a session there.
+Run it from the primary checkout. When the session is in a worktree, call `ExitWorktree` with `keep` first. When `ExitWorktree` says that no session is active, the session went into the worktree with `cd`: run `cd` to the first path of `git worktree list`, which is the primary checkout. When the session is still not in the primary checkout, stop, and tell the user to run `/sv-cleanup` in a session there.
 
 ## 1. Find
 
@@ -21,7 +21,7 @@ Completion: you have the branch, its issue and the trunk.
 
 Run `gh pr list --head <branch> --state all --json number,url,state,body`.
 
-- **A merged PR**: go on. Read its merge commit with `gh pr view <pr> --json mergeCommit`. When that commit has two parents (`git cat-file -p <commit>` after a fetch), the PR merged with a merge commit, not rebase and merge. Name it in the report, with the repo setting that blocks it: `gh repo edit --enable-merge-commit=false`.
+- **A merged PR**: go on. Read its merge commit with `gh pr view <pr> --json mergeCommit`. When that commit has two parents (`git cat-file -p <commit>` after a fetch), the PR merged with a merge commit, not rebase and merge. Name it in the report. Name the repo setting that blocks it, `gh repo edit --enable-merge-commit=false`, only when the trunk is not `develop` and no ADR in `docs/adr/` needs merge commits. A release flow from `develop` to `main` can need them.
 - **An open PR**: stop, and give its URL.
 - **No PR**: stop. The next step is `/sv-ship`.
 
@@ -44,7 +44,7 @@ Completion: no process has its working directory in the worktree.
 
 ## 5. Worktree
 
-Call the Skill tool with `sv-worktree` to remove the worktree of the branch. Ticket worktrees of the spec stay. The next `/sv-build` on such a ticket makes a new spec branch and rebases the ticket onto it.
+Call the Skill tool with `sv-worktree` to remove the worktree of the branch. When the primary checkout has the branch and no worktree has it, run `git switch <trunk>`, then `git branch -D <branch>`, and skip `sv-worktree`. Ticket worktrees of the spec stay. The next `/sv-build` on such a ticket makes a new spec branch and rebases the ticket onto it.
 
 Completion: `git worktree list` does not show the branch, and the local branch is gone.
 

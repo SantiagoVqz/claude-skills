@@ -7,6 +7,8 @@ description: Cut AI tells from any writing.
 
 Edit text to remove AI patterns. Scan for the patterns below, then rewrite. Preserve meaning and match the intended tone.
 
+When the user runs this right after they rejected or interrupted a message or a question, that text is in scope too. Rewrite it and show the new version.
+
 ## Patterns to detect and fix
 
 Rule numbers are stable ids that other skills cite. A removed rule leaves a gap.
@@ -49,6 +51,7 @@ Rule numbers are stable ids that other skills cite. A removed rule leaves a gap.
 ### Jargon
 
 26. **Abstract metaphor nouns.** Substrate (base), wedge, wedge in (add), vector (way, method), locus, vantage, nexus, primitive as a noun, harness as a metaphor, surface as in "API surface", bedrock, scaffolding as a metaphor, modality, paradigm, gold-plating (more than the job needs), ratchet as a metaphor (the mechanism's real name, or a limit that only tightens), evacuate for moving code (move out), endgame (the last phase), north star, flywheel. These read as technical but usually have a plainer concrete word. Pick the concrete word.
+34. **The reader's words.** Each project term, code name and system name that the reader did not write is a word they must decode: "shadow unit", "closed-vocabulary word", "`ClosedWord`, a `str` subclass". Replace it with what it does, or define it once in plain words. When the text asks the reader for a decision, open with one plain sentence of 15 words or fewer that states the problem: "The name filter mistakes our own word "player" for a player's name."
 
 ### Plain speech
 
@@ -59,3 +62,7 @@ Rule numbers are stable ids that other skills cite. A removed rule leaves a gap.
 31. **Prefer the plain word.** "utilize" and "leverage" become "use", "facilitate" becomes "help", "numerous" becomes "many", "in the event that" becomes "if". The fancier synonym is rarely clearer.
 32. **Mannered prose.** Metaphor or flourish where a literal phrase exists: aphorisms ("wire it or delete it"), rhetorical fragments for effect, personified code ("the plan holds it"), figurative verbs ("rides along", "stands on"), stock framing phrases. "A dial worth turning" becomes "a parameter worth varying". Say what you mean. Rule 26 covers the metaphor nouns.
 33. **Over-compression.** Dropped articles, verbless fragments, symbol-speak, and abbreviations that make the reader decode instead of read. "Parser rejects bad date → exit 2, no write" becomes "The parser rejects a bad date, exits with code 2, and writes nothing." Write whole sentences with their articles and verbs, and spell out arrows and abbreviations.
+
+## Report
+
+Say what changed in one or two sentences. The report follows the same rules as the text, so it has no inline-header list (rule 16).

@@ -36,7 +36,7 @@ Completion: the session is in the fix worktree, or on the fix branch or the curr
 
 ## 3. Loop
 
-Read the glossary that `docs/agents/domain.md` names, or that `NO-SETUP.md` names, and the ADRs for the area. The fix keeps the meaning of each glossary term. Then build the loop. Try these in order:
+Read the glossary that `docs/agents/domain.md` names, or that `NO-SETUP.md` names. Open each ADR that the area's code or the glossary names. A listing of `docs/adr/` is not a read. The fix keeps the meaning of each glossary term. Then build the loop. Try these in order:
 
 1. A failing test at the seam that reaches the bug.
 2. A `curl` script against a running dev server.
@@ -52,6 +52,8 @@ Read the glossary that `docs/agents/domain.md` names, or that `NO-SETUP.md` name
 Then tighten it: make it faster, assert on the exact symptom, and pin the time, the random seed and the network.
 
 For a bug that does not occur each time, raise the rate: run the trigger many times, in parallel, under load. A rate of 50% is enough to work with. A rate of 1% is not.
+
+When the loop or the suite needs a workaround for a fault outside the bug, such as an env var that breaks the test setup, file the fault once. Call the Skill tool with `sv-issue`, when no open issue names the fault. Name the workaround and the issue in the report.
 
 When you cannot build a loop, stop. List what you tried. Ask the user for access to an environment that shows the bug, a captured artifact, or approval for temporary instrumentation in production.
 
@@ -74,9 +76,9 @@ Completion: the loop is red on the user's symptom, and each part that is left ma
 
 ## 5. Hypothesise
 
-Write 3 to 5 hypotheses, ranked. Each one states its prediction: "When <X> is the cause, <changing Y> makes the bug go away." A hypothesis with no prediction is a guess: sharpen it or remove it.
+Write 3 to 5 hypotheses, ranked. A hypothesis names a cause, not a fix. Each one states its prediction: "When <X> is the cause, <changing Y> makes the bug go away." A hypothesis with no prediction is a guess: sharpen it or remove it.
 
-Ask with the question tool which hypothesis to test first. Give one option for each hypothesis, with its prediction in the description. Mark your top pick as recommended. When the question returns no answer, ask it again before any other action.
+Ask with the question tool which hypothesis to test first. Give one option for each hypothesis, with its prediction in the description. An option holds one hypothesis only. Mark your top pick as recommended. When the question returns no answer, ask it again before any other action.
 
 Completion: the user picked a hypothesis, or wrote their own.
 
@@ -88,7 +90,9 @@ For a performance bug, measure a baseline first, with a timer, a profiler or a q
 
 When the user's pick is false, go to the next hypothesis in the ranking.
 
-Completion: one hypothesis is confirmed by its prediction, and the others that you tested are false.
+When no offline loop can test the cause, the cause is not confirmed. The card says "cause not confirmed" and names the real-world check that confirms it.
+
+Completion: one hypothesis is confirmed by its prediction, and the others that you tested are false, or the card will say "cause not confirmed" with its check.
 
 ## 7. Fix
 
@@ -126,8 +130,8 @@ Write the card in your message, before the question. The question tool does not 
 
 ```markdown
 ### #<n> <title>
-Cause: <the confirmed hypothesis, in one line>
-Fix: <one line>
+Cause: <the confirmed hypothesis, in one sentence, or "cause not confirmed" and the check that confirms it>
+Fix: <one sentence>
 Test: <test name> | Missing seam: <why>
 
 Judgment calls:
@@ -137,7 +141,7 @@ Check yourself: `<run command>`
 1. <a step and what the user sees>
 ```
 
-Keep "Check yourself" to three steps or fewer.
+Keep "Check yourself" to three steps or fewer. The card has only these parts. A finding outside the fix goes in the report, as an issue filed with `sv-issue`.
 
 Ask with the question tool: "Approve", "Change" or "Run ui-check". Leave out "Run ui-check" when it already ran on the fix. On Run ui-check, call the Skill tool with `sv-ui-check` for this bug, then ask again with "Approve" or "Change". On Change, make the edits, commit, run `sv-verify` in a new subagent, and show the card again. When Change comes with no notes, ask in the chat what to change. A free-text answer that clearly approves counts as Approve. Only for a free-text answer, start the reply with: "Taking that as Approve." When the question returns no answer, ask it again before any other action.
 
@@ -153,7 +157,7 @@ Completion: the branch has one commit over the trunk, or `/sv-build` runs this s
 
 ## Redact
 
-Redact each secret in each command, output and artifact that you show: write `<REDACTED>` in its place. Build loops that read credentials from environment variables. Quote only the lines of a captured artifact that carry the signal. When the redacted output is not enough to find the cause, say so and ask the user.
+Redact each secret in each command, output and artifact that you show: write `<REDACTED>` in its place. Print no value from an env file, because one pattern can also match a production line. To see which variables exist, list the names only: `grep -oE '^[A-Z_]+=' <file>`. Take the dev database name and user from the provision output. Build loops that read credentials from environment variables. Quote only the lines of a captured artifact that carry the signal. When the redacted output is not enough to find the cause, say so and ask the user.
 
 ## Excuses
 
@@ -161,9 +165,10 @@ Redact each secret in each command, output and artifact that you show: write `<R
 |---|---|
 | "The setup is missing, so I make the worktree by hand." | Call the `sv-worktree` skill. When it reports blocked, follow `NO-SETUP.md`. |
 | "The question options describe the fix." | The user approves the card. Write it in the message first. |
+| "I only need the local URL, so I grep the .env." | The grep also matches the production line. Print names only. |
 
 Add a row only when `/sv-retro` finds a new excuse.
 
 ## Report
 
-Issue · cause · commit, or the changed files when the work is uncommitted · missing seam, if any · each fallback from `NO-SETUP.md` · next step: `/sv-ship <n>`, or the next step that `NO-SETUP.md` gives.
+Issue · cause · commit, or the changed files when the work is uncommitted · missing seam, if any · each workaround and each issue filed for a fault outside the bug · each fallback from `NO-SETUP.md` · next step: `/sv-ship <n>`, or the next step that `NO-SETUP.md` gives.

@@ -28,16 +28,20 @@ Completion: you can name the tracker, the state of each file above, each label t
 
 ## 2. Confirm
 
-The tracker is GitHub when the remote is on GitHub. This version supports GitHub only. For any other tracker, stop and say that this version does not support it.
+The tracker is GitHub when the remote is on GitHub. This version supports GitHub only. For any other tracker, stop and say that this version does not support it. Ask no question about the tracker.
 
 Show the user, in one message:
 
+- The tracker.
 - The `## Agent skills` block from step 3, and the file that gets it.
 - The files that you will write or change, and the labels that you will create.
 - When the repo needs provisioning: the filled CONFIG block of `provision.sh`, from [PROVISIONING.md](PROVISIONING.md).
 - Each existing file or label that you will keep as it is.
 
-Send that message first. Then ask each choice in its own question tool call: the tracker, and each existing file or label that you could keep or replace. For each file in `docs/agents/` that covers the same job as a file that you write, ask: "Merge", "Keep both" or "Delete". Put your recommendation first. Then show the drafts, and ask for approval with the question tool. Give the options "Approve" and "Change". When the user picks Change, apply the edits and ask again.
+Send that message first. Then ask each choice in its own question tool call: each existing file or label that you could keep or replace. For each file in `docs/agents/` that covers the same job as a file that you write, ask: "Merge", "Keep both" or "Delete". Put your recommendation first. Recommend these:
+
+- A file that a commit deleted after an earlier run, such as the provisioning hook: "Leave deleted". The deletion is the user's choice. Give only the reason that the commit message states.
+- A file that a skill of the repo reads, such as a release skill: "Keep", also when no `sv-` skill reads it. Search `.claude/skills/` for the file name. Then show the drafts, and ask for approval with the question tool. Give the options "Approve" and "Change". When the user picks Change, apply the edits and ask again.
 
 Completion: the user picked Approve.
 
@@ -45,7 +49,7 @@ Completion: the user picked Approve.
 
 **Docs.** Copy [tracker-github.md](tracker-github.md) to `docs/agents/tracker.md` and [domain.md](domain.md) to `docs/agents/domain.md`. Write the glossary file from step 1 in place of `<glossary>`. When a file exists, keep the user's edits and add only what is missing.
 
-**Labels.** Create each label from the table in `tracker-github.md`. Use its Meaning as the description: `gh label create <name> --description "<meaning>" --force`. `--force` updates a label that exists, so a rerun is safe.
+**Labels.** Use the Meaning in the table in `tracker-github.md` as the description. For each missing label, run `gh label create <name> --description "<meaning>"`. For a label that exists with another description, run `gh label edit <name> --description "<meaning>"`. This keeps the label's color.
 
 **Block.** The block goes in `AGENTS.md`, because agents other than Claude Code read that file. Make `CLAUDE.md` load it:
 

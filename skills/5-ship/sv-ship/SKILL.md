@@ -18,7 +18,7 @@ Read the `## Agent skills` block in `AGENTS.md`, then `docs/agents/tracker.md`. 
 Find the target from the argument, or from the current branch:
 
 - **Spec**: an issue with the `spec` label, and its branch `spec/<n>-<slug>`.
-- **Issue**: a bug, or a ticket whose spec has no branch, with its branch `fix/<n>-<slug>`.
+- **Issue**: a bug, or a lone ticket, which has no parent spec, with its branch `fix/<n>-<slug>`.
 
 Completion: you have the issue, its branch and the trunk, as the `sv-worktree` skill finds it.
 
@@ -32,7 +32,7 @@ For a spec, read the latest comment on the spec issue that starts with `### Revi
 
 Take full or partial from the comment. A partial review lists the open tickets.
 
-An issue needs no review comment. For a bug, `/sv-diagnose` ran `sv-verify` on the fix. For a ticket, run `sv-verify` now in a subagent with a fresh context, with the ticket and the diff `origin/<trunk>...HEAD`. A hard finding stops `/sv-ship`.
+An issue needs no review comment. For a bug, `/sv-diagnose` ran `sv-verify` on the fix. For a lone ticket, `/sv-build` ran `sv-verify` on the ticket.
 
 Completion: the branch head is the reviewed commit, and you know full or partial, or the target is an issue that passed `sv-verify`.
 
