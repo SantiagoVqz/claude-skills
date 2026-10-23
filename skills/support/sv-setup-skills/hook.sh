@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# SessionStart and PostToolUse(EnterWorktree): provision a linked worktree
-# before any work, whoever created it. Idempotent: a provisioned worktree costs
-# one no-op run. The primary checkout is never provisioned.
+# SessionStart: provision a linked worktree before any work, whoever created it.
+# Idempotent: a provisioned worktree costs one no-op run. The primary checkout is
+# never provisioned. No EnterWorktree hook: sv-worktree runs provision.sh itself,
+# and a hook there also provisioned worktrees that Remove was about to drop.
 set -u
 input="$(cat)"
 field() { printf '%s' "$input" | python3 -c 'import json,sys; print(json.load(sys.stdin).get(sys.argv[1], ""))' "$1"; }
-event="$(field hook_event_name)"
 cwd="$(field cwd)"
 [[ -n "$cwd" && -x "$cwd/scripts/provision.sh" ]] || exit 0
 git_dir="$(git -C "$cwd" rev-parse --absolute-git-dir 2>/dev/null)"
@@ -20,9 +20,5 @@ else
 fi
 rm -f "$log"
 
-# SessionStart takes plain stdout as context; PostToolUse needs the JSON envelope.
-if [[ "$event" == "PostToolUse" ]]; then
-  python3 -c 'import json,sys; print(json.dumps({"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":sys.argv[1]}}))' "$msg"
-else
-  printf '%s\n' "$msg"
-fi
+# SessionStart takes plain stdout as context.
+printf '%s\n' "$msg"

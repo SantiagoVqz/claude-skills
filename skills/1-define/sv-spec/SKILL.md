@@ -45,7 +45,7 @@ Completion: the user confirmed the decisions log with an explicit yes.
 
 ## 4. Draft
 
-Write the spec from the decisions log with [SPEC-TEMPLATE.md](../sv-prd/SPEC-TEMPLATE.md). `/sv-prd` owns the template, so both skills share it. Show the draft to the user, and change it until they approve it.
+Write the spec from the decisions log with [SPEC-TEMPLATE.md](../sv-prd/SPEC-TEMPLATE.md). `/sv-prd` owns the template, so both skills share it. Show the draft to the user, and change it until they approve it. In the chat, show the user stories by their numbers and count only, because the user settled their text in the interview. The spec issue has the full text.
 
 When the draft needs a term or a decision that is not in the log, ask the user about it before you publish. Add it to the log only when the user agrees.
 
@@ -53,7 +53,7 @@ Completion: the user approved the draft, and each term in the draft is in the lo
 
 ## 5. Publish
 
-Create the spec issue with the `spec` label.
+Call the Skill tool with `sv-issue` to create the spec issue with the `spec` label.
 
 Completion: the issue exists, and you have its number.
 

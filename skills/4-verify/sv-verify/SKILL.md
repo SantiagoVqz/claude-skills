@@ -24,15 +24,15 @@ Use the diff and the ticket that the caller gave. When you run on your own:
 - **Base**: the ref. With no ref, use the spec branch for a ticket branch. For any other branch, use `git merge-base origin/<trunk> HEAD`, because a local trunk can be ahead of the branch base.
 - **Diff**: `git diff <base>`. It includes the work that is not committed yet.
 
-Read the ticket with its acceptance criteria, and its parent spec with the testing decisions. Run `git diff --stat <base>` and `git status --short`. Read each untracked file: `git diff` does not show it.
+Read the ticket with its acceptance criteria, and its parent spec with the testing decisions, when it has one. Run `git diff --stat <base>` and `git status --short`. Read each untracked file: `git diff` does not show it.
 
 Completion: the base resolves, the diff is not empty, you have the acceptance criteria, and you know each untracked file.
 
 ## 2. Run the checks
 
-Find the test, typecheck, lint and build commands in `package.json`, the README or `AGENTS.md`. Run each one. Trust no earlier report.
+Find the test, typecheck, lint and build commands in `package.json`, the README or `AGENTS.md`. Run the typecheck, the lint and the build. Run the test files that the diff adds or changes, and each test file that imports a module that the diff changes. Run the full suite when the caller asks for it, or when you run on your own. `/sv-build` runs the full suite after its rebase, so each verify round skips it. Trust no earlier report.
 
-Completion: each check passed or failed, and you have the output of each failure.
+Completion: each check passed or failed, each run has finished, and you have the output of each failure.
 
 ## 3. Review
 
@@ -41,7 +41,7 @@ Read the diff once for each heading. Keep the two headings apart, so that one do
 **Spec**: does the diff do what the ticket asks?
 
 - Each acceptance criterion has code and a test that proves it.
-- Each test is at a seam from the spec's testing decisions.
+- Each test is at a seam from the spec's testing decisions. With no spec, each test is at a seam that the existing tests of the area use.
 - Each expected value comes from a literal, a worked example or the spec, not from the code's own logic.
 - The result can be checked from outside: through the UI, an API or a command. A ticket that changes one layer only, such as storage with no UI, is not a vertical slice.
 - Behavior that the ticket did not ask for is a judgment call.
@@ -64,6 +64,7 @@ A finding is hard when it is one of these:
 - An acceptance criterion has no code, or no test proves it.
 - A test is at a seam that the spec did not agree, or it is tautological.
 - The diff breaks a written rule of the repo.
+- The diff causes a defect that a user can see or that stores or sends wrong data, such as a false text, a lost value or a stale screen.
 - The ticket is not a vertical slice. This does not apply to a refactor ticket.
 - A refactor ticket changed an expected value in an existing test.
 

@@ -15,7 +15,7 @@ A refactor changes the structure and keeps the behavior. The suite is the proof:
 
 ## 1. Prepare
 
-Read the ticket, its parent spec, the glossary that `docs/agents/domain.md` names, and the ADRs for the area. Use the glossary words in new names.
+Read the ticket, its parent spec when it has one, the glossary that `docs/agents/domain.md` names, and the ADRs for the area. When the repo has no `docs/agents/domain.md`, find the glossary as `NO-SETUP.md` in the folder of the `sv-setup-skills` skill says. Use the glossary words in new names.
 
 Read the code that the ticket changes, with its callers. For each piece that you plan to remove or merge, find why it exists: read `git log -L` or `git blame` for it. This is **Chesterton's fence**: when you cannot say why a piece exists, keep it, and ask the user.
 
@@ -25,7 +25,7 @@ Completion: you can name each piece that the ticket changes, and why each piece 
 
 Run the full suite and the typecheck. Both must pass before the first change.
 
-For each behavior that the refactor touches, find a test at a seam from the spec that proves it. When a behavior has no test, write a **pin test** at an agreed seam: it asserts what the code does now, odd parts included. It passes on its first run. Then break the code for one run, see the test fail, and undo the break. Commit each pin test: `Pin: <behavior>`.
+For each behavior that the refactor touches, find a test at a seam from the spec that proves it. For a ticket with no parent spec, the agreed seams are the ones that the existing tests of the area use. When a behavior has no test, write a **pin test** at an agreed seam: it asserts what the code does now, odd parts included. It passes on its first run. Then break the code for one run, see the test fail, and undo the break. Commit each pin test: `Pin: <behavior>`.
 
 When a behavior can be tested only at a new seam, stop and ask the user. Propose the seam in one line: what it catches and what it misses.
 
@@ -46,7 +46,7 @@ Completion: each acceptance criterion is met, and the suite is green.
 
 ## 4. Check
 
-Run `git diff <spec-branch>...HEAD` on the test files. Confirm that no expected value changed, and that each test change follows a rename or a move. Read all the changed code once more: each new name says what the thing does, and no piece is left that only passes calls on.
+Run `git diff <base>...HEAD` on the test files. The base is the spec branch, or the trunk for a ticket with no parent spec. Confirm that no expected value changed, and that each test change follows a rename or a move. Read all the changed code once more: each new name says what the thing does, and no piece is left that only passes calls on.
 
 Completion: no expected value changed, the full suite is green, and you have no more steps to make.
 

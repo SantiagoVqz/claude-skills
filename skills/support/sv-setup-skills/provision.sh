@@ -216,7 +216,9 @@ if declare -f install_deps >/dev/null; then say "Installing dependencies"; insta
 FE_PORT=""; BE_PORT=""
 if [[ -n "${FE_PORT_BASE:-}${BE_PORT_BASE:-}" ]]; then
   digits="$(printf '%s' "$BRANCH" | grep -oE '[0-9]+' | tail -1 || true)"
-  NN="00"; [[ -n "$digits" ]] && NN="$(printf '%02d' $((10#${digits: -2})))"
+  # NN 00 is the primary's port pair, so a worktree starts at 01.
+  NN="01"; [[ -n "$digits" ]] && NN="$(printf '%02d' $((10#$digits % 100)))"
+  [[ "$NN" == "00" ]] && NN="01"
   port_busy() { lsof -nP -iTCP:"$1" -sTCP:LISTEN >/dev/null 2>&1; }
   pair_busy() { local b; for b in ${FE_PORT_BASE:-} ${BE_PORT_BASE:-}; do port_busy "$b$NN" && return 0; done; return 1; }
   # A rerun keeps the stamped pair: this worktree's own servers are what make
@@ -227,7 +229,7 @@ if [[ -n "${FE_PORT_BASE:-}${BE_PORT_BASE:-}" ]]; then
   fi
   tries=0
   while pair_busy; do
-    NN="$(printf '%02d' $(( (10#$NN + 1) % 100 )))"
+    NN="$(printf '%02d' $(( 10#$NN % 99 + 1 )))"
     (( ++tries > 99 )) && die "no free port pair"
   done
   [[ -n "${FE_PORT_BASE:-}" ]] && FE_PORT="$FE_PORT_BASE$NN"

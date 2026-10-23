@@ -9,7 +9,7 @@ argument-hint: "[spec | issue]"
 
 `/sv-ship` turns a branch into one PR that the team can read. It ends with the PR open and ready for review, CI finished, and a short summary for the user. The merge is always the user's, with rebase and merge, so that each ticket stays one commit on the trunk.
 
-After `EnterWorktree`, run one plain shell command per call from the worktree root: no `cd`, no `-C`, no `&&` chain, no `$(...)`, no shell variable and no path outside the worktree. A `cd` stays in effect for the rest of the session. For a subfolder, use a flag such as `pnpm --dir` or `uv --directory`. Write files with the Write tool.
+After `EnterWorktree`, run one plain shell command per call, from the worktree root, on paths in the worktree. For a subfolder, use a flag such as `pnpm --dir` or `uv --directory`, because a `cd` stays in effect for the rest of the session. Change a file with the Edit tool, and make a new file with the Write tool. Quote each argument that holds `*`, `[` or `]`. The guard refuses only some other forms, such as a `&&` chain, `$(...)` or a heredoc, so a command that ran is no proof that its form is safe.
 
 ## 1. Load
 
@@ -18,7 +18,7 @@ Read the `## Agent skills` block in `AGENTS.md`, then `docs/agents/tracker.md`. 
 Find the target from the argument, or from the current branch:
 
 - **Spec**: an issue with the `spec` label, and its branch `spec/<n>-<slug>`.
-- **Issue**: a bug, or a ticket whose spec has no branch, with its branch `fix/<n>-<slug>`.
+- **Issue**: a bug, or a lone ticket, which has no parent spec, with its branch `fix/<n>-<slug>`.
 
 Completion: you have the issue, its branch and the trunk, as the `sv-worktree` skill finds it.
 
@@ -32,7 +32,7 @@ For a spec, read the latest comment on the spec issue that starts with `### Revi
 
 Take full or partial from the comment. A partial review lists the open tickets.
 
-An issue needs no review comment. For a bug, `/sv-diagnose` ran `sv-verify` on the fix. For a ticket, run `sv-verify` now in a subagent with a fresh context, with the ticket and the diff `origin/<trunk>...HEAD`. A hard finding stops `/sv-ship`.
+An issue needs no review comment. For a bug, `/sv-diagnose` ran `sv-verify` on the fix. For a lone ticket, `/sv-build` ran `sv-verify` on the ticket.
 
 Completion: the branch head is the reviewed commit, and you know full or partial, or the target is an issue that passed `sv-verify`.
 
@@ -57,7 +57,7 @@ Completion: every check passes.
 Call the Skill tool with `sv-pr` to write the body. Give it:
 
 - **The title**: the title of the spec or the issue.
-- **The evidence**: for a spec, the Stories and Verified lines of the review comment, and its link. For a bug, the regression test. For a ticket, its acceptance criteria with their tests.
+- **The evidence**: for a spec, the story list and the Verified lines of the review comment, and its link. For a bug, the regression test. For a ticket, its acceptance criteria with their tests.
 - **The closing line**: `Closes #<n>` for a full spec or an issue. `Part of #<spec>` for a partial spec, with the list of open tickets.
 - **The merge line**: `Merge with rebase and merge.`
 

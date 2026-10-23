@@ -15,26 +15,33 @@ Read the repo's current state:
 - `git remote -v`: the host of the repo.
 - `gh auth status`: `gh` can write to this repo.
 - `AGENTS.md` and `CLAUDE.md` at the root: which exist, whether one has an `## Agent skills` block, and whether `CLAUDE.md` imports `@AGENTS.md`.
-- `docs/agents/`: files from an earlier run.
-- The **glossary file**: `GLOSSARY.md`, or `CONTEXT.md` when the repo keeps its terms there. With neither, it is `GLOSSARY.md`. And `docs/adr/`.
+- `docs/agents/`: each file, from an earlier run or from another skill set.
+- The **glossary file**: `GLOSSARY.md`, or `CONTEXT.md` when the repo keeps its terms there. With neither, it is `GLOSSARY.md`.
+- `docs/adr/`: each ADR that sets a rule for worktrees, provisioning or the tracker.
 - `gh label list`: labels that already exist.
 - What a new worktree lacks: gitignored `.env` files (`git ls-files --others --ignored --exclude-standard`), a lockfile, a database URL in an env file. When the repo has none of these, it needs no provisioning.
-- `scripts/provision.sh` and `.claude/hooks/provision-worktree.sh`: files from an earlier run.
+- `scripts/provision.sh` and `.claude/hooks/provision-worktree.sh`: files from an earlier run, or the repo's own script.
 
-Completion: you can name the tracker, the state of each file above, each label that is missing, and whether the repo needs provisioning.
+Then send one line: the tracker, and each conflict between the repo and the files that this skill writes.
+
+Completion: you can name the tracker, the state of each file above, each label that is missing, and whether the repo needs provisioning. The one-line summary is in the chat.
 
 ## 2. Confirm
 
-The tracker is GitHub when the remote is on GitHub. This version supports GitHub only. For any other tracker, stop and say that this version does not support it.
+The tracker is GitHub when the remote is on GitHub. This version supports GitHub only. For any other tracker, stop and say that this version does not support it. Ask no question about the tracker.
 
 Show the user, in one message:
 
+- The tracker.
 - The `## Agent skills` block from step 3, and the file that gets it.
 - The files that you will write or change, and the labels that you will create.
 - When the repo needs provisioning: the filled CONFIG block of `provision.sh`, from [PROVISIONING.md](PROVISIONING.md).
 - Each existing file or label that you will keep as it is.
 
-Ask each choice with the question tool, one at a time: the tracker, and each existing file or label that you could keep or replace. Put your recommendation first. Then show the drafts, and ask for approval with the question tool. Give the options "Approve" and "Change". When the user picks Change, apply the edits and ask again.
+Send that message first. Then ask each choice in its own question tool call: each existing file or label that you could keep or replace. For each file in `docs/agents/` that covers the same job as a file that you write, ask: "Merge", "Keep both" or "Delete". Put your recommendation first. Recommend these:
+
+- A file that a commit deleted after an earlier run, such as the provisioning hook: "Leave deleted". The deletion is the user's choice. Give only the reason that the commit message states.
+- A file that a skill of the repo reads, such as a release skill: "Keep", also when no `sv-` skill reads it. Search `.claude/skills/` for the file name. Then show the drafts, and ask for approval with the question tool. Give the options "Approve" and "Change". When the user picks Change, apply the edits and ask again.
 
 Completion: the user picked Approve.
 
@@ -42,7 +49,7 @@ Completion: the user picked Approve.
 
 **Docs.** Copy [tracker-github.md](tracker-github.md) to `docs/agents/tracker.md` and [domain.md](domain.md) to `docs/agents/domain.md`. Write the glossary file from step 1 in place of `<glossary>`. When a file exists, keep the user's edits and add only what is missing.
 
-**Labels.** Create each label from the table in `tracker-github.md`. Use its Meaning as the description: `gh label create <name> --description "<meaning>" --force`. `--force` updates a label that exists, so a rerun is safe.
+**Labels.** Use the Meaning in the table in `tracker-github.md` as the description. For each missing label, run `gh label create <name> --description "<meaning>"`. For a label that exists with another description, run `gh label edit <name> --description "<meaning>"`. This keeps the label's color.
 
 **Block.** The block goes in `AGENTS.md`, because agents other than Claude Code read that file. Make `CLAUDE.md` load it:
 
@@ -56,7 +63,7 @@ Completion: the user picked Approve.
 
 ### Tracker
 
-Specs, tickets and bugs are GitHub issues. Before you create, read, link, label or close an issue, read `docs/agents/tracker.md`.
+Ideas, specs, tickets and bugs are GitHub issues. To file an issue, use the `sv-issue` skill. Before you read, link, label or close an issue, read `docs/agents/tracker.md`.
 
 ### Domain docs
 
@@ -72,6 +79,14 @@ Code work runs in a linked worktree under `.claude/worktrees/`. The primary chec
 Leave the changes uncommitted. The user commits them.
 
 Completion: both docs files exist, `gh label list` shows every label from the table, `AGENTS.md` has exactly one `## Agent skills` block, `CLAUDE.md` loads `@AGENTS.md`, and the provisioning check in `PROVISIONING.md` passed, or the repo needs no provisioning.
+
+## Excuses
+
+| Excuse | Answer |
+|---|---|
+| "The choices are related, so I ask them in one call." | One choice for each question tool call. |
+
+Add a row only when `/sv-retro` finds a new excuse.
 
 ## Report
 

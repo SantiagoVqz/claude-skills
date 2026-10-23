@@ -7,11 +7,13 @@ The set has two entry points:
 - `/sv-spec` starts a feature.
 - `/sv-diagnose` starts a bug fix.
 
+`/sv-issue` files work for later: an idea, a bug, a task or a follow-up. Each entry point can start from its issue.
+
 Each phase has one command. Each command reads the output of the command before it. The tracker holds the work: GitHub Issues or Linear.
 
 ## The flow
 
-`/sv-prd` is the setup-free path. It writes a PRD, and tickets if you want them, in any repo.
+`/sv-prd` is the setup-free path. It writes a PRD, and tickets if you want them, in any repo. `/sv-issue`, `/sv-diagnose`, `sv-tdd` and `sv-refactor` also run with no setup: they use the fallbacks in `NO-SETUP.md`, in the folder of `sv-setup-skills`.
 
 ```text
 Feature:  /sv-spec ──► /sv-plan ──► /sv-build (one per ticket) ──► /sv-review ──► /sv-ship ──► you merge ──► /sv-cleanup
@@ -20,11 +22,36 @@ Feature:  /sv-spec ──► /sv-plan ──► /sv-build (one per ticket) ─�
 Bug:      /sv-diagnose ──► /sv-ship ──► you merge ──► /sv-cleanup
              └─ runs /sv-verify
 
+One-off:  /sv-issue ──► /sv-build ──► /sv-ship ──► you merge ──► /sv-cleanup
+                             └─ runs /sv-verify
+
 Once per repo:  /sv-setup-skills
 End of the day: /sv-retro
+Not sure:       /sv-ask
 ```
 
 ## Commands
+
+### `/sv-ask`
+
+Run it when you do not know which command is next. The agent also runs it when work starts and no command was named.
+
+- **Input:** your request and the state of the repo: setup, branch, issue, PR and any git conflict.
+- **Output:** the next command, the facts that chose it, and the command after it. It changes nothing.
+
+### `/sv-issue [idea | bug | task] [what it is]`
+
+Run it when you want to track work, or when you start work that has no issue. `/sv-spec`, `/sv-prd`, `/sv-plan`, `/sv-diagnose` and `sv-interview` also call it to publish their issues.
+
+- **Input:** your words, and what the conversation already found: an `/sv-ask` route, a diagnosis, a screenshot. One request can hold several issues.
+- **Process:**
+  1. It finds the kind of each issue: idea, bug or task. It fills the template of the kind from the conversation and the code, and asks three questions at most for each issue.
+  2. It finds the order between the issues, such as a bug that must be fixed before an idea.
+  3. It searches the open issues for duplicates.
+  4. It shows each draft. You approve before it files anything.
+- **Output:** each issue with its label and blocking edges. An idea gets `idea`, a bug gets `bug`, and a task gets one `approach:` label. A bug body has the symptom, the steps, the facts, the hypotheses to rank, the open question for the fix and where to look. A screenshot goes in as text, and you drag the image in after.
+- **Follow-ups:** say "file a follow-up" during an interview. It files the issue from the conversation, then the interview goes on.
+- **Next:** `/sv-spec <n>` for an idea, `/sv-diagnose <n>` for a bug, `/sv-build <n>` for a task.
 
 ### `/sv-setup-skills`
 
@@ -62,43 +89,44 @@ It needs no `/sv-setup-skills`. It works in any repo.
 - **Process:** it cuts the spec into tickets and shows you the breakdown. You approve the breakdown before it publishes anything.
 - **Output:** tickets as sub-issues of the spec, with native blocking links. Each ticket has an `approach:` label and a `Covers stories` line.
 - **Rules:**
-  - A ticket fits in one context window and one worktree.
-  - All schema changes go in one early ticket. Every ticket that needs the new schema is blocked by it.
+  - A spec is one ticket by default. It splits only at a named boundary: parallel work, a schema change that parallel tickets share, a prefactor, work too big for one context window, or a part you ask to approve on its own.
+  - Each ticket in a split names its boundary on its card. Story count is not a boundary.
   - Each user story is in one ticket or more. `/sv-plan` does not publish while a story has no ticket.
   - A rerun cuts tickets only for the stories that no ticket covers. It does not change the open tickets.
 - **Next:** you run `/sv-build` on each ticket that has no open blockers.
 
-### `/sv-build <ticket> [--ui]`
+### `/sv-build <ticket> [--no-ui]`
 
 You start each `/sv-build` by hand, in its own terminal. You decide how many run at the same time.
 
-- **Input:** one ticket.
+- **Input:** one ticket. A lone ticket has no parent spec. It builds on a `fix/<n>-<slug>` branch from the trunk in place of a spec branch.
 - **Process:**
   1. It stops when a blocker is open. When someone else has the ticket, it asks whether you take it over. It sets the ticket to in progress and assigns it to you.
-  2. It pushes the spec branch when the remote does not have it. When no spec branch exists, it stops and tells you to push it from the machine that ran `/sv-spec`.
+  2. It pushes the spec branch when the remote does not have it. A lone ticket skips this step. When no spec branch exists, it stops and tells you to push it from the machine that ran `/sv-spec`.
   3. It calls `sv-worktree` to make a ticket worktree from the spec branch. When the worktree has commits, it resumes from them.
   4. It calls the skill that the ticket's `approach:` label names: `sv-tdd`, `sv-refactor` or `sv-diagnose`. When that skill does not exist yet, it stops.
-  5. It runs `/sv-verify` in a subagent with a fresh context. It fixes the hard findings and runs `/sv-verify` again one time. When a hard finding remains, it stops. You fix it, or you override it with a reason.
-  6. It rebases onto the spec branch and runs every check. On a conflict, it calls `sv-resolve-conflicts`, runs `/sv-verify` again, and asks for your approval again.
-  7. It shows a checkpoint card: each criterion with its test, the judgment calls, and a short "Check yourself" list. You approve, ask for a change, or ask for `/sv-ui-check`. It starts no dev server until you ask. With `--ui`, it runs `/sv-ui-check` before the card.
-  8. It squashes the ticket into one commit on the spec branch and pushes it. It closes the ticket and removes the ticket worktree.
+  5. It runs `/sv-verify` in a subagent with a fresh context. It fixes the hard findings and runs `/sv-verify` again, three runs at most. When a hard finding remains, it stops. You fix it, or you override it with a reason.
+  6. It rebases onto the spec branch and runs every check, with the full suite. This is the one full suite run after verify. On a conflict, it calls `sv-resolve-conflicts`, runs `/sv-verify` again, and asks for your approval again.
+  7. It shows a checkpoint card: each criterion with its test, the judgment calls, and a short "Check yourself" list. You approve, ask for a change, or ask for `/sv-ui-check`. When a criterion shows in a browser, it runs `/sv-ui-check` before the card. `--no-ui` turns that off.
+  8. It squashes the ticket into one commit on the spec branch and pushes it. It closes the ticket and removes the ticket worktree. A lone ticket becomes one commit on its own branch. The ticket stays open and the worktree stays, for `/sv-ship` and `/sv-cleanup`.
 - **Output:** one commit per ticket on the spec branch, and a closed ticket.
-- **Next:** `/sv-build` on the tickets it unblocked. When all tickets are closed, you run `/sv-review`.
+- **Next:** `/sv-build` on the tickets it unblocked. When all tickets are closed, you run `/sv-review`. For a lone ticket, `/sv-ship`.
 
 ### `/sv-verify [ref]`
 
 `/sv-build` and `/sv-diagnose` run it in a subagent. You can also run it on any diff.
 
 - **Input:** a diff and the ticket or issue it comes from.
-- **Checks:** it runs the tests, typecheck, lint and build itself. It checks the diff against the ticket's acceptance criteria and the spec's seams, then against the repo's written rules and a list of code smells.
+- **Checks:** it runs the typecheck, lint, build and the tests that the diff touches itself. It runs the full suite when the caller asks, or when you run it. It checks the diff against the ticket's acceptance criteria and the spec's seams, then against the repo's written rules and a list of code smells.
 - **Output:** findings. A hard finding blocks the ticket: a failed check, a criterion with no test, a test at the wrong seam, a broken written rule, or a ticket that is not a vertical slice. Everything else is a judgment call, and it reports the top five. It edits nothing.
 
 ### `/sv-ui-check [ticket | what to check]`
 
-You run it when you want a browser check. `/sv-build --ui` runs it too. Each run starts a dev server, so it never runs on its own.
+You run it when you want a browser check. `/sv-build` runs it for a ticket whose criteria show in a browser, and `/sv-review` for the stories. Each run starts a dev server.
 
 - **Process:** it starts the dev server and does the main flow of the change in Chrome, five steps or fewer. For `/sv-review`, it does one step per story. It uses Claude in Chrome, or Chrome DevTools when the extension is not connected. The server and the tab stay open until you answer.
-- **Output:** a "Verified" list, one line per step, and a "Check yourself" list of three steps or fewer. You approve or ask for a change.
+- **Data:** when the worktree database lacks the rows that the flow needs, it makes the fewest rows, through the seed script or the API.
+- **Output:** the flow before the run, then a "Verified" list, one line per step, and a "Check yourself" list of three steps or fewer. You approve or ask for a change.
 
 ### `/sv-review <spec> [--no-ui]`
 
@@ -109,9 +137,14 @@ Run it when all tickets of a spec are closed. Each ticket already passed `/sv-ve
   - **Coverage:** each user story has tickets and a test. A story with no test is a gap.
   - **Drift:** a subagent with a fresh context reads the whole spec diff. It looks for faults between tickets: duplication, two names for one term, a helper that one ticket ignored.
   - **Walk:** `/sv-ui-check` does one step per story on the merged app. `--no-ui` skips it.
-- **Gaps:** you mark each gap "Ticket" or "Out of scope". A missing story gets its own ticket. The other gaps share one follow-up ticket. When it creates a ticket, you `/sv-build` it and run `/sv-review` again.
+- **Gaps:** each gap is blocking or cleanup. A blocking gap is a story with no test, a failed walk step, or a defect a user can see. Everything else is cleanup, and the drift subagent reports the top five only.
+  - You get one list with a recommended action for each gap, and one question.
+  - A blocking gap is "Ticket", a sub-issue that the spec waits for, or "Out of scope".
+  - A cleanup is "Skip", on the card, or "Later", a lone ticket that the spec does not wait for.
+  - After a blocking ticket, the next `/sv-review` reads only the diff after the last review, so it does not find the same drift again.
 - **Partial:** when a ticket is open, it asks whether to review the closed tickets only.
-- **Output:** a card that you approve. Then it posts the card as a comment on the spec issue, with the reviewed commit. The evidence is text only: the "Verified" lines.
+- **Light:** a spec with one closed ticket, and no commit after it, gets coverage only. It skips the checks, the drift subagent and the walk, because `/sv-build` ran them on the same commit and `/sv-ship` runs the checks again.
+- **Output:** a card that you approve. It counts the covered stories and lists only the stories that went out of scope. Then it posts the card as a comment on the spec issue, with the reviewed commit and the full story list in a collapsed block. The evidence is text only: the story list and the "Verified" lines.
 - **Next:** `/sv-ship`.
 
 ### `/sv-ship [spec | issue]`
@@ -128,7 +161,7 @@ Run it when all tickets of a spec are closed. Each ticket already passed `/sv-ve
   - A partial review gives `Part of #<spec>` and the list of open tickets.
 - **Next:** you merge with rebase and merge, so each ticket stays one commit on the trunk. Then `/sv-cleanup`.
 
-### `/sv-cleanup [spec | bug]`
+### `/sv-cleanup [spec | issue]`
 
 Run it after you merge.
 
@@ -140,8 +173,8 @@ Run it after you merge.
 
 - **Input:** a Sentry link, a pasted error, or an issue.
 - **Process:**
-  1. If the input is not an issue, it creates an issue with the `bug` label.
-  2. It calls `sv-worktree` to make a fix branch, `fix/<n>-<slug>`, from the trunk.
+  1. If the input is not an issue, it creates an issue with the `bug` label through `sv-issue`. If the input is an issue, it starts from its facts, hypotheses and places to look. With no setup, it uses `NO-SETUP.md`: with no tracker it keeps the issue text in the report.
+  2. It calls `sv-worktree` to make a fix branch, `fix/<n>-<slug>`, from the trunk. When the repo is not set up for worktrees, it makes the branch in a clean primary checkout, or leaves the fix uncommitted.
   3. It builds a feedback loop that goes red on the bug, and minimises the repro. When a person must reproduce the bug, `/sv-ui-check` tries first, then it asks you one step at a time.
   4. It ranks 3 to 5 hypotheses, and you pick the first one to test. It instruments the code, fixes the cause with a regression test, and cleans up.
   5. It runs `/sv-verify` in a subagent, the same as `/sv-build`.
@@ -165,7 +198,7 @@ You do not type these. Other skills call them.
 | `sv-worktree` | `/sv-spec`, `/sv-build`, `/sv-diagnose` | Find or make the worktree, then provision it. |
 | `sv-pr` | `/sv-ship` | Write the PR body: summary, evidence, merge danger. |
 
-`sv-prototype` is optional. Use it during `/sv-spec` when a question needs a demo to answer. It publishes the variants as one artifact.
+`sv-prototype` is optional. Run it on its own, or let `/sv-spec` and `/sv-prd` call it when a question needs a demo to answer. It builds each prototype as one Claude artifact, for a UI question and for a logic question.
 
 ## Branches, worktrees and databases
 
@@ -173,18 +206,41 @@ You do not type these. Other skills call them.
 |---|---|
 | Spec branch | One per spec, `spec/<n>-<slug>`, from the trunk. It is the one PR. |
 | Ticket branch | One per ticket, `ticket/<n>-<slug>`, from the spec branch. It merges into the spec branch locally. It never gets a PR. |
-| Fix branch | One per bug, `fix/<n>-<slug>`, from the trunk. |
+| Fix branch | One per bug or lone ticket, `fix/<n>-<slug>`, from the trunk. |
 | Primary checkout | It stays on the trunk. Code work never happens here. |
 | Dev database | Each branch from the trunk gets its own fork of the trunk dev database. Ticket worktrees use the fork of their spec. |
 | Test database | Each worktree gets its own. |
+
+### Parallel specs
+
+Git checks out a branch in one place only. Two different branches can be checked out at the same time in two different worktrees. Thus each spec and each ticket has its own worktree, and the primary checkout stays on the trunk.
+
+Example, with specs 12 and 15 in progress at the same time:
+
+```
+repo/                                  trunk (primary checkout)
+.claude/worktrees/spec-12-foo          spec/12-foo
+.claude/worktrees/ticket-31-bar        ticket/31-bar   (from spec/12-foo)
+.claude/worktrees/spec-15-baz          spec/15-baz
+.claude/worktrees/ticket-40-qux        ticket/40-qux   (from spec/15-baz)
+```
+
+Each worktree is a separate folder with its own branch and its own test database. Each spec has its own dev database fork. The two specs share nothing until one of them merges into the trunk.
+
+- **Sessions:** `EnterWorktree` keeps a session in one worktree. To work on two specs at the same time, use two sessions.
+- **Landing a ticket:** `/sv-build` enters the spec worktree and squash-merges the ticket branch there. The spec worktree stays until `/sv-cleanup`, because each ticket of the spec lands there.
+- **Conflicts in one spec:** when two tickets of a spec run in parallel, the second ticket to land rebases onto the spec branch first.
+- **Conflicts between specs:** a spec sees the changes of another spec only after that spec merges. `/sv-ship` rebases onto the trunk and resolves the conflicts with `sv-resolve-conflicts`.
+- **Migrations:** each spec migrates its own fork, so parallel specs do not interfere. In one spec, only the schema ticket migrates, because all tickets of the spec share the fork.
 
 ## Labels
 
 | Label | Set by | Read by |
 |---|---|---|
+| `idea` | `/sv-issue` | `/sv-spec`, `/sv-prd` |
 | `spec` | `/sv-spec` | `/sv-plan`, `/sv-review`, `/sv-ship`, `/sv-cleanup` |
-| `bug` | `/sv-diagnose` | `/sv-ship`, `/sv-cleanup` |
-| `approach:tdd`, `approach:refactor`, `approach:diagnose` | `/sv-plan` | `/sv-build` |
+| `bug` | `/sv-issue`, `/sv-diagnose` | `/sv-ship`, `/sv-cleanup` |
+| `approach:tdd`, `approach:refactor`, `approach:diagnose` | `/sv-plan`, `/sv-issue` | `/sv-build` |
 | `in-progress` | `/sv-build` | you and your team |
 
 On Linear, `/sv-build` sets the native In Progress status. It does not use the `in-progress` label. Blocked work uses native blocking links. Done work is a closed issue.
@@ -195,7 +251,7 @@ On Linear, `/sv-build` sets the native In Progress status. It does not use the `
 - A finding that repeats across runs is fixed first. A fix commit names the finding ID and sets its status.
 - Fix the skill after each run. Do not fix it by prompting again.
 - Add a skill only when a run shows a need for it.
-- Add a row to an anti-rationalization table only when a run shows a new excuse. These tables are in `sv-tdd`, `sv-refactor`, `sv-diagnose`, `sv-verify` and `sv-review`.
+- Add a row to an anti-rationalization table only when a run shows a new excuse. These tables are in `sv-build`, `sv-tdd`, `sv-refactor`, `sv-diagnose`, `sv-verify`, `sv-review`, `sv-worktree`, `sv-cleanup` and `sv-setup-skills`.
 - Put each engineering principle in the one skill where it applies.
 
 ## Layout
@@ -209,7 +265,7 @@ skills/
 ├── 3-build/    sv-build, sv-tdd, sv-refactor, sv-resolve-conflicts, sv-diagnose
 ├── 4-verify/   sv-verify, sv-ui-check, sv-review
 ├── 5-ship/     sv-ship, sv-pr, sv-cleanup
-└── support/    sv-setup-skills, sv-worktree, sv-retro, sv-writing-for-agents, sv-unslop
+└── support/    sv-ask, sv-issue, sv-setup-skills, sv-worktree, sv-retro, sv-writing-for-agents, sv-unslop
 ```
 
 A skill installs by its folder name only, for example `sv-spec`. The phase folder groups skills and is not part of the name.
@@ -224,3 +280,11 @@ A skill installs by its folder name only, for example `sv-spec`. The phase folde
 ```
 
 A plugin and `npx skills add` come later. See issue #3.
+
+`sv-ui-check` falls back to Chrome DevTools when the Claude in Chrome extension is not connected. Run the DevTools server with `--isolated`, so that each session gets its own Chrome and parallel checks do not collide. The `chrome-devtools-mcp` plugin shares one profile across all sessions, so turn it off and add the server yourself:
+
+```bash
+claude mcp add -s user chrome-devtools -- npx -y chrome-devtools-mcp@1.11.0 --isolated
+```
+
+Each isolated Chrome starts signed out, so you sign in once per check.

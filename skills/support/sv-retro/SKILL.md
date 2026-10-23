@@ -31,9 +31,11 @@ Completion: you have the sessions, each with its line range.
 
 ## 3. Read the sessions
 
+Read `WATCH.md` in the run folder, when it exists. Each of its items is one more gap to look for in each session, and each reader reports what the session showed for it.
+
 For one or two sessions, read each one yourself: run `digest.py <transcript> --from <first>`. The output is a timeline: user messages, commands, skills, subagents, questions and tool errors, each with its transcript line number. Open the transcript at a line when you need the full text. Then find the gaps as step 5 says.
 
-For three sessions or more, start one subagent for each session, all at once. Give each one its row, the path of this `SKILL.md`, and this task: read the timeline, read the `SKILL.md` of each skill that ran, find the gaps as step 5 says, and return each gap in the finding format of step 6, with no status. Evidence cites `<session>:<line>`.
+For three sessions or more, start one subagent for each session, all at once. Give each one its row, the path of this `SKILL.md`, the watch items, and this task: read the timeline, read the `SKILL.md` of each skill that ran, find the gaps as step 5 says, and return each gap in the finding format of step 6, with no status. Evidence cites `<session>:<line>`.
 
 Completion: you have the gaps of each session.
 
@@ -63,7 +65,7 @@ Completion: each finding has a skill and step, evidence with `<session>:<line>`,
 
 ## 6. Confirm and write
 
-Show the findings to the user, ordered by how many sessions and runs saw them, then by cost to the user. The user can drop or change each one. Then write `<run folder>/<date>-<projects>-<skills>.md` in this format:
+Show the findings to the user, ordered by how many sessions and runs saw them, then by cost to the user. Give each finding its own line in the chat, with its ID, skill and title, so the user can drop or change each one without opening the file. A count in place of the lines is not a list. Then write `<run folder>/<date>-<projects>-<skills>.md` in this format:
 
 ```markdown
 # <date> · <projects> · <skills that ran>
@@ -97,4 +99,4 @@ Completion: the run file exists, its Sessions list has each row from step 2, and
 
 ## Report
 
-Run file path · sessions read · findings: new, repeated, project · the finding to fix first.
+Run file path · sessions read · findings: new, repeated, project · each watch item, with what the sessions showed or "not seen" · the finding to fix first.

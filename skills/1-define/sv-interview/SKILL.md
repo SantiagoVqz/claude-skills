@@ -39,7 +39,8 @@ Say yes to accept, or give your answer.
 - `<k>` is your estimate of the questions left on the current branch. Answers can open new branches, so the count can go up.
 - Write the question so that "yes" accepts your recommendation.
 - When the options are few and discrete, use the question tool so the user picks one. Use text for open questions.
-- When the caller names required decisions, each one gets its own question. For content such as user stories, show your draft in the question and ask the user to change it. Do not draft a required decision and settle it first in the close.
+- When the caller names required decisions, each one gets its own question. For content such as user stories, show your draft in the question and ask the user to change it. Show a long list in groups of five or fewer, one group per question. Settle each required decision in step 2, so that the close only confirms it.
+- When the user asks to file a follow-up, call the Skill tool with `sv-issue` for it. Then send the open question again with its number.
 - **Facts are your job. Decisions are the user's.** When a question needs a fact from the code, the tracker or the docs, look it up. For a wide search, send a subagent. Ask the user only for what they decide.
 
 Completion: one question is sent, and you wait for the answer.
@@ -58,6 +59,6 @@ Completion: the log matches every answer so far. Go back to step 2 while the fro
 
 ## 4. Close
 
-When the frontier is empty, show the full decisions log and ask the user to confirm it. The log has only decisions that the user settled in step 2, so the close adds nothing new. "Sounds good" or "whatever you think" is not a confirmation. Ask what they would change.
+When the frontier is empty, show the decisions log and ask the user to confirm it. Name a list that the user settled in step 2, such as the user stories, by its numbers and its count, such as "stories 1 to 9, as settled in Q3 and Q4". The log has only decisions that the user settled in step 2, so the close adds nothing new. "Sounds good" or "whatever you think" is not a confirmation. Ask what they would change.
 
 Completion: the user confirms the log with an explicit yes. Then stop. The caller, or the user, decides what happens next.

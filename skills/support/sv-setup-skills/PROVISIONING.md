@@ -3,7 +3,16 @@
 Install two files so that every linked worktree gets env files, dependencies, free ports and its databases before work starts:
 
 - [provision.sh](provision.sh) → `scripts/provision.sh`. It sets up the worktree that it runs in. Only its CONFIG block and its DATABASE block change per repo.
-- [hook.sh](hook.sh) → `.claude/hooks/provision-worktree.sh`. It runs `provision.sh` when a session opens in a linked worktree, and after `EnterWorktree`.
+- [hook.sh](hook.sh) → `.claude/hooks/provision-worktree.sh`. It runs `provision.sh` when a session opens in a linked worktree. `sv-worktree` runs `provision.sh` itself after `EnterWorktree`, so no hook runs on that tool. A hook on it also provisioned a worktree that `sv-worktree` Remove was about to drop.
+
+## Existing script
+
+When `scripts/provision.sh` exists and has no ENGINE header, it is the repo's own script, and an ADR can require it. Keep it. Check the contract that `sv-worktree` needs:
+
+- With no argument, it provisions the worktree that it runs in, and the end of its output names the dev and test databases.
+- With `drop`, it removes the databases that the worktree owns.
+
+Add only the mode that is missing, in the style of the script. Then install the hook and run the check below. Show the change in the confirm step.
 
 ## Fill the CONFIG
 
@@ -19,16 +28,13 @@ Show the filled block in the confirm step.
 ## Install
 
 - Write both files, executable. Copy the ENGINE section of `provision.sh` as it is.
-- Merge the hooks into `.claude/settings.json`. Keep the hooks that are already there.
+- Merge the hook into `.claude/settings.json`. Keep the hooks that are already there. Remove a `PostToolUse` hook on `EnterWorktree` that runs `provision-worktree.sh`, from an earlier run.
 
 ```json
 {
   "hooks": {
     "SessionStart": [
       { "hooks": [ { "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/provision-worktree.sh", "timeout": 600 } ] }
-    ],
-    "PostToolUse": [
-      { "matcher": "EnterWorktree", "hooks": [ { "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/provision-worktree.sh", "timeout": 600 } ] }
     ]
   }
 }

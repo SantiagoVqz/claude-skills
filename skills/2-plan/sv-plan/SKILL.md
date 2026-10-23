@@ -46,7 +46,7 @@ Give each ticket one approach label. `/sv-build` runs `sv-` plus the label value
 
 Check coverage: each uncovered story is in the `Covers stories` line of one new ticket or more. When a story is in no ticket, cut a ticket for it, or ask the user whether it is out of scope.
 
-Completion: each uncovered story is in a ticket, and each ticket has one approach label.
+Completion: each uncovered story is in a ticket, each ticket has one approach label, and each ticket in a split names its boundary.
 
 ## 4. Approve
 
@@ -54,7 +54,7 @@ Write the breakdown in your message, before the question, as one card for each t
 
 ```markdown
 ### 1. <title>
-<approach> · stories 1, 2 · blocked by: none
+<approach> · stories 1, 2 · blocked by: none · boundary: <the boundary from TICKETS.md, or "one ticket">
 
 Builds: <one sentence, from the user's point of view>
 Done when:
@@ -74,7 +74,7 @@ Completion: the user picked Approve.
 
 ## 5. Publish
 
-Create the tickets in order, blockers first, so that each blocker has a number before the ticket that it blocks. Use the template in `TICKETS.md`, the `--parent <spec>` flag and the approach label. Then add each blocking edge.
+Call the Skill tool with `sv-issue`, and hand it the approved tickets as one list. Each ticket has a ref such as `T1`, its title, its body from the template in `TICKETS.md`, the spec as its parent, its approach label, and its blockers by ref or number.
 
 Completion: each approved ticket is a sub-issue of the spec, with its label and its blocking edges.
 
