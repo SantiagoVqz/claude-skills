@@ -53,7 +53,7 @@ Completion: the user approved the draft, and each term in the draft is in the lo
 
 ## 5. Publish
 
-Create the spec issue with the `spec` label.
+Call the Skill tool with `sv-issue` to create the spec issue with the `spec` label.
 
 Completion: the issue exists, and you have its number.
 
