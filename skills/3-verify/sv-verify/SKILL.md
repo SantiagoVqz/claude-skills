@@ -1,7 +1,7 @@
 ---
 name: sv-verify
-description: "Review a diff against its ticket and the repo's standards, and report hard findings and judgment calls. Use when /sv-build or /sv-diagnose asks for a verify run, or the user asks to verify a diff."
-argument-hint: "[ticket] [ref]"
+description: "Review a diff against its phase or ticket and the repo's standards, and report hard findings and judgment calls. Use when /sv-build or /sv-diagnose asks for a verify run, or the user asks to verify a diff."
+argument-hint: "[issue] [ref]"
 metadata:
   credits:
     skill: code-review
@@ -14,23 +14,23 @@ metadata:
 
 `/sv-verify` is the adversarial review of one diff. It reports and edits nothing. The caller fixes the findings.
 
-A finding is **hard** or a **judgment call**. A hard finding blocks the ticket. A judgment call goes to the user.
+A finding is **hard** or a **judgment call**. A hard finding blocks the phase or ticket. A judgment call goes to the user.
 
 ## 1. Pin the diff
 
-Use the diff and the ticket that the caller gave. When you run on your own:
+Use the diff and the criteria that the caller gave: the criteria of a phase, or of a lone ticket. When you run on your own:
 
-- **Ticket**: the argument, or the number in a `ticket/<n>-` or `fix/<n>-` branch name.
-- **Base**: the ref. With no ref, use the spec branch for a ticket branch. For any other branch, use `git merge-base origin/<trunk> HEAD`, because a local trunk can be ahead of the branch base.
+- **Issue**: the argument, or the number in a `spec/<n>-` or `fix/<n>-` branch name.
+- **Base**: the ref. With no ref, use `git merge-base origin/<trunk> HEAD`, because a local trunk can be ahead of the branch base.
 - **Diff**: `git diff <base>`. It includes the work that is not committed yet.
 
-Read the ticket with its acceptance criteria, and its parent spec with the testing decisions, when it has one. Run `git diff --stat <base>` and `git status --short`. Read each untracked file: `git diff` does not show it.
+Read the issue with its criteria, and the spec with the testing decisions, when there is one. Run `git diff --stat <base>` and `git status --short`. Read each untracked file: `git diff` does not show it.
 
-Completion: the base resolves, the diff is not empty, you have the acceptance criteria, and you know each untracked file.
+Completion: the base resolves, the diff is not empty, you have the criteria, and you know each untracked file.
 
 ## 2. Run the checks
 
-Find the test, typecheck, lint and build commands in `package.json`, the README or `AGENTS.md`. Run the typecheck, the lint and the build. Run the test files that the diff adds or changes, and each test file that imports a module that the diff changes. Run the full suite when the caller asks for it, or when you run on your own. `/sv-build` runs the full suite after its rebase, so each verify round skips it. Trust no earlier report.
+Find the test, typecheck, lint and build commands in `package.json`, the README or `AGENTS.md`. Run the typecheck, the lint and the build. Run the test files that the diff adds or changes, and each test file that imports a module that the diff changes. Run the full suite when the caller asks for it, or when you run on your own. `sv-review` runs the full suite once the phases are built, so each verify round skips it. Trust no earlier report.
 
 Completion: each check passed or failed, each run has finished, and you have the output of each failure.
 
@@ -38,15 +38,15 @@ Completion: each check passed or failed, each run has finished, and you have the
 
 Read the diff once for each heading. Keep the two headings apart, so that one does not hide the other.
 
-**Spec**: does the diff do what the ticket asks?
+**Spec**: does the diff do what the phase or ticket asks?
 
-- Each acceptance criterion has code and a test that proves it.
+- Each criterion has code and a test that proves it.
 - Each test is at a seam from the spec's testing decisions. With no spec, each test is at a seam that the existing tests of the area use.
 - Each expected value comes from a literal, a worked example or the spec, not from the code's own logic.
-- The result can be checked from outside: through the UI, an API or a command. A ticket that changes one layer only, such as storage with no UI, is not a vertical slice.
-- Behavior that the ticket did not ask for is a judgment call.
+- The result can be checked from outside: through the UI, an API or a command. A phase or ticket that changes one layer only, such as storage with no UI, is not a vertical slice.
+- Behavior that the phase or ticket did not ask for is a judgment call.
 
-For an `approach:refactor` ticket, the behavior must stay the same. Replace the first item and the vertical slice item with these: no expected value in an existing test changed, each test change follows a rename or a move, and each acceptance criterion is met in the structure of the code.
+For `approach:refactor` work, the behavior must stay the same. Replace the first item and the vertical slice item with these: no expected value in an existing test changed, each test change follows a rename or a move, and each criterion is met in the structure of the code.
 
 **Standards**: does the diff follow the rules of the repo?
 
@@ -61,12 +61,12 @@ Completion: each criterion, each test and each written rule is checked, and you 
 A finding is hard when it is one of these:
 
 - A check from step 2 fails.
-- An acceptance criterion has no code, or no test proves it.
+- A criterion has no code, or no test proves it.
 - A test is at a seam that the spec did not agree, or it is tautological.
 - The diff breaks a written rule of the repo.
 - The diff causes a defect that a user can see or that stores or sends wrong data, such as a false text, a lost value or a stale screen.
-- The ticket is not a vertical slice. This does not apply to a refactor ticket.
-- A refactor ticket changed an expected value in an existing test.
+- The work is not a vertical slice. This does not apply to refactor work.
+- Refactor work changed an expected value in an existing test.
 
 Everything else is a judgment call. Keep the five that matter most.
 

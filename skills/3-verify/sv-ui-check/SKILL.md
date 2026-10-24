@@ -1,22 +1,22 @@
 ---
 name: sv-ui-check
-description: "Drive the app in a browser to check a change, then give the user a short list of what passed and what to check by hand. Use when the user runs /sv-ui-check, /sv-build checks a ticket in a browser, or /sv-review walks the stories."
-argument-hint: "[ticket | what to check]"
+description: "Drive the app in a browser to check a change, then give the user a short list of what passed and what to check by hand. Use when the user runs /sv-ui-check, or sv-review walks the stories."
+argument-hint: "[issue | what to check]"
 ---
 
 # UI check
 
-`/sv-ui-check` runs the app, does the main flow of a change in a browser, and reports. It changes no code. The user decides when it runs, or `/sv-build` runs it for a ticket whose criteria show in a browser. The server and the tab stay open until the user answers, so the user can look for themselves.
+`/sv-ui-check` runs the app, does the main flow of a change in a browser, and reports. It changes no code. The user decides when it runs, or `sv-review` runs it to walk the stories. The server and the tab stay open until the user answers, so the user can look for themselves.
 
 ## 1. Pick the flow
 
-Read the target: the ticket and its acceptance criteria, or the text the user gave. With no argument, use the ticket of the current `ticket/<n>-` branch.
+Read the target: the issue and its criteria, or the text the user gave. With no argument, use the issue of the current `spec/<n>-` or `fix/<n>-` branch.
 
-Write the flow as a short list of steps, the way a user does the feature from start to end. Cover the acceptance criteria that a browser can show. A criterion that a browser cannot show stays out. A screen width, such as 390px, is a parameter of a step, not a new step.
+Write the flow as a short list of steps, the way a user does the feature from start to end. Cover the criteria that a browser can show. A criterion that a browser cannot show stays out. A screen width, such as 390px, is a parameter of a step, not a new step.
 
-When `/sv-review` calls you, it gives the flow: one step for each user story, with no limit on the count.
+When `sv-review` calls you, it gives the flow: one step for each user story, with no limit on the count.
 
-Completion: you have the flow, five steps or fewer, or the flow from `/sv-review`.
+Completion: you have the flow, five steps or fewer, or the flow from `sv-review`.
 
 ## 2. Run
 
@@ -43,7 +43,7 @@ Completion: the numbered flow is in the chat above the first tool call, and each
 
 ## 3. Report
 
-Print the two lists in your message, one line each, also when a caller ran you. When a caller such as `/sv-build` ran you, stop here: the caller asks the question and stops the server. When the user ran you, or you started yourself with no caller skill, ask with the question tool: "Approve" or "Change".
+Print the two lists in your message, one line each, also when a caller ran you. When a caller such as `sv-review` ran you, stop here: the caller asks the question and stops the server. When the user ran you, or you started yourself with no caller skill, ask with the question tool: "Approve" or "Change".
 
 ```markdown
 Verified:

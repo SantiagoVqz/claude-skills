@@ -31,8 +31,8 @@ Completion: the branch has a merged PR.
 
 Read the closing line of the PR body.
 
-- **`Closes #<n>`**: read the issue and, for a spec, each of its tickets. Close each one that is still open, as `tracker.md` says: the tickets first, then the spec. The keyword fires only on a merge into the default branch, so when the trunk is not the default branch, a close by hand is the normal path.
-- **`Part of #<spec>`**: a partial ship. The spec and its open tickets stay open.
+- **`Closes #<n>`**: when the issue is still open, close it as `tracker.md` says. When it is a child spec and every child spec of its project is closed now, close the project too. The keyword fires only on a merge into the default branch, so when the trunk is not the default branch, a close by hand is the normal path.
+- **`Part of #<spec>`**: a partial ship from before phases. The spec and its open tickets stay open.
 
 Completion: each issue is in the state that the closing line gives, and you know which closed by keyword and which by hand.
 
@@ -44,7 +44,7 @@ Completion: no process has its working directory in the worktree.
 
 ## 5. Worktree
 
-Call the Skill tool with `sv-worktree` to remove the worktree of the branch. When the primary checkout has the branch and no worktree has it, run `git switch <trunk>`, then `git branch -D <branch>`, and skip `sv-worktree`. Ticket worktrees of the spec stay. The next `/sv-build` on such a ticket makes a new spec branch and rebases the ticket onto it.
+Call the Skill tool with `sv-worktree` to remove the worktree of the branch. When the primary checkout has the branch and no worktree has it, run `git switch <trunk>`, then `git branch -D <branch>`, and skip `sv-worktree`.
 
 Completion: `git worktree list` does not show the branch, and the local branch is gone.
 
@@ -82,4 +82,4 @@ Add a row only when `/sv-retro` finds a new excuse.
 
 ## Report
 
-PR · merge method, when it was not rebase and merge · issues closed by keyword, by hand, or left open for a partial ship · servers stopped · worktree removed · branches deleted · trunk head · migrations applied · ticket worktrees left open.
+PR · merge method, when it was not rebase and merge · issues closed by keyword, by hand, or left open for a partial ship · servers stopped · worktree removed · branches deleted · trunk head · migrations applied.

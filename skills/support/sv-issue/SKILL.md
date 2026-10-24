@@ -20,7 +20,7 @@ An issue from this skill is a **handoff**: the next skill, such as `/sv-diagnose
 | Spec | `spec` | The caller writes it. | the caller's |
 | Ticket | one `approach:` label, and the parent spec | The caller writes it. | the caller's |
 
-A task is a lone ticket: a one-off change with a known result, and no parent spec. A defect whose cause is unknown is a bug, and gets no `approach:` label: `/sv-diagnose` finds the cause. Pick the approach label of a task from the table in the `sv-plan` skill: `approach:tdd` when the behavior changes, `approach:refactor` when it stays the same.
+A task is a lone ticket: a one-off change with a known result, and no parent spec. A defect whose cause is unknown is a bug, and gets no `approach:` label: `/sv-diagnose` finds the cause. Pick the approach label of a task from the table in `PLAN.md`, in the folder of the `sv-build` skill: `approach:tdd` when the behavior changes, `approach:refactor` when it stays the same.
 
 Idea template:
 
@@ -82,7 +82,7 @@ A screenshot does not go into the issue through `gh`. Write what it shows as tex
 
 ## Called by a skill
 
-A caller, such as `/sv-plan`, hands you a list of issues. Each issue has a ref such as `T1`, a kind, a title, a body, its labels, and, when they apply, a parent and its blockers. A blocker is a ref from the list or an issue number. The caller already has the user's approval, so do only step 1 and step 5 below.
+A caller, such as `/sv-prd`, hands you a list of issues. Each issue has a ref such as `T1`, a kind, a title, a body, its labels, and, when they apply, a parent and its blockers. A blocker is a ref from the list or an issue number. The caller already has the user's approval, so do only step 1 and step 5 below.
 
 Give back each ref with its number and URL, and each label that you could not add. With no tracker, give back the text of each issue, by its ref.
 

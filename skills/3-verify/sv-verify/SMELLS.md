@@ -10,7 +10,7 @@ Fowler's code smells, from _Refactoring_, chapter 3. Each one is a judgment call
 - **Repeated switches**: the same switch on the same type is in more than one place. Use one map, or polymorphism.
 - **Shotgun surgery**: one change needs edits in many files. Put the things that change together in one module.
 - **Divergent change**: one module changes for unrelated reasons. Split it.
-- **Speculative generality**: a parameter, hook or abstraction that the ticket does not need. Remove it.
+- **Speculative generality**: a parameter, hook or abstraction that the work does not need. Remove it.
 - **Message chains**: a long `a.b().c().d()` walk. Hide the walk behind one function.
 - **Middle man**: a module that only passes calls on. Call the target directly.
 - **Refused bequest**: a subtype that ignores most of what it inherits. Use composition.

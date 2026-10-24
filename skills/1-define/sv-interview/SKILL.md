@@ -21,25 +21,22 @@ Completion: you can name the root of the design tree, and the log exists.
 Pick the frontier decision that the most open decisions depend on. Format each message like this:
 
 ```markdown
-Recorded:
-- <each decision settled by the last answer>
+Recorded: <each decision settled by the last answer, a few words each>
 
-## Q<n> · about <k> left on this branch
+**Q<n> · <the question, in one sentence>** · about <k> left
 
-**<the question, in one sentence>**
+<one line of context, only when the question cannot be answered without it>
 
-<what depends on it, and the facts that bear on it>
-
-My recommendation: <answer>, because <reason>. The other option is <alternative>, which costs <cost>.
-
-Say yes to accept, or give your answer.
+Recommend: <answer>, because <reason>. Other: <alternative>, which costs <cost>.
 ```
+
+The message is short, because a long question tires the user and hides the decision. Each fact that you looked up and that the user does not need for this answer goes in the log, not in the message.
 
 - Number questions across the whole conversation. A question you ask again keeps its number.
 - `<k>` is your estimate of the questions left on the current branch. Answers can open new branches, so the count can go up.
 - Write the question so that "yes" accepts your recommendation.
 - When the options are few and discrete, use the question tool so the user picks one. Use text for open questions.
-- When the caller names required decisions, each one gets its own question. For content such as user stories, show your draft in the question and ask the user to change it. Show a long list in groups of five or fewer, one group per question. Settle each required decision in step 2, so that the close only confirms it.
+- When the caller names required decisions, each one gets its own question. Ask about decisions, such as what a user can do, and never about the wording of content, such as user story text. The caller writes the content from the log.
 - When the user asks to file a follow-up, call the Skill tool with `sv-issue` for it. Then send the open question again with its number.
 - **Facts are your job. Decisions are the user's.** When a question needs a fact from the code, the tracker or the docs, look it up. For a wide search, send a subagent. Ask the user only for what they decide.
 
@@ -59,6 +56,8 @@ Completion: the log matches every answer so far. Go back to step 2 while the fro
 
 ## 4. Close
 
-When the frontier is empty, show the decisions log and ask the user to confirm it. Name a list that the user settled in step 2, such as the user stories, by its numbers and its count, such as "stories 1 to 9, as settled in Q3 and Q4". The log has only decisions that the user settled in step 2, so the close adds nothing new. "Sounds good" or "whatever you think" is not a confirmation. Ask what they would change.
+When the frontier is empty and a skill called you, return the log and stop. The caller shows one approval of its own, so a second confirmation here only repeats it.
 
-Completion: the user confirms the log with an explicit yes. Then stop. The caller, or the user, decides what happens next.
+When the user called you, show the log, one line per decision, and ask the user to confirm it. "Sounds good" or "whatever you think" is not a confirmation. Ask what they would change.
+
+Completion: the frontier is empty, and the log went to the caller, or the user confirmed it with an explicit yes. Then stop. The caller, or the user, decides what happens next.
