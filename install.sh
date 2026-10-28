@@ -18,7 +18,7 @@ usage() {
   echo "A project install with no --prefix/--no-prefix flag asks for one on a terminal."
   echo ""
   echo "Examples:"
-  echo "  ./install.sh skills/5-ship/cleanup --prefix acme   # .claude/skills/acme-cleanup"
+  echo "  ./install.sh skills/4-ship/cleanup --prefix acme   # .claude/skills/acme-cleanup"
   echo "  ./install.sh skills/1-define/spec --global         # Install globally"
   echo "  ./install.sh --all --global                        # Install all skills globally"
   exit 1
