@@ -69,6 +69,7 @@ Make, provision or remove a worktree ──────────► worktree
 End of a day of work ──────────────────────────► /retro
 Edit a skill, AGENTS.md or CLAUDE.md ──────────► writing-for-agents
 Cut AI tells from text ────────────────────────► unslop
+Explain a ticket in plain terms ───────────────► /brief
 ```
 
 When no branch matches, say so, and give the two nearest skills with the difference between them.
