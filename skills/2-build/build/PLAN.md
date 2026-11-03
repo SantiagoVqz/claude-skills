@@ -29,7 +29,33 @@ Give each phase one approach. `/build` runs the skill that the approach names, s
 
 ## Criteria
 
-Write the done-when criteria of each phase. They tell when the phase is done, and include the edge cases of its stories, such as an empty list or a value at its limit. Use the spec's words. Leave out file paths and code: they go stale before the work ends.
+Write the done-when criteria of each phase. They tell when the phase is done, and include the edge cases of its stories, such as an empty list or a value at its limit. Use the spec's words.
+
+The plan holds none of these, because they go stale before the work ends or another step owns them:
+
+- file paths, code, or test names
+- a "Notes for the builder" section, or any section that the format below does not have
+- the terms and ADRs of the spec's `Domain changes` section, because `/build` commits them before phase 1
+
+## Chat summary
+
+The user approves the plan from the chat. The full criteria are too long to read there: plans of 450 to 950 words were approved in under 30 seconds. So the chat shows this summary, and the full plan goes only in the comment:
+
+```markdown
+**Plan of #<spec>: <spec title>**
+
+<One or two sentences in plain words: the problem that the spec solves for the user.>
+
+1. **<phase title>**: <the Builds sentence>. <boundary, or "One phase.">
+2. ...
+
+You approve:
+1. <a decision the plan takes that the spec did not settle, such as a phase order or a story put in a later phase>
+2. ...
+Defaults taken: <each choice the planner made with no input, or "none">.
+```
+
+Each line is a fact that the user can say no to. Leave out the criteria count, approaches and estimates, unless a phase split depends on one.
 
 ## Format
 

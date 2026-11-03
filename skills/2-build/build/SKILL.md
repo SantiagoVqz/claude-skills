@@ -51,12 +51,12 @@ Completion: the issue is in progress, assigned to the user, and has no open bloc
 
 Skip this step when the spec has a plan comment and no open ticket from before phases.
 
-Start the planner: a subagent with a fresh context. Its prompt has the spec issue number and this task: read [PLAN.md](PLAN.md) in the folder of this skill, the spec issue with its comments and sub-issues, the glossary and ADRs on the trunk, and the code in the area that the spec touches; then return a plan in the format of `PLAN.md`. Tell it:
+Start the planner: a subagent with a fresh context. Its prompt has the spec issue number and this task: read [PLAN.md](PLAN.md) in the folder of this skill, the spec issue with its comments and sub-issues, the glossary and ADRs on the trunk, and the code in the area that the spec touches; then return the full plan in the Format of `PLAN.md`, and its Chat summary. Tell it:
 
 - A phase that has a commit on `origin/spec/<n>-<slug>` stays as it is. Find them with `git log --format='%(trailers:key=Phase,valueonly)' origin/<trunk>..origin/spec/<n>-<slug>`, when that branch exists.
 - A closed ticket from before phases covers its stories. Each open ticket becomes the input of a phase.
 
-Write the plan in your message, before the question. The user approves what they can read. Ask with the question tool: "Approve" or "Change". On Change, apply the edits, show the plan again and ask again.
+Check the full plan against the rules of `PLAN.md`, and remove any path, test name, extra section or domain change. Then write the Chat summary in your message, before the question. The user approves what they can read. Ask with the question tool: "Approve", "Show full plan" or "Change". On "Show full plan", write the full plan and ask again. On Change, apply the edits, show the summary again and ask again.
 
 On Approve, post the plan as a comment on the spec issue, as `tracker.md` says. Close each open ticket that a phase took over, with the comment `Planned as phase <k>: <comment URL>`.
 
@@ -76,11 +76,25 @@ Completion: the session is in the worktree, the domain changes are committed or 
 
 Take each phase with no commit, in the order of the plan. For each phase:
 
-1. **Start.** Record the phase start: `git rev-parse HEAD`.
+1. **Start.** Record the phase start: `git rev-parse HEAD`. Tell the user what the phase builds, in this form:
+
+   ```text
+   Phase <k>/<total> · <title>
+   <the Builds sentence>
+   Criteria:
+   - <each criterion, cut to its first clause>
+   ```
 2. **Implement.** Start a subagent with a fresh context. Its prompt has the worktree path, the shell rules, the issue number, the phase block from the plan word for word, the phase start, and this task: call the Skill tool with the approach skill for this phase, and return the approach skill's report. When the approach skill says to ask the user, the subagent stops and returns the question with its recommendation, because a subagent cannot reach the user. Ask that question with the question tool, then send the answer to the same subagent with `SendMessage`, so it resumes with its context.
-3. **Verify.** Start only when the implementer returned its report and none of its checks still runs. Start a new subagent with a fresh context. Tell it to call the Skill tool with `verify`, with the issue number, the phase's criteria and the diff `<phase start>...HEAD`. Give it no list of checks to skip.
-4. **Fix.** Send each hard finding, word for word, to the implementer with `SendMessage`. It fixes, commits, and after a fix for a word or a name greps `git diff <phase start>...HEAD` for each form of it. Then run a new verifier. Run three verifiers or fewer for each phase. When the third run still has a hard finding, stop. Show the findings. The issue stays in progress and the worktree stays. The user fixes it, or overrides it with a reason.
-5. **Land.** Squash the phase into one commit: `git reset --soft <phase start>`, then `git commit` with one `-m` flag per paragraph:
+3. **Watch.** The user sees nothing of a subagent's work, and an implementer runs for 20 to 45 minutes. So while the implementer runs, watch its commits with the Monitor tool, with `timeout_ms` 600000 and this command:
+
+   ```sh
+   while true; do git -C <worktree> log --reverse --format='%h %s' <phase start>..HEAD; sleep 20; done | awk '!seen[$0]++ { print; fflush() }'
+   ```
+
+   For each new commit, send the user one line: `Phase <k> · <commit subject>`, such as `Phase 1 · Green: an empty list shows the empty state`. When the monitor expires and no commit came in its 10 minutes, run `git -C <worktree> status --short` and `ps -o pid,etime,command -U "$USER"`, and tell the user in one line what runs, such as "No commit for 10 min. The backend suite has run 6 min." Then arm the monitor again. Stop the monitor with TaskStop when the implementer returns. Do the same for each fix in step 5.
+4. **Verify.** Start only when the implementer returned its report and none of its checks still runs. Start a new subagent with a fresh context. Tell it to call the Skill tool with `verify`, with the issue number, the phase's criteria and the diff `<phase start>...HEAD`. Give it no list of checks to skip.
+5. **Fix.** Send each hard finding, word for word, to the implementer with `SendMessage`. It fixes, commits, and after a fix for a word or a name greps `git diff <phase start>...HEAD` for each form of it. Then run a new verifier. Run three verifiers or fewer for each phase. When the third run still has a hard finding, stop. Show the findings. The issue stays in progress and the worktree stays. The user fixes it, or overrides it with a reason.
+6. **Land.** Squash the phase into one commit: `git reset --soft <phase start>`, then `git commit` with one `-m` flag per paragraph:
    - `<phase title> (#<n>)`
    - one line for each criterion: `<criterion> · <test name>`, from the implementer's report
    - `Open judgment calls:`, then one line for each call of the last verify run, as verify gave it
@@ -88,9 +102,9 @@ Take each phase with no commit, in the order of the plan. For each phase:
    - `Phase: <k>/<total>`, as the last paragraph, so git reads it as a trailer
 
    For a spec, push the branch: `git push -u origin <branch>`. A lone ticket stays local until `/ship`.
-6. **Report.** Send one line to the user: `Phase <k>/<total> · <title> · <criteria count> criteria · <verify runs> verify runs · <short hash>`.
+7. **Report.** Send one line to the user: `Phase <k>/<total> · <title> · <criteria count> criteria · <verify runs> verify runs · <short hash>`.
 
-Completion: each phase of the plan has its commit with its `Phase:` trailer, and the user has one line for each phase.
+Completion: each phase of the plan has its commit with its `Phase:` trailer. The user had the criteria of each phase before it started, one line for each commit of the implementer, and one line for each phase.
 
 ## 5. Review
 
