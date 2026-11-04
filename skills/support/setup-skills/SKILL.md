@@ -19,6 +19,7 @@ Read the repo's current state:
 - The **glossary file**: `GLOSSARY.md`, or `CONTEXT.md` when the repo keeps its terms there. With neither, it is `GLOSSARY.md`.
 - `docs/adr/`: each ADR that sets a rule for worktrees, provisioning or the tracker.
 - `gh label list`: labels that already exist.
+- `.claude/skills/`: each folder that copies a skill of this set under an old prefix, such as `knot-build` or `sv-build`, and each label description that names one.
 - What a new worktree lacks: gitignored `.env` files (`git ls-files --others --ignored --exclude-standard`), a lockfile, a database URL in an env file. When the repo has none of these, it needs no provisioning.
 - A `.xcodeproj` or a `.xcworkspace`: the repo is an Xcode repo.
 - `scripts/provision.sh` and `.claude/hooks/provision-worktree.sh`: files from an earlier run, or the repo's own script.
@@ -29,7 +30,7 @@ Completion: you can name the tracker, the state of each file above, each label t
 
 ## 2. Confirm
 
-The tracker is GitHub when the remote is on GitHub. This version supports GitHub only. For any other tracker, stop and say that this version does not support it. Ask no question about the tracker.
+The tracker is GitHub when the remote is on GitHub. This version supports GitHub only. For any other tracker, stop and say that this version does not support it. Ask no question about the tracker, except when the repo has no remote: then ask "Create a private GitHub repo" or "Stop". On Create, run `gh repo create <name> --private --source . --remote origin`.
 
 Show the user, in one message:
 
@@ -39,7 +40,7 @@ Show the user, in one message:
 - When the repo needs provisioning: the filled CONFIG block of `provision.sh`, from [PROVISIONING.md](PROVISIONING.md).
 - Each existing file or label that you will keep as it is.
 
-Send that message first. Then ask each choice in its own question tool call: each existing file or label that you could keep or replace. For each file in `docs/agents/` that covers the same job as a file that you write, ask: "Merge", "Keep both" or "Delete". Put your recommendation first. Recommend these:
+Send that message first. Then ask each choice in its own question tool call: each existing file or label that you could keep or replace. For each file in `docs/agents/` that covers the same job as a file that you write, ask: "Merge", "Keep both" or "Delete". Put your recommendation first. For the old copies as a group, ask: "Delete" or "Keep". An agent picks a copy over the current skill, so recommend Delete. Recommend these:
 
 - A file that a commit deleted after an earlier run, such as the provisioning hook: "Leave deleted". The deletion is the user's choice. Give only the reason that the commit message states.
 - A file that a skill of the repo reads, such as a release skill: "Keep", also when no skill of this set reads it. Search `.claude/skills/` for the file name. Then show the drafts, and ask for approval with the question tool. Give the options "Approve" and "Change". When the user picks Change, apply the edits and ask again.
