@@ -7,7 +7,7 @@ argument-hint: "[--since YYYY-MM-DD]"
 
 # Retro
 
-The skill set improves from evidence, not from memory. `/retro` reads each session since the last retro, in each project, compares what each skill did with what its `SKILL.md` says, and writes the gaps to one run file. It proposes fixes and edits no skill.
+The skill set improves from evidence, not from memory, and each fix must keep it small. Run it about once a week. `/retro` reads each session since the last retro, in each project, compares what each skill did with what its `SKILL.md` says, and writes the gaps to one run file. It proposes fixes and edits no skill.
 
 `digest.py` is in the folder of this skill. Run it with `python3 -I`.
 
@@ -35,7 +35,7 @@ Read `WATCH.md` in the run folder, when it exists. Each of its items is one more
 
 For one or two sessions, read each one yourself: run `digest.py <transcript> --from <first>`. The output is a timeline: user messages, commands, skills, subagents, questions and tool errors, each with its transcript line number. Open the transcript at a line when you need the full text. Then find the gaps as step 5 says.
 
-For three sessions or more, start one subagent for each session, all at once. Give each one its row, the path of this `SKILL.md`, the watch items, and this task: read the timeline, read the `SKILL.md` of each skill that ran, find the gaps as step 5 says, and return each gap in the finding format of step 6, with no status. Evidence cites `<session>:<line>`.
+For three sessions or more, group the sessions by project, about 3 or 4 for each subagent, and start the subagents all at once. Give each one its rows, the path of this `SKILL.md`, the watch items, and this task: read the timeline, read the `SKILL.md` of each skill that ran, find the gaps as step 5 says, and return each gap in the finding format of step 6, with no status. Evidence cites `<session>:<line>`.
 
 Completion: you have the gaps of each session.
 
@@ -53,11 +53,11 @@ Look for these gaps in each timeline:
 - **Correction**: the user corrected, repeated or stopped the agent.
 - **Wrong trigger**: a skill fired when it should not, or did not fire when it should.
 - **Fact question**: the agent asked the user for a fact that it could look up.
-- **Excuse**: the agent gave a reason to skip work. These become anti-rationalization rows.
+- **Excuse**: the agent gave a reason to skip work.
 - **Friction**: a tool error, a retry, or a long detour.
 - **Outside skill**: a skill or agent that is not in this set ran. Record what it did that the set did not do.
 
-For each gap, decide the fix: sharpen the wording, add a step, add a row to an anti-rationalization table, cut a no-op, change a description, or, for an outside skill, add its idea to a skill of this set or propose a new skill. A gap that is caused by the project and not by a skill gets the `project` tag and no fix.
+For each gap, decide the fix: cut a step or a no-op, sharpen the wording, change a description, add a step, or, for an outside skill, add its idea to a skill of this set. A fix must remove at least as many lines as it adds from the skill, and a skill stays at about 80 lines. When a gap has no fix that fits, propose what to cut with it, or drop the finding. A gap that is caused by the project and not by a skill gets the `project` tag and no fix.
 
 Merge the gaps of all sessions. The same gap in more than one session is one finding, with evidence from each session. When a gap matches an open finding from step 4, link that finding and count the runs. When it matches a rejected finding, leave it out.
 

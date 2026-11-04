@@ -1,6 +1,6 @@
 ---
 name: prototype
-description: "Build throwaway prototypes as Claude artifacts to explore UI designs and answer design questions. Use when the user asks to prototype, mock up or see options, and before a UI change that the user must see first."
+description: "Build throwaway prototypes as Claude artifacts to explore UI designs and answer design questions. Use when the user asks to prototype, mock up or see options, when a project rule asks for an HTML mockup, and before a UI change that the user must see first."
 ---
 
 # Prototype
@@ -28,13 +28,9 @@ Name the surface too: which app, and which page or flow. When the request does n
 4. **High fidelity on the surface, throwaway underneath.** The prototype looks and behaves like the real product: the project's fonts, colours, spacing and components, real copy, realistic data, and working hover, focus and open states. Read the project's design doc first: `DESIGN.md`, `docs/design-system.md`, or the doc that `AGENTS.md` names. Build each screen from the components it names, and use only the platform patterns it uses. Then read the tokens and component styles from the code (theme files, CSS variables, Tailwind config) or from the user's screenshots. The code behind it stays throwaway: no tests, no error handling beyond what makes the prototype _runnable_, no abstractions.
 5. **Surface the state.** After every action, render the full relevant state so the user can see what changed.
 6. **Iterate in place.** Republish each change to the same artifact, so the link always shows the current prototype.
-7. **Check before the handover.** Run the script check, and wait for its result before you publish. Then open the published link in the browser at the target width, and look at every screen and state. Fix what you find, and republish before you send the link.
-8. **Capture it when done.** Fold any validated decision into the real code. Record the answer (the verdict and the question it settled) with the artifact link as the context pointer: on the implementation issue when one exists, in the decisions log when `/spec` or `/prd` called the skill, else in the reply to the user. The artifact is the **primary source**, so the repo keeps only the validated decision.
-
-## Excuses
-
-| Excuse | Answer |
-|---|---|
-| "The implementer needs the HTML as a spec." | Give the implementer the artifact link and the decisions. The artifact stays the source. |
-
-Add a row only when `/retro` finds a new excuse.
+7. **Check before the handover.** Run the script check, and wait for its result before you publish. Then open the published link in a browser at the target width, take a screenshot of each frame, and drive its hover and open states. Fix what you find, and republish. The check counts only on the last publish, so check again after each fix.
+   - **Browser.** Use Claude in Chrome. When it is not connected or does not answer, use the DevTools tools, as `DEVTOOLS.md` in the folder of the `ui-check` skill says.
+   - **Blocked page.** When the link shows a bot check or a sign-in, do not try to get past it. Open the local source files of the frames in the browser, when they render alone.
+   - **Still no look.** Send the link, and name each frame and state that you did not see, and why. A failed attempt is the only reason to send an unchecked frame.
+   - **Close.** Close each page that you opened, and stop any Chrome that this session started for the check, because a project script can refuse to run next to a second Chrome.
+8. **Capture it when done.** Fold any validated decision into the real code. Record the answer (the verdict and the question it settled) with the artifact link as the context pointer: on the implementation issue when one exists, in the decisions log when `/spec` called the skill, else in the reply to the user. The artifact is the **primary source**, so the repo keeps only the validated decision.

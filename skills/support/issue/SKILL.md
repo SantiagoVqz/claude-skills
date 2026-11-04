@@ -14,13 +14,13 @@ An issue from this skill is a **handoff**: the next skill, such as `/diagnose <n
 
 | Kind | Label | Body | Next step |
 |---|---|---|---|
-| Idea | `idea` | The idea template below. | `/spec <n>`, or `/prd <n>` with no setup |
+| Idea | `idea` | The idea template below. | `/spec <n>` |
 | Bug | `bug` | The bug template below. | `/diagnose <n>` |
-| Task | one `approach:` label | The `Lone ticket` section of [TICKETS.md](../../1-define/prd/TICKETS.md). | `/build <n>` |
+| Task | none | The `Lone ticket` section of [TICKETS.md](../../1-define/spec/TICKETS.md). | `/build <n>` |
 | Spec | `spec` | The caller writes it. | the caller's |
-| Ticket | one `approach:` label, and the parent spec | The caller writes it. | the caller's |
+| Ticket | none, and the parent spec | The caller writes it. | the caller's |
 
-A task is a lone ticket: a one-off change with a known result, and no parent spec. A defect whose cause is unknown is a bug, and gets no `approach:` label: `/diagnose` finds the cause. Pick the approach label of a task from the table in `PLAN.md`, in the folder of the `build` skill: `approach:tdd` when the behavior changes, `approach:refactor` when it stays the same.
+A task is a lone ticket: a one-off change with a known result, and no parent spec. A defect whose cause is unknown is a bug: `/diagnose` finds the cause.
 
 Idea template:
 
@@ -82,7 +82,7 @@ A screenshot does not go into the issue through `gh`. Write what it shows as tex
 
 ## Called by a skill
 
-A caller, such as `/prd`, hands you a list of issues. Each issue has a ref such as `T1`, a kind, a title, a body, its labels, and, when they apply, a parent and its blockers. A blocker is a ref from the list or an issue number. The caller already has the user's approval, so do only step 1 and step 5 below.
+A caller, such as `/spec`, hands you a list of issues. Each issue has a ref such as `T1`, a kind, a title, a body, its labels, and, when they apply, a parent and its blockers. A blocker is a ref from the list or an issue number. The caller already has the user's approval, so do only step 1 and step 5 below.
 
 Give back each ref with its number and URL, and each label that you could not add. With no tracker, give back the text of each issue, by its ref.
 
@@ -100,7 +100,7 @@ Read the conversation first. It often holds the work already done: an `/ask` rou
 
 Find the issues to file. One request can hold several, such as a bug and an idea that waits for it. For each one, find its kind, and the issues that must finish before it: each one is a blocker. Ask for a kind only when two kinds fit.
 
-Read the code that each issue touches, enough to use the repo's words, to check each finding, and to pick the approach of a task. This is a capture, not a spec: stop when you can fill the template.
+Read the code that each issue touches, enough to use the repo's words, and to check each finding. This is a capture, not a spec: stop when you can fill the template.
 
 Ask for each template section that the conversation and the code do not fill, one question at a time with the question tool. Put your best guess first. Ask three questions at most for each issue.
 
@@ -120,7 +120,7 @@ Completion: no open issue is the same one, or the user picked what to do with it
 
 Show each draft in your message: the title, the labels, the blockers, and the full body. For several issues, add the order in one line, such as "the bug first, then the idea". Then ask once with the question tool: "File them" or "Change". When the user picks Change, apply the edits, show the drafts again and ask again.
 
-Completion: the user picked "File them".
+Completion: each full draft is in the chat above the question, and the user picked "File them".
 
 ## 5. File
 

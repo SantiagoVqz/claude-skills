@@ -1,8 +1,8 @@
 ---
 name: cleanup
-description: "Tear down a merged spec or fix branch: check the merged PR, close the issues, remove the worktree and branches, and refresh the trunk."
+description: "Tear down a merged branch: check the merged PR, close the issues, remove the worktree and branches, and refresh the trunk."
 disable-model-invocation: true
-argument-hint: "[spec | issue]"
+argument-hint: "[issue]"
 ---
 
 # Cleanup
@@ -13,7 +13,7 @@ Run it from the primary checkout. When the session is in a worktree, call `ExitW
 
 ## 1. Find
 
-The target is the argument, or the branch you just shipped: `spec/<n>-<slug>` or `fix/<n>-<slug>`. Find the trunk as the `worktree` skill does.
+The target is the argument, or the branch you just shipped. Find the trunk as the `worktree` skill does.
 
 Completion: you have the branch, its issue and the trunk.
 
@@ -21,7 +21,7 @@ Completion: you have the branch, its issue and the trunk.
 
 Run `gh pr list --head <branch> --state all --json number,url,state,body`.
 
-- **A merged PR**: go on. Read its merge commit with `gh pr view <pr> --json mergeCommit`. When that commit has two parents (`git cat-file -p <commit>` after a fetch), the PR merged with a merge commit, not rebase and merge. Name it in the report. Name the repo setting that blocks it, `gh repo edit --enable-merge-commit=false`, only when the trunk is not `develop` and no ADR in `docs/adr/` needs merge commits. A release flow from `develop` to `main` can need them.
+- **A merged PR**: go on. Read its merge commit with `gh pr view <pr> --json mergeCommit`. When that commit has two parents (`git cat-file -p <commit>` after a fetch), the PR merged with a merge commit. When the merge line of the PR body names another method, name the difference in the report, and name the repo setting that blocks it, `gh repo edit --enable-merge-commit=false`.
 - **An open PR**: stop, and give its URL.
 - **No PR**: stop. The next step is `/ship`.
 
@@ -29,10 +29,10 @@ Completion: the branch has a merged PR.
 
 ## 3. Issues
 
-Read the closing line of the PR body.
+Read the closing line of the PR body. Use `docs/agents/tracker.md`, or `NO-SETUP.md` in the folder of the `setup-skills` skill. A PR with no closing line has no issue to change.
 
-- **`Closes #<n>`**: when the issue is still open, close it as `tracker.md` says. When it is a child spec and every child spec of its project is closed now, close the project too. The keyword fires only on a merge into the default branch, so when the trunk is not the default branch, a close by hand is the normal path.
-- **`Part of #<spec>`**: a partial ship from before phases. The spec and its open tickets stay open.
+- **`Closes #<n>`**: when the issue is still open, close it as `tracker.md` says. When it is a ticket and every ticket of its spec is closed now, close the spec too. The keyword fires only on a merge into the default branch, so when the trunk is not the default branch, a close by hand is the normal path.
+- **`Refs #<n>`**: the fix added instrumentation, and the cause is not confirmed. The issue stays open. Name in the report what confirms the cause.
 
 Completion: each issue is in the state that the closing line gives, and you know which closed by keyword and which by hand.
 
@@ -40,11 +40,17 @@ Completion: each issue is in the state that the closing line gives, and you know
 
 Stop each dev server and background task that runs from the worktree. Check the background tasks of this session, and each process whose working directory is in the worktree: `lsof -d cwd` lists them. A task can survive a `/clear`, so look also when you think this session started none.
 
-Completion: no process has its working directory in the worktree.
+In a repo with a `.xcodeproj` or a `.xcworkspace`, also shut down the simulators, because their working directory is not in the worktree. When `pgrep xcodebuild` finds no other build, run `xcrun simctl shutdown all`, then `xcrun simctl --set testing shutdown all`. The second one fails harmlessly when no test clone exists.
+
+Then delete the test clones, which are disposable: Xcode leaves them on disk, and one session found 5 clone folders with one booted. Record the size with `du -sh ~/Library/Developer/XCTestDevices`, then run `xcrun simctl --set testing delete all`.
+
+Leave Claude Code's own processes, which are the session shell, `caffeinate` and the MCP servers. Then clear what this session left: close each browser page that it opened, and delete each partial install and temp file that it made. Name each one in the report.
+
+Completion: no process other than Claude Code's has its working directory in the worktree, and no simulator is booted unless another build uses it.
 
 ## 5. Worktree
 
-Call the Skill tool with `worktree` to remove the worktree of the branch. When the primary checkout has the branch and no worktree has it, run `git switch <trunk>`, then `git branch -D <branch>`, and skip `worktree`.
+Call the Skill tool with `worktree` to remove the worktree of the branch, also when you know its steps. When the primary checkout has the branch and no worktree has it, run `git switch <trunk>`, then `git branch -D <branch>`, and skip `worktree`.
 
 Completion: `git worktree list` does not show the branch, and the local branch is gone.
 
@@ -72,14 +78,6 @@ Find the migration folder in `AGENTS.md`, or in the config of the migration tool
 
 Completion: the trunk dev database has each new migration, or the report names them.
 
-## Excuses
-
-| Excuse | Answer |
-|---|---|
-| "The worktree was made by hand, so I remove it by hand." | Call the `worktree` skill. Its Remove also drops the test database. |
-
-Add a row only when `/retro` finds a new excuse.
-
 ## Report
 
-PR · merge method, when it was not rebase and merge · issues closed by keyword, by hand, or left open for a partial ship · servers stopped · worktree removed · branches deleted · trunk head · migrations applied.
+PR · merge method, when it differs from the merge line of the PR · issues closed by keyword, by hand, or left open · servers stopped · session leftovers cleared · size of the test clones deleted · worktree removed · branches deleted · trunk head · migrations applied.

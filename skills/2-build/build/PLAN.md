@@ -1,50 +1,50 @@
-# Plan rules
+# Full plan
 
-A **plan** is the ordered **phases** that `/build` builds in one run. `/build` drafts it when a spec has no plan comment. `issue`, `final-review` and `TICKETS.md` read the approach table below.
+`/build` runs this plan in the same session when a ticket has a hard stop, or when the user asks. It replaces step 3. The ticket stays in `/build`, and needs no spec.
 
-## Cut
+## 1. Brief
 
-Cut the spec's stories into phases. **One phase by default.** Each phase pays a fixed cost: an implementer subagent, the verify runs and a commit. Split only at a **boundary**:
+Send one message that states the problem back:
 
-| Boundary | Split when |
-|---|---|
-| Prefactor | A change to the existing code keeps the behavior the same and makes the feature easier. It goes in its own first phase with `approach:refactor`. Make the change easy, then make the easy change. |
-| Context | The work would not fit in one implementer's context: more than about 1500 changed lines. Count added and deleted lines, tests included, and estimate from the files that the stories touch. |
+- **The issue, plainly**: what is wrong or missing, for whom, and what it costs them. Use no symbol names.
+- **The ask and the cause**: what the ticket asks, and what you think the cause is. When they differ, say how confident you are.
+- **Ways to fix it**: the ticket's fix, the structural fix when one exists, and the cost of each, such as a migration or a locked-in contract. Name the settled practice when there is one. End with your recommendation and the reason in one line.
+- **Out of scope**: what you leave as it is, and why.
 
-Each phase is a **vertical slice**: it goes through every layer that its stories touch, such as schema, API, UI and tests. At a context boundary, cut by stories, not by layers. The first phase that needs a schema change takes all of it, with the first behavior that uses it. Read the spec's `Schema changes` line to find the changes.
+Completion: the brief is in the chat.
+
+## 2. Decisions
+
+List each point where two reasonable answers lead to different plans. Facts are yours to find. A decision earns a question only when the answer changes the plan. Zero decisions is a valid result: say so, and name the defaults that you take.
+
+The decisions go out with the approval, in one question tool call, as `interview` asks them: four questions at most, the approval included, with your recommendation first. Each question must stand on its own text.
+
+Completion: you have each decision, with your recommendation or a default.
+
+## 3. Plan
+
+Write the plan in the format below, on the recommended options. Ask with the question tool: "Approve", "Change" or "Write a spec", with each decision of step 2 in the same call. Recommend "Write a spec" only when the work is a feature with stories to settle, over about 800 changed lines.
+
+**One phase by default.** Split only at a real boundary: a contract that another part consumes, a migration that later code depends on, or a step whose failure must stay apart. Size alone is no boundary. A prefactor that keeps the behavior goes in its own first phase, with the `refactor` approach.
 
 A **wide refactor** is one mechanical change, such as a column rename, that breaks call sites across the codebase. Plan it as phases: expand, with the new form next to the old one; one phase per batch of call sites; then contract, which removes the old form.
 
-Each story is in one phase or more. When a story fits no phase, ask the user whether it is out of scope.
-
-## Approach
-
-Give each phase one approach. `/build` runs the skill that the approach names, such as `tdd` for `approach:tdd`. Tasks use the same values as labels:
-
-| Approach | When |
-|---|---|
-| `approach:tdd` | The work adds or changes behavior. |
-| `approach:refactor` | The behavior stays the same: a prefactor, or a batch of a wide refactor. |
-| `approach:diagnose` | The work starts from a defect whose cause is unknown. |
-
-## Criteria
-
-Write the done-when criteria of each phase. They tell when the phase is done, and include the edge cases of its stories, such as an empty list or a value at its limit. Use the spec's words. Leave out file paths and code: they go stale before the work ends.
-
-## Format
-
-The plan comment on the spec issue:
+Write the criteria in the words of the ticket, with the edge cases of the work, such as an empty list or a value at its limit. Leave out file paths, code and test names, because they go stale before the work ends.
 
 ```markdown
-### Plan of #<spec>
+### Plan of #<n>
+
+Problem: <the brief, corrected by the user's answer>
+Fix: <the chosen way, and the way you did not take, with the reason>
+Decisions: <each decision and default, with the reason>
+Hard stops: <the verdict line>
 
 #### Phase 1: <title>
-<approach> · stories 1, 2 · boundary: <the boundary, or "one phase">
+<approach> · boundary: <the boundary, or "one phase">
 
 Builds: <one sentence, from the user's point of view>
 Done when:
 - <each criterion>
-
-#### Phase 2: <title>
-...
 ```
+
+Completion: the user picked "Approve", or you stopped with `/spec <n>` as the next step. On "Approve", go to step 4 of `/build`.

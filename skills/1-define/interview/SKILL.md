@@ -1,13 +1,13 @@
 ---
 name: interview
-description: "Interview the user one question at a time on a design tree until every decision is settled, and keep a decisions log. Use when the user says \"grill me\" or wants to stress-test a plan or decision, and when /spec interviews for a spec."
+description: "Interview the user in short rounds of up to four questions on a design tree until every decision is settled, and keep a decisions log. Use when the user says \"grill me\" or wants to stress-test a plan or decision, and when /spec interviews for a spec."
 ---
 
 # Interview
 
 Run the interview until you both share one understanding of the plan. Map the plan as a **design tree**: each decision branches into the decisions that depend on it. The **frontier** is every open decision whose prerequisites are settled.
 
-The user's attention is the scarce resource. Ask **one question per message**, and spend each question on the decision that unblocks the most of the tree.
+The user's attention is the scarce resource, and each wait for an answer costs the most time: plan questions cost about 40 hours of waiting in one month. Ask in **rounds**: one question tool call with four questions or fewer. Spend each question on a decision that unblocks the tree.
 
 ## 1. Prepare
 
@@ -18,37 +18,33 @@ Completion: you can name the root of the design tree, and the log exists.
 
 ## 2. Ask
 
-Pick the frontier decision that the most open decisions depend on. Format each message like this:
+Take the frontier decisions that the most open decisions depend on, four or fewer. Before the round, write one line in your message:
 
 ```markdown
-Recorded: <each decision settled by the last answer, a few words each>
-
-**Q<n> · <the question, in one sentence>** · about <k> left
-
-<one line of context, only when the question cannot be answered without it>
-
-Recommend: <answer>, because <reason>. Other: <alternative>, which costs <cost>.
+Recorded: <each decision settled by the last round, a few words each> · about <k> questions left
 ```
 
-The message is short, because a long question tires the user and hides the decision. Each fact that you looked up and that the user does not need for this answer goes in the log, not in the message.
+Then ask the round in one question tool call. For each question:
 
-- Number questions across the whole conversation. A question you ask again keeps its number.
-- `<k>` is your estimate of the questions left on the current branch. Answers can open new branches, so the count can go up.
-- Write the question so that "yes" accepts your recommendation.
-- When the options are few and discrete, use the question tool so the user picks one. Use text for open questions.
+- Write the question in one sentence that stands on its own text. Add one line of context only when the user cannot answer without it.
+- Give two to four options, with your recommendation first, and the cost of each other option in its description.
+- Use text in place of the tool only for an open question, and ask it alone.
+
+A question earns its place only when the answer changes the plan. `<k>` is your estimate: answers can open new branches, so the count can go up.
+
 - When the caller names required decisions, each one gets its own question. Ask about decisions, such as what a user can do, and never about the wording of content, such as user story text. The caller writes the content from the log.
-- When the user asks to file a follow-up, call the Skill tool with `issue` for it. Then send the open question again with its number.
-- **Facts are your job. Decisions are the user's.** When a question needs a fact from the code, the tracker or the docs, look it up. For a wide search, send a subagent. Ask the user only for what they decide.
+- When the user asks to file a follow-up, call the Skill tool with `issue` for it. Then ask the open questions again.
+- **Facts are your job. Decisions are the user's.** When a question needs a fact from the code, the tracker or the docs, look it up, and put it in the log. For a wide search, send a subagent.
 
-Completion: one question is sent, and you wait for the answer.
+Completion: one round is sent, and you wait for the answers.
 
 ## 3. Record
 
-After each answer:
+After each round:
 
 - Write each settled decision to the log, in one sentence, with the reason when the user gave one.
 - A word whose meaning got settled goes under Terms. A decision that is hard to reverse, surprising to a newcomer, and the result of a real choice goes under ADR candidates. Anything the user excluded goes under Out of scope.
-- Recompute the frontier. An answer can close a branch, open a branch, or reverse an earlier decision. When it reverses one, update the log entry and say so in the next Recorded list.
+- Recompute the frontier. An answer can close a branch, open a branch, or reverse an earlier decision. When it reverses one, update the log entry and say so in the next Recorded line.
 
 Listen for **should-want** answers: best-practice words with no specifics, such as "scalable", "clean" or "the standard way". Ask what the user would choose if nobody would see the reason. Then record that answer.
 

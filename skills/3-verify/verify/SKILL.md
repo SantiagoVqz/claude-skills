@@ -1,6 +1,6 @@
 ---
 name: verify
-description: "Review a diff against its phase or ticket and the repo's standards, and report hard findings and judgment calls. Use when /build or /diagnose asks for a verify run, or the user asks to verify a diff."
+description: "Review a diff against its ticket and the repo's standards, and report hard findings and judgment calls. Use when /ship or /build asks for a cold read, or the user asks to verify a diff."
 argument-hint: "[issue] [ref]"
 metadata:
   credits:
@@ -14,23 +14,23 @@ metadata:
 
 `/verify` is the adversarial review of one diff. It reports and edits nothing. The caller fixes the findings.
 
-A finding is **hard** or a **judgment call**. A hard finding blocks the phase or ticket. A judgment call goes to the user.
+A finding is **hard** or a **judgment call**. A hard finding blocks the ticket. A judgment call goes to the user.
 
 ## 1. Pin the diff
 
-Use the diff and the criteria that the caller gave: the criteria of a phase, or of a lone ticket. When you run on your own:
+Use the diff and the criteria that the caller gave. When you run on your own:
 
-- **Issue**: the argument, or the number in a `spec/<n>-` or `fix/<n>-` branch name.
+- **Issue**: the argument, or the number in the branch name.
 - **Base**: the ref. With no ref, use `git merge-base origin/<trunk> HEAD`, because a local trunk can be ahead of the branch base.
 - **Diff**: `git diff <base>`. It includes the work that is not committed yet.
 
-Read the issue with its criteria, and the spec with the testing decisions, when there is one. Run `git diff --stat <base>` and `git status --short`. Read each untracked file: `git diff` does not show it.
+Read the issue with its criteria, with the Read command of `docs/agents/tracker.md`, or as `NO-SETUP.md` in the folder of the `setup-skills` skill says, and the spec with the testing decisions, when there is one. Run `git diff --stat <base>` and `git status --short`. Read each untracked file: `git diff` does not show it.
 
-Completion: the base resolves, the diff is not empty, you have the criteria, and you know each untracked file.
+Completion: the base resolves, the diff is not empty, you have the criteria when an issue exists, and you know each untracked file.
 
 ## 2. Run the checks
 
-Find the test, typecheck, lint and build commands in `package.json`, the README or `AGENTS.md`. Run the typecheck, the lint and the build. Run the test files that the diff adds or changes, and each test file that imports a module that the diff changes. Run the full suite when the caller asks for it, or when you run on your own. `final-review` runs the full suite once the phases are built, so each verify round skips it. Trust no earlier report.
+Find the test, typecheck, lint and build commands in `package.json`, the README or `AGENTS.md`. Run the typecheck, the lint and the build. Run the test files that the diff adds or changes, and each test file that imports a module that the diff changes. Run the full suite only when the caller asks for it, or when you run on your own. Trust no earlier report.
 
 Completion: each check passed or failed, each run has finished, and you have the output of each failure.
 
@@ -38,21 +38,22 @@ Completion: each check passed or failed, each run has finished, and you have the
 
 Read the diff once for each heading. Keep the two headings apart, so that one does not hide the other.
 
-**Spec**: does the diff do what the phase or ticket asks?
+**Spec**: does the diff do what the ticket asks?
 
 - Each criterion has code and a test that proves it.
 - Each test is at a seam from the spec's testing decisions. With no spec, each test is at a seam that the existing tests of the area use.
 - Each expected value comes from a literal, a worked example or the spec, not from the code's own logic.
-- The result can be checked from outside: through the UI, an API or a command. A phase or ticket that changes one layer only, such as storage with no UI, is not a vertical slice.
-- Behavior that the phase or ticket did not ask for is a judgment call.
+- The result can be checked from outside: through the UI, an API or a command. A ticket that changes one layer only, such as storage with no UI, is not a vertical slice.
+- Behavior that the ticket did not ask for is a judgment call.
 
-For `approach:refactor` work, the behavior must stay the same. Replace the first item and the vertical slice item with these: no expected value in an existing test changed, each test change follows a rename or a move, and each criterion is met in the structure of the code.
+For refactor work, the behavior must stay the same. Replace the first item and the vertical slice item with these: no expected value in an existing test changed, each test change follows a rename or a move, and each criterion is met in the structure of the code.
 
 **Standards**: does the diff follow the rules of the repo?
 
 - Find the written rules: `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `CODING_STANDARDS.md` and the ADRs for the area.
 - Then read `SMELLS.md` in the folder of this skill with the Read tool, and look for its smells. A written rule wins over a smell.
 - Skip what a linter or a formatter already enforces.
+- When the diff adds a dependency, compare its `engines` with the versions in the CI workflow and the deploy target.
 
 Completion: each criterion, each test and each written rule is checked, and you read each changed or new test file.
 
@@ -61,26 +62,27 @@ Completion: each criterion, each test and each written rule is checked, and you 
 A finding is hard when it is one of these:
 
 - A check from step 2 fails.
-- A criterion has no code, or no test proves it.
+- A criterion has no code, or no test proves it. A criterion that no agreed seam can test needs only the code.
 - A test is at a seam that the spec did not agree, or it is tautological.
 - The diff breaks a written rule of the repo.
+- A new dependency needs a runtime version that CI or the deploy target does not have.
 - The diff causes a defect that a user can see or that stores or sends wrong data, such as a false text, a lost value or a stale screen.
 - The work is not a vertical slice. This does not apply to refactor work.
 - Refactor work changed an expected value in an existing test.
 
+Defects that a user can see were filed as judgment calls in 7 sessions of one retro. So before you file a judgment call, answer the **user test** for it. When any answer is yes, the finding is hard:
+
+- Can a user see or hear it, in any state of the story: empty, at a limit, after an error, after a stop, pause or retry?
+- Does it store, show, export or send a wrong value, such as a wrong currency, total or count?
+- Does it lose what the user entered or chose, such as a filter, a toggle or an edit?
+- Does a screen fail with no message, or a dialog take no focus or have no way to close?
+- Does it write a secret, a token or personal data to a log?
+
+To answer, walk each story of the criteria through its edge states in the code: empty, one, at the limit, error, and an action in the middle of another one. A finding that only one edge state shows is still hard.
+
 Everything else is a judgment call. Keep the five that matter most.
 
-Completion: each finding is hard or a judgment call, and you have five judgment calls or fewer.
-
-## Excuses
-
-| Excuse | Answer |
-|---|---|
-| "A test of a class name is tautological, and I checked it in the browser." | Report the criterion as hard, with the browser evidence. The user decides. |
-| "The code diff reads clean." | Read each changed and new test file before you call the diff clean. |
-| "Check and lint passed earlier in this session." | Run each check again in this verify run. Edits since then can break it. |
-
-Add a row only when `/retro` finds a new excuse.
+Completion: each finding is hard or a judgment call, each judgment call passed the user test, and you have five judgment calls or fewer.
 
 ## Report
 
@@ -89,8 +91,10 @@ Add a row only when `/retro` finds a new excuse.
 - <file>:<line> · <rule or criterion> · <what is wrong>
 
 ## Judgment calls
-- <file>:<line> · <smell> · <fix in a few words>
+- <file>:<line> · <smell> · <fix in a few words> · user effect: none
 and <n> more
 ```
+
+"user effect: none" records that the finding passed the user test of step 4. When you cannot write it, the finding is hard.
 
 Print this block in each run, before the caller commits. Write "None" under a heading that has no findings. Write each finding on one line. Leave out the "and <n> more" line when you kept every judgment call.

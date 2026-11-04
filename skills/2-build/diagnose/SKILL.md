@@ -1,6 +1,6 @@
 ---
 name: diagnose
-description: "Find and fix the cause of a bug or a performance regression with a red feedback loop, ranked hypotheses and a regression test. Use when the user runs /diagnose, or /build runs approach:diagnose work."
+description: "Find and fix the cause of a bug or a performance regression with a red feedback loop, ranked hypotheses and a regression test. Use when the user runs /diagnose, or /build picks it."
 argument-hint: "<sentry link | error | issue>"
 metadata:
   credits:
@@ -14,7 +14,7 @@ metadata:
 
 `/diagnose` takes a bug from a symptom to one fix commit. The **loop** is the skill: one command that goes **red** on this bug and green when it is fixed. With a **tight** loop, the cause falls out of the steps that follow. With no loop, reading code gives only a guess.
 
-When `/build` runs this skill for an `approach:diagnose` phase or ticket, skip the steps marked "(not under `/build`)". `/build` owns them.
+When `/build` runs this skill, skip the steps marked "(not under `/build`)". `/build` owns them.
 
 When you stop, put the symptom and the path of each attachment in the stop message, so that the next run needs no new input from the user.
 
@@ -56,6 +56,8 @@ For a bug that does not occur each time, raise the rate: run the trigger many ti
 When the loop or the suite needs a workaround for a fault outside the bug, such as an env var that breaks the test setup, file the fault once. Call the Skill tool with `issue`, when no open issue names the fault. Name the workaround and the issue in the report.
 
 When you cannot build a loop, stop. List what you tried. Ask the user for access to an environment that shows the bug, a captured artifact, or approval for temporary instrumentation in production.
+
+When the loop needs production facts, ask for all of them in one message. Write each query against the schema of the deployed branch, and offer temporary instrumentation in the same question.
 
 Completion: you read the glossary and the ADRs for the area. You have one command, and you ran it at least once. It is:
 
@@ -118,11 +120,11 @@ Completion: the loop is green, and the regression test passes, or the missing se
 
 Completion: `git grep` finds no debug prefix, the loop is green, and no throwaway file is left in the repo.
 
-## 9. Verify (not under `/build`)
+## 9. Check (not under `/build`)
 
-Start a subagent with a fresh context. Tell it to call the Skill tool with `verify`, with the bug issue, the base `git merge-base origin/<trunk> HEAD`, and a request for the full suite. The base also covers work that is not committed. Fix only the hard findings, commit, and run `verify` in a new subagent one more time. When a hard finding is still there, stop and show the findings. Each judgment call goes on the card.
+Run the typecheck, the lint, and the tests that the fix adds or touches. `/ship` runs the one cold read and the full check.
 
-Completion: the last `verify` run has no hard finding.
+Completion: each check passed after the last change.
 
 ## 10. Card (not under `/build`)
 
@@ -134,22 +136,19 @@ Cause: <the confirmed hypothesis, in one sentence, or "cause not confirmed" and 
 Fix: <one sentence>
 Test: <test name> | Missing seam: <why>
 
-Judgment calls:
-- <one line each, from verify>
-
 Check yourself: `<run command>`
 1. <a step and what the user sees>
 ```
 
 Keep "Check yourself" to three steps or fewer. The card has only these parts. A finding outside the fix goes in the report, as an issue filed with `issue`.
 
-Ask with the question tool: "Approve", "Change" or "Run ui-check". Leave out "Run ui-check" when it already ran on the fix. On Run ui-check, call the Skill tool with `ui-check` for this bug, then ask again with "Approve" or "Change". On Change, make the edits, commit, run `verify` in a new subagent, and show the card again. When Change comes with no notes, ask in the chat what to change. A free-text answer that clearly approves counts as Approve. Only for a free-text answer, start the reply with: "Taking that as Approve." When the question returns no answer, ask it again before any other action.
+Ask with the question tool: "Approve", "Change" or "Run ui-check". Leave out "Run ui-check" when it already ran on the fix. On Run ui-check, call the Skill tool with `ui-check` for this bug, then ask again with "Approve" or "Change". On Change, make the edits, commit, run the checks of step 9, and show the card again. When Change comes with no notes, ask in the chat what to change. A free-text answer that clearly approves counts as Approve. Only for a free-text answer, start the reply with: "Taking that as Approve." When the question returns no answer, ask it again before any other action.
 
 Completion: the card is in the chat above the question, and the user approved. Stop the dev server, and close the tab as `ui-check` says, when `ui-check` started them.
 
 ## 11. Record
 
-Squash the branch into one commit, except under `/build`, which squashes when it lands the phase, and except for work that `NO-SETUP.md` keeps uncommitted. Run `git merge-base HEAD origin/<trunk>`, then `git reset --soft <base>`. Commit with `-m "Fix <title> (#<n>)"`, then `-m "Cause: <the confirmed hypothesis>"`.
+Squash the branch into one commit, except under `/build`, which squashes when it lands the ticket, and except for work that `NO-SETUP.md` keeps uncommitted. Run `git merge-base HEAD origin/<trunk>`, then `git reset --soft <base>`. Commit with `-m "Fix <title> (#<n>)"`, then `-m "Cause: <the confirmed hypothesis>"`. When the cause is not confirmed, the title is `Instrument <symptom> (#<n>)`, and the second paragraph names the check that confirms it.
 
 Comment on the issue, as `tracker.md` says: the cause, the loop command, and the missing seam when there is one. When the loop is a harness, put its text, redacted, in the comment, then delete the harness.
 
@@ -158,16 +157,6 @@ Completion: the branch has one commit over the trunk, or `/build` runs this skil
 ## Redact
 
 Redact each secret in each command, output and artifact that you show: write `<REDACTED>` in its place. Print no value from an env file, because one pattern can also match a production line. To see which variables exist, list the names only: `grep -oE '^[A-Z_]+=' <file>`. Take the dev database name and user from the provision output. Build loops that read credentials from environment variables. Quote only the lines of a captured artifact that carry the signal. When the redacted output is not enough to find the cause, say so and ask the user.
-
-## Excuses
-
-| Excuse | Answer |
-|---|---|
-| "The setup is missing, so I make the worktree by hand." | Call the `worktree` skill. When it reports blocked, follow `NO-SETUP.md`. |
-| "The question options describe the fix." | The user approves the card. Write it in the message first. |
-| "I only need the local URL, so I grep the .env." | The grep also matches the production line. Print names only. |
-
-Add a row only when `/retro` finds a new excuse.
 
 ## Report
 

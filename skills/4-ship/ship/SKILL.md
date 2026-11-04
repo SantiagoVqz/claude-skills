@@ -1,88 +1,90 @@
 ---
 name: ship
-description: "Open the PR for a reviewed spec or lone ticket, or a fixed bug: rebase on the trunk, write the body, open the PR, and wait for CI to pass."
+description: "Open the PR for a built branch: rebase on the trunk, check the hard stops, run one cold read of the whole diff, write the body, open the PR, and wait for CI to pass."
 disable-model-invocation: true
-argument-hint: "[spec | issue]"
+argument-hint: "[issue]"
 ---
 
 # Ship
 
-`/ship` turns a reviewed branch into one PR that the team can read. It reviews nothing: `/build` closes with `final-review`, and CI runs the checks. It ends with the PR open and ready for review, CI finished, and a short summary for the user. The merge is always the user's, with rebase and merge, so that each phase stays one commit on the trunk.
+`/ship` turns a built branch into one PR that the team can read. It runs the one cold read of the whole diff and the one full check of the code. It works on any branch with commits, with no earlier skill needed. It ends with the PR open, CI finished, and a short summary for the user. The merge is always the user's, with the method that step 1 finds.
 
-After `EnterWorktree`, run one plain shell command per call, from the worktree root, on paths in the worktree. For a subfolder, use a flag such as `pnpm --dir` or `uv --directory`, because a `cd` stays in effect for the rest of the session. Change a file with the Edit tool, and make a new file with the Write tool. Quote each argument that holds `*`, `[` or `]`. The guard refuses only some other forms, such as a `&&` chain, `$(...)` or a heredoc, so a command that ran is no proof that its form is safe.
+In a worktree, follow the shell rules of the `build` skill.
 
 ## 1. Load
 
-Read the `## Agent skills` block in `AGENTS.md`, then `docs/agents/tracker.md`. When the block is missing, tell the user to run `/setup-skills`, and stop.
+Read the `## Agent skills` block in `AGENTS.md`, then `docs/agents/tracker.md`. When the block is missing, read `NO-SETUP.md` in the folder of the `setup-skills` skill, and go on with its sources.
 
-Find the target from the argument, or from the current branch:
+The target is the argument, or the number in the current branch name. A branch with no number has no issue. Go to the worktree that has the branch, when one does. When `git status` shows changes, stop and ask whether they belong in this PR.
 
-- **Spec**: an issue with the `spec` label, and its branch `spec/<n>-<slug>`.
-- **Lone ticket**: an issue with an `approach:` label and no parent, with its branch `fix/<n>-<slug>`.
-- **Bug**: an issue with the `bug` label, with its branch `fix/<n>-<slug>` from `/diagnose`.
+Find the **merge method**. Search `docs/adr/` for "merge commit", and read `gh repo view --json rebaseMergeAllowed,mergeCommitAllowed`. An ADR that needs merge commits wins. Otherwise use rebase and merge when the repo allows it, and a merge commit when it does not.
 
-Completion: you have the issue, its branch and the trunk, as the `worktree` skill finds it.
+Completion: you have the branch, its issue when it has one, the trunk, as the `worktree` skill finds it, and the merge method.
 
-## 2. Gate
+## 2. Rebase
 
-For a spec or a lone ticket, read the latest comment on the issue that starts with `### Review of #<n>`.
+Run `git fetch origin`, then `git rebase origin/<trunk>`. On a conflict, call the Skill tool with `resolve-conflicts`.
 
-- **A phase has no commit**: stop. Find the phases as `final-review` does. The next step is `/build <n>`, which resumes.
-- **No review comment**: stop. The next step is `/build <n>`, which resumes at the review.
-- **The branch head is not the reviewed commit**: stop. A commit came after the review. The next step is `/final-review <n>`.
+Completion: the branch is on the latest trunk.
 
-A bug needs no review comment: `/diagnose` ran `verify` on the fix.
+## 3. Hard stops
 
-Completion: the branch head is the reviewed commit, or the target is a bug that passed `verify`.
+Run `hardstop-check.sh origin/<trunk>`, from the folder of this skill, in the root of the branch. It refuses a diff that holds a migration, a backfill, or auth or permission code when a commit says `Hard stops: none`.
 
-## 3. Rebase
+When it refuses, show its lines, and ask with the question tool: "Override", with a reason that goes in the PR body, or "Stop".
 
-Call `EnterWorktree` with the path of the worktree that has the branch. When the current directory is already that worktree, skip the call. Run `git fetch origin`, then `git rebase origin/<trunk>`.
+Completion: the check passed, or the user gave the override reason.
 
-- **Clean**: go to step 4. The review still counts.
-- **Conflict**: call the Skill tool with `resolve-conflicts`. Then run `verify` in a subagent with a fresh context, with the issue and the diff `origin/<trunk>...HEAD`. A hard finding stops `/ship`. CI runs every check on the resolved code, so the review still counts.
+## 4. Cold read
 
-Completion: the branch is on the latest trunk, and each conflict is resolved, or `/ship` stopped.
+Start a subagent with a fresh context. Tell it to call the Skill tool with `verify`, with the issue, its criteria, and the diff `origin/<trunk>...HEAD`. Give it the shell rules, and no list of checks to skip. It needs only the conclusions, so keep the diff out of this context.
 
-## 4. Checks without CI
+Fix each hard finding in this session, squash the fix into the commit, and run a new subagent. Run three cold reads or fewer. When a hard finding remains, stop and show it. The user fixes it, or overrides it with a reason that goes in the PR body. Judgment calls go in the report, and change nothing.
 
-Run `git ls-files .github/workflows`. When the output is not empty, skip this step: CI runs the checks on the PR in step 7.
+Completion: the last cold read has no hard finding, or the user gave each override reason.
 
-With no CI, run the full suite, the typecheck, the lint and the build here, because nothing else runs them on the rebased code. When the repo has no script for a check, skip that check and name it in the report. A failure stops `/ship`. Show its output.
+## 5. Full checks
 
-Completion: the repo has CI, or every check passes.
+A workflow file is no proof that CI runs on this PR. Some repos have workflows that run only on `main` while the trunk is `develop`. Read the `on:` block of each file that `git ls-files .github/workflows` lists. **CI covers the PR** when a workflow has `pull_request` or `pull_request_target`, and its `branches` is missing or matches `<trunk>`, and its `branches-ignore` does not match `<trunk>`.
 
-## 5. Write the body
+When CI covers the PR, skip the rest of this step. Otherwise start a subagent to run the full suite, the typecheck, the lint and the build, once, under the shell rules. Wait for its result, so that no check still runs when the user merges. When the repo has no script for a check, skip that check and name it in the report. A failure in the code of the branch stops `/ship`. Show its output.
+
+Completion: CI covers the PR, or every check passed.
+
+## 6. Write the body
 
 Call the Skill tool with `pr` to write the body. Give it:
 
-- **The title**: the title of the spec or the issue.
-- **The evidence**: for a spec or a lone ticket, the story list and the Verified lines of the review comment, and its link. For a bug, the regression test.
-- **The closing line**: `Closes #<n>`.
-- **The merge line**: `Merge with rebase and merge.`
+- **The title**: the title of the issue, or the subject of the commit.
+- **The evidence**: the `<criterion> · <test>` lines of the commit message, the result of the cold read and each override reason. For a bug, the regression test.
+- **The closing line**: `Closes #<n>`, or `Refs #<n>` for a bug whose cause is not confirmed. A branch with no issue has no closing line.
+- **The merge line**: `Merge with <merge method>.`
 
 Completion: you have the title and a body with each of these parts.
 
-## 6. Open
+## 7. Open
 
 Run `git push --force-with-lease origin <branch>`. Write the body to a file in the worktree root. Run `gh pr create --base <trunk> --head <branch> --title "<title>" --body-file <file>`. When the branch already has an open PR, run `gh pr edit <pr> --body-file <file>` in its place. Then delete the file.
 
 Completion: the PR is open, ready for review, and `git status` is clean.
 
-## 7. Watch CI
+## 8. Watch CI
 
-Run `git ls-files .github/workflows`. Skip this step when the output is empty.
+Skip this step when step 5 found that CI does not cover the PR.
 
-Run `gh pr checks <pr> --watch` in the background, and wait for it to end. When a check fails, show the job name and the end of `gh run view <run> --log-failed`. Fix nothing. A fix is a commit after the review, so the user decides how to fix it.
+Run `gh pr checks <pr> --watch` in the background, and wait for it to end. It can exit non-zero when every check passed, so read the result with `gh pr checks <pr>` each time it ends.
 
-Completion: each check passed, or you showed each failure.
+- **A check failed**: show the job name and the end of `gh run view <run> --log-failed`. Fix nothing, because the user decides how to fix it.
+- **No check was reported**: CI did not start, for example because of a `paths` filter. Run the checks of step 5, and name the gap in the report.
+
+Completion: each check passed, or you showed each failure, or the checks of step 5 ran because CI did not start.
 
 ## Report
 
 Start with a short summary, three lines or fewer. Do not show the PR body.
 
 ```markdown
-- <what changed> · because <why, from the spec's problem or the bug's cause>
+- <what changed> · because <why, from the issue's problem or the bug's cause>
 ```
 
-Then: PR URL · spec, lone ticket or bug · CI result · next step: merge with rebase and merge, then `/cleanup`.
+Then: PR URL · hard-stop check · cold read result, with each judgment call · CI result, or `no CI on PRs to <trunk>` with where the checks ran · next step: merge with <merge method>, then `/cleanup`.

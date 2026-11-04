@@ -4,7 +4,9 @@ Read this file when the Claude in Chrome extension is not connected and `ui-chec
 
 ## Start
 
-Each session runs its own DevTools server with `--isolated`, so its Chrome has a fresh profile that no other session shares. The browser starts signed out: step 2 of `ui-check` covers the sign-in.
+Each session runs its own DevTools server with `--isolated`, so its Chrome has a fresh profile that no other session shares. The browser starts signed out: step 2 of `ui-check` covers the sign-in. The profile and its sign-in last only as long as that Chrome, because `--isolated` deletes the profile when the browser closes.
+
+Call `list_pages` before each walk. Use an open page when one exists. When a tool answers "No page found" or says that the browser restarted, call `list_pages` again and open a new page. Tell the user once when the sign-in is gone.
 
 When a tool answers "The browser is already running", the server is not isolated, and another session owns that Chrome. Leave that Chrome alone, because the other session's check runs in it. Ask one question with the question tool: "Connect the extension" or "Skip the browser check". Tell the user to start the server with `--isolated`, as the Install section of the README says.
 
@@ -21,4 +23,4 @@ The DevTools tools have no batch. A step that clicks starts with one `take_snaps
 
 ## Close
 
-Close each page that you opened with `close_page`. DevTools cannot close the last open page: navigate it to `about:blank`. The isolated Chrome closes with the session.
+While the review can still ask for another walk, keep one page open, so that the sign-in stays for the next walk. At the end, close each page that you opened with `close_page`. DevTools cannot close the last open page: navigate it to `about:blank`. The isolated Chrome closes with the session.

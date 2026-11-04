@@ -22,7 +22,7 @@ Use this template for writing the PR body:
 
 ## Evidence
 
-<spec: one line per story, then the review link>
+<ticket: one line per criterion, then the cold read result>
 <fix: the regression test, before and after>
 
 ## Merge Danger
@@ -169,8 +169,7 @@ You may use one of these, you may use several, it is unlikely you will use all o
 
 Concrete evidence that the change works, as text. Pick the shape:
 
-- **Spec PR**: one line for each user story: `<n>. <story> · <test name> · ✓ <what the walk saw>`. Then the link to the review comment.
-- **Issue PR**, for a ticket that ships alone: one line for each acceptance criterion: `<n>. <criterion> · <test name> · ✓ <what you saw>`.
+- **Ticket PR**: one line for each criterion: `<criterion> · <test name, or what you saw>`. Then the result of the cold read.
 - **Fix PR**: **Before:** the regression test fails, with its failure message. **After:** it passes. Show the test as pseudocode.
 
 ### Merge Danger

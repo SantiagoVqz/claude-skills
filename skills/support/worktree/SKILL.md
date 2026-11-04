@@ -1,20 +1,19 @@
 ---
 name: worktree
-description: "Make, provision or remove the linked worktree for a spec or fix branch, with its databases. Use before code work starts on a branch, before you add a migration, and to tear a worktree down after its merge."
+description: "Make, provision or remove the linked worktree for a branch, with its databases. Use before code work starts on a branch, before you add a migration, and to tear a worktree down after its merge."
 ---
 
 # Worktree
 
-Code work runs in a linked worktree. The primary checkout stays on the trunk. This skill reads git facts only, so a worktree made by this skill, by `git worktree add` or by another tool resolves the same way.
+A linked worktree gives a branch its own folder and databases. `/build` uses one when the primary checkout is busy or the plan has a migration. This skill reads git facts only, so a worktree made by this skill, by `git worktree add` or by another tool resolves the same way.
 
 ## Branches
 
 | Branch | Made from | Dev database |
 |---|---|---|
-| `spec/<n>-<slug>` | the trunk | its own fork |
 | `fix/<n>-<slug>` | the trunk | its own fork |
 
-`/build` makes a `spec/` branch for a spec, and a `fix/` branch for a lone ticket. `/diagnose` makes a `fix/` branch for a bug.
+`/build` and `/diagnose` make `fix/` branches.
 
 Each worktree also has its own test database. `scripts/provision.sh` applies these rules.
 
@@ -35,20 +34,13 @@ Completion: the session is in the worktree, and the end of the `provision.sh` ou
 
 Run this from the primary checkout after the branch is merged into the trunk.
 
-1. Call `EnterWorktree` with the worktree path, and skip the call when the session is already there. Run `scripts/provision.sh drop`. The script drops the test database and the dev fork. Then call `ExitWorktree` with `keep` to go back to the primary checkout.
-2. `git worktree remove <path>`. When it refuses because of uncommitted or untracked files, stop and show them. Keep the files: no `--force`.
+1. Call `EnterWorktree` with the worktree path, and skip the call when the session is already there. Run `scripts/provision.sh drop`. The script drops the test database and the dev fork. Then call `ExitWorktree` with `keep` to go back to the primary checkout. When the drop fails, show the end of its output and stop. When the user drops the databases by hand, list the databases to confirm that each is gone, and remove any container that the failed drop created.
+2. `git worktree remove <path>`. When it refuses because of uncommitted or untracked files, stop and show them. Keep the files: no `--force`. The exception is an `xcuserdata/` folder, which holds only Xcode's window state: delete it, and remove the worktree again.
 3. `git branch -D <branch>`.
 4. `git worktree prune`, for the records of worktrees whose folder is gone.
+5. In a repo with a `.xcodeproj` or a `.xcworkspace`, delete each folder of `~/Library/Developer/Xcode/DerivedData` that belongs to the worktree, because Xcode keeps one for each path. Read its path with `plutil -extract WorkspacePath raw <folder>/info.plist`.
 
-Completion: `git worktree list` does not show the path, and the branch is gone.
-
-## Excuses
-
-| Excuse | Answer |
-|---|---|
-| "The change is frontend only, so I can copy the `.env` files." | A copied `.env` points at the shared dev database, and a browser check later needs the API and the database. Stop, and tell the user to run `/setup-skills`. |
-
-Add a row only when `/retro` finds a new excuse.
+Completion: `git worktree list` does not show the path, the branch is gone, and no DerivedData folder names the path.
 
 ## Report
 
