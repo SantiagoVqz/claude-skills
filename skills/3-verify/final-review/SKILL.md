@@ -124,6 +124,8 @@ When a cleanup is marked Later, call the Skill tool with `issue` to file all of 
 
 Post the card as a comment on the issue, as `tracker.md` says. Its first line is `### Review of #<n> · <full commit hash of HEAD>`. `/ship` finds the comment by this line, and stops when the head moved after it. Put "Cleanup later: #<n>" under the card when you filed the ticket. Under the card, add the full story list in a `<details>` block, one line each: `<n>. <story> · phase <k> · <test name>`. `/ship` takes it as the PR evidence.
 
+In a repo with a `.xcodeproj` or a `.xcworkspace`, shut down the simulators as step 4 of `/cleanup` says, because the user can wait days to merge.
+
 When the walk ran, stop the dev server, and close the tab as `ui-check` says.
 
 Completion: the comment is on the issue, and no dev server from this review runs.

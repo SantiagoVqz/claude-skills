@@ -40,7 +40,9 @@ Completion: each issue is in the state that the closing line gives, and you know
 
 Stop each dev server and background task that runs from the worktree. Check the background tasks of this session, and each process whose working directory is in the worktree: `lsof -d cwd` lists them. A task can survive a `/clear`, so look also when you think this session started none.
 
-Completion: no process has its working directory in the worktree.
+In a repo with a `.xcodeproj` or a `.xcworkspace`, also shut down the simulators, because their working directory is not in the worktree. When `pgrep xcodebuild` finds no other build, run `xcrun simctl shutdown all`, then `xcrun simctl --set testing shutdown all`. The second one fails harmlessly when no test clone exists.
+
+Completion: no process has its working directory in the worktree, and no simulator is booted unless another build uses it.
 
 ## 5. Worktree
 
