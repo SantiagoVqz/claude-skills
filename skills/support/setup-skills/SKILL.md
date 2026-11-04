@@ -20,6 +20,7 @@ Read the repo's current state:
 - `docs/adr/`: each ADR that sets a rule for worktrees, provisioning or the tracker.
 - `gh label list`: labels that already exist.
 - What a new worktree lacks: gitignored `.env` files (`git ls-files --others --ignored --exclude-standard`), a lockfile, a database URL in an env file. When the repo has none of these, it needs no provisioning.
+- A `.xcodeproj` or a `.xcworkspace`: the repo is an Xcode repo.
 - `scripts/provision.sh` and `.claude/hooks/provision-worktree.sh`: files from an earlier run, or the repo's own script.
 
 Then send one line: the tracker, and each conflict between the repo and the files that this skill writes.
@@ -76,9 +77,11 @@ Code work runs in a linked worktree under `.claude/worktrees/`. The primary chec
 
 **Worktrees.** When the repo needs provisioning, install it with [PROVISIONING.md](PROVISIONING.md). Add `.claude/worktrees/` to `.gitignore` in every repo.
 
+**Xcode.** In an Xcode repo, follow [XCODE.md](XCODE.md).
+
 Leave the changes uncommitted. The user commits them.
 
-Completion: both docs files exist, `gh label list` shows every label from the table, `AGENTS.md` has exactly one `## Agent skills` block, `CLAUDE.md` loads `@AGENTS.md`, and the provisioning check in `PROVISIONING.md` passed, or the repo needs no provisioning.
+Completion: both docs files exist, `gh label list` shows every label from the table, `AGENTS.md` has exactly one `## Agent skills` block, `CLAUDE.md` loads `@AGENTS.md`, and the provisioning check in `PROVISIONING.md` passed, or the repo needs no provisioning. An Xcode repo meets the completion of `XCODE.md`.
 
 ## Excuses
 
