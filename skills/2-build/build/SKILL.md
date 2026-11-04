@@ -41,6 +41,7 @@ Then check:
 
 - **Blocked**: an issue in `blockedBy` is open. Stop, and name it.
 - **Assigned to someone else**: ask with the question tool: "Take over" or "Stop". On Take over, assign the issue to the user.
+- **Sibling at work**: for a child spec, look for an open `origin/spec/` branch of a sibling spec. When `git diff --name-only origin/<trunk>...<sibling branch>` names a migration or a screen that this spec also changes, tell the user in one line, and go on.
 - **Approach skill missing**: the approach skill has the name of the approach value, so `approach:tdd` runs `tdd`. When the skill of a phase is not installed, stop, and name it.
 
 Set the issue to in progress, as `tracker.md` says.

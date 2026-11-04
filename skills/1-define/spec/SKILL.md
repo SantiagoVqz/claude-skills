@@ -50,7 +50,7 @@ A **spec** is one feature that a user can demo, and one PR that a reviewer reads
 - **One spec**: the estimate fits. Go to step 5 with one spec.
 - **Project**: the estimate does not fit. Cut the stories into 2 to 5 child specs.
 
-Cut a project by user value, never by layer. Each child spec is a vertical slice that works end to end, and ships alone with its own stories. The first child spec that needs a schema change takes the change, with the first behavior that uses it. A child spec that needs another to merge first is blocked by it. Name only a spec that truly gates it.
+Cut a project by user value, never by layer. Each child spec is a vertical slice that works end to end, and ships alone with its own stories. The first child spec that needs a schema change takes the change, with the first behavior that uses it. A child spec that needs another to merge first is blocked by it. Name only a spec that truly gates it. Two child specs gate each other when both add a migration, or both change one screen: put them in order, because built at the same time they collide at each rebase.
 
 Completion: you have one spec, or 2 to 5 child specs with their stories and blocking edges.
 
@@ -79,7 +79,7 @@ For a project, the list has the problem, out of scope and seams once, then one b
 
 ```markdown
 - <ref>. <title> · blocked by: <refs, or none>
-  Stories: <count>, <a title of a few words for each> · Schema: <each migration, or none> · Domain: <each term and ADR, or none>
+  Stories: <count>, <a title of a few words for each> · Screens: <each screen, or none> · Schema: <each migration, or none> · Domain: <each term and ADR, or none>
 ```
 
 The issue has the full text. Ask with the question tool: "Approve" or "Change". On Change, apply the edits, show the list again and ask again.
