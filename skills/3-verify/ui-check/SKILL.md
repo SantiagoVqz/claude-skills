@@ -1,6 +1,6 @@
 ---
 name: ui-check
-description: "Drive the app in a browser to check a change, then give the user a short list of what passed and what to check by hand. Use when the user runs /ui-check, or final-review walks the stories."
+description: "Drive the app in a browser or an iOS simulator to check a change, then give the user a short list of what passed and what to check by hand. Use when the user runs /ui-check, or final-review walks the stories."
 argument-hint: "[issue | what to check]"
 ---
 
@@ -27,6 +27,8 @@ Read the run section of the README or `AGENTS.md`, and start each service that t
 Check that the dev database holds the rows that the flow needs. Take the database name and the user from the provision output of the worktree. Print no value from an env file, because a line such as `PROD_DATABASE_URL` holds a password. To see which variables exist, list the names only: `grep -oE '^[A-Z_]+=' <file>`.
 
 When rows are missing and the database is a worktree fork, with a branch suffix such as `<app>_<branch>`, make the fewest rows that the flow needs, and ask no question, because the fork is disposable. Use the project's seed script or the API. When neither can make the rows, use SQL in the fork: read `\d <table>` first, and give each row the timestamps that the list orders by. Restore each row that you change for one step, such as a role or a module flag. For any other database, ask the user first. The report names the rows that you made and the rows that you restored.
+
+For a native iOS app, read [SIMULATOR.md](SIMULATOR.md) and follow it in place of the server and browser parts of this step.
 
 Load the Claude in Chrome tools and `browser_batch` in one ToolSearch call, and open a new tab. When the extension is not connected, ask once in this session with the question tool: "Connect the extension" or "Use DevTools". The extension uses the user's Chrome, so it keeps their sign-ins. DevTools starts signed out. On "Connect the extension", load the tools again. On "Use DevTools", or when the extension still does not connect, use the Chrome DevTools tools, and read [DEVTOOLS.md](DEVTOOLS.md) first.
 

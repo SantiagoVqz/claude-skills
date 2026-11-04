@@ -109,9 +109,9 @@ Check yourself at <URL, or with `<run command>` before the walk>:
 
 List under "Stories" only the stories that went out of scope. Leave out "Environment fixes" when step 4 had none, "Fixed in review" when step 6 was skipped, "Verified" until the walk ran, and "Cleanup" when it is empty. Keep "Check yourself" to three steps or fewer. The card has only these parts.
 
-Ask with the question tool: "Approve", "Change" or "Walk in browser". Offer "Walk in browser" only when a story in scope has a screen and no walk ran on this commit.
+Ask with the question tool: "Approve", "Change" or "Walk in browser". For a native iOS app, the third option is "Walk on simulator". Offer it only when a story in scope has a screen and no walk ran on this commit.
 
-- **Walk in browser**: call the Skill tool with `ui-check`. Give it the stories in scope as the flow, one step for each story. It leaves the dev server and the tab open, so the user can look while the question waits. A failed step is a blocking gap: go to step 6 with no question. Then show the card again with its Verified lines, and ask again.
+- **Walk in browser** or **Walk on simulator**: call the Skill tool with `ui-check`. Give it the stories in scope as the flow, one step for each story. It leaves the dev server and the tab open, so the user can look while the question waits. A failed step is a blocking gap: go to step 6 with no question. Then show the card again with its Verified lines, and ask again.
 - **Change**: each note from the user is a change to make, such as a design tweak, or a new action for a cleanup. A change goes to step 6, with an implementer and `verify`, also when it touches only CI or config. Then show the card again and ask again. When Change comes with no notes, ask in the chat what to change.
 
 A free-text answer that clearly approves counts as Approve. Only for a free-text answer, start the reply with: "Taking that as Approve." When the question returns no answer, ask it again before any other action.
