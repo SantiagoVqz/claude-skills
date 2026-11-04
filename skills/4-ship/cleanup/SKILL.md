@@ -21,7 +21,7 @@ Completion: you have the branch, its issue and the trunk.
 
 Run `gh pr list --head <branch> --state all --json number,url,state,body`.
 
-- **A merged PR**: go on. Read its merge commit with `gh pr view <pr> --json mergeCommit`. When that commit has two parents (`git cat-file -p <commit>` after a fetch), the PR merged with a merge commit, not rebase and merge. Name it in the report. Name the repo setting that blocks it, `gh repo edit --enable-merge-commit=false`, only when the trunk is not `develop` and no ADR in `docs/adr/` needs merge commits. A release flow from `develop` to `main` can need them.
+- **A merged PR**: go on. Read its merge commit with `gh pr view <pr> --json mergeCommit`. When that commit has two parents (`git cat-file -p <commit>` after a fetch), the PR merged with a merge commit. When the merge line of the PR body names another method, name the difference in the report, and name the repo setting that blocks it, `gh repo edit --enable-merge-commit=false`.
 - **An open PR**: stop, and give its URL.
 - **No PR**: stop. The next step is `/ship`.
 
@@ -82,4 +82,4 @@ Add a row only when `/retro` finds a new excuse.
 
 ## Report
 
-PR · merge method, when it was not rebase and merge · issues closed by keyword, by hand, or left open for a partial ship · servers stopped · worktree removed · branches deleted · trunk head · migrations applied.
+PR · merge method, when it differs from the merge line of the PR · issues closed by keyword, by hand, or left open for a partial ship · servers stopped · worktree removed · branches deleted · trunk head · migrations applied.

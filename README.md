@@ -159,7 +159,7 @@ It reviews nothing. `/build` closed with the review, and CI runs the checks.
   4. It pushes and opens the PR, ready for review. You get a short summary of what changed and why, not the body.
   5. It waits for CI to pass. It reports a failure and fixes nothing.
 - **Output:** one PR with `Closes #<n>`.
-- **Next:** you merge with rebase and merge, so each phase stays one commit on the trunk. Then `/cleanup`.
+- **Next:** you merge with the method that `/ship` names: rebase and merge, so each phase stays one commit on the trunk, unless an ADR or the repo setting asks for a merge commit. Then `/cleanup`.
 
 ### `/cleanup [spec | issue]`
 

@@ -7,7 +7,7 @@ argument-hint: "[spec | issue]"
 
 # Ship
 
-`/ship` turns a reviewed branch into one PR that the team can read. It reviews nothing: `/build` closes with `final-review`, and CI runs the checks. It ends with the PR open and ready for review, CI finished, and a short summary for the user. The merge is always the user's, with rebase and merge, so that each phase stays one commit on the trunk.
+`/ship` turns a reviewed branch into one PR that the team can read. It reviews nothing: `/build` closes with `final-review`, and CI runs the checks. It ends with the PR open and ready for review, CI finished, and a short summary for the user. The merge is always the user's, with the method that step 1 finds.
 
 After `EnterWorktree`, run one plain shell command per call, from the worktree root, on paths in the worktree. For a subfolder, use a flag such as `pnpm --dir` or `uv --directory`, because a `cd` stays in effect for the rest of the session. Change a file with the Edit tool, and make a new file with the Write tool. Quote each argument that holds `*`, `[` or `]`. The guard refuses only some other forms, such as a `&&` chain, `$(...)` or a heredoc, so a command that ran is no proof that its form is safe.
 
@@ -21,7 +21,9 @@ Find the target from the argument, or from the current branch:
 - **Lone ticket**: an issue with an `approach:` label and no parent, with its branch `fix/<n>-<slug>`.
 - **Bug**: an issue with the `bug` label, with its branch `fix/<n>-<slug>` from `/diagnose`.
 
-Completion: you have the issue, its branch and the trunk, as the `worktree` skill finds it.
+Find the **merge method**. Search `docs/adr/` for "merge commit", and read `gh repo view --json rebaseMergeAllowed,mergeCommitAllowed`. An ADR that needs merge commits wins. Otherwise use rebase and merge when the repo allows it, so that each phase stays one commit on the trunk, and a merge commit when it does not.
+
+Completion: you have the issue, its branch, the trunk, as the `worktree` skill finds it, and the merge method.
 
 ## 2. Gate
 
@@ -61,7 +63,7 @@ Call the Skill tool with `pr` to write the body. Give it:
 - **The title**: the title of the spec or the issue.
 - **The evidence**: for a spec or a lone ticket, the story list and the Verified lines of the review comment, and its link. For a bug, the regression test.
 - **The closing line**: `Closes #<n>`.
-- **The merge line**: `Merge with rebase and merge.`
+- **The merge line**: `Merge with <merge method>.`
 
 Completion: you have the title and a body with each of these parts.
 
@@ -90,4 +92,4 @@ Start with a short summary, three lines or fewer. Do not show the PR body.
 - <what changed> · because <why, from the spec's problem or the bug's cause>
 ```
 
-Then: PR URL · spec, lone ticket or bug · CI result, or `no CI on PRs to <trunk>` with where the checks ran · next step: merge with rebase and merge, then `/cleanup`.
+Then: PR URL · spec, lone ticket or bug · CI result, or `no CI on PRs to <trunk>` with where the checks ran · next step: merge with <merge method>, then `/cleanup`.
