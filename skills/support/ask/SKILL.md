@@ -39,6 +39,7 @@ Go down the tree. The first match is the answer.
 A rebase or merge stops on a conflict ─────────► resolve-conflicts
 File or track work for later (idea, bug) ──────► /issue
 Branch has a merged PR ────────────────────────► /cleanup
+Branch has a draft PR ─────────────────────────► /ship
 Branch has an open PR ─────────────────────────► you merge, then /cleanup
 Something is broken (error, Sentry, bug) ──────► /diagnose
 fix/ branch with commits, no PR ───────────────► /ship
@@ -48,6 +49,7 @@ New idea or feature with stories to settle ────► /spec
 Research, look up or compare a topic ─────────► /research
 A design question that talk cannot settle ─────► prototype
 Stress-test a plan or decision ────────────────► interview
+Close a phase of built work ───────────────────► phase-done
 Check a diff ──────────────────────────────────► /verify
 Check a change in a browser ───────────────────► /ui-check
 Change structure, keep behavior ───────────────► refactor
@@ -87,8 +89,8 @@ Ticket:   you write it ──► /build ──► /ship ──► you merge ─�
 Bug:      /diagnose ──► /ship ──► you merge ──► /cleanup
 ```
 
-- Each `/build` works in your session, on one ticket: plan, one approval, build, scoped checks. A hard stop gets the full plan in that session.
+- Each `/build` works in your session, on one ticket: plan, one approval, build, then `phase-done` for each phase. A hard stop gets the full plan in that session.
 - `/build` picks `tdd`, `refactor` or `diagnose` from the work, or builds directly.
-- `/ship` runs the hard-stop check, the one cold read and the full check.
+- `/ship` runs the hard-stop check and pushes a draft PR. Then the one cold read runs while CI does the full check.
 - Every skill runs alone, with no earlier step. `/setup-skills` is optional.
 - Skills with no slash in this file are called by other skills. The user can also run them directly.
