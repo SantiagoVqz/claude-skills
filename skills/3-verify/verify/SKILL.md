@@ -68,9 +68,19 @@ A finding is hard when it is one of these:
 - The work is not a vertical slice. This does not apply to refactor work.
 - Refactor work changed an expected value in an existing test.
 
+Defects that a user can see were filed as judgment calls in 7 sessions of one retro, and `final-review` then made most of them blocking. So before you file a judgment call, answer the **user test** for it. When any answer is yes, the finding is hard:
+
+- Can a user see or hear it, in any state of the story: empty, at a limit, after an error, after a stop, pause or retry?
+- Does it store, show, export or send a wrong value, such as a wrong currency, total or count?
+- Does it lose what the user entered or chose, such as a filter, a toggle or an edit?
+- Does a screen fail with no message, or a dialog take no focus or have no way to close?
+- Does it write a secret, a token or personal data to a log?
+
+To answer, walk each story of the criteria through its edge states in the code: empty, one, at the limit, error, and an action in the middle of another one. A finding that only one edge state shows is still hard.
+
 Everything else is a judgment call. Keep the five that matter most.
 
-Completion: each finding is hard or a judgment call, and you have five judgment calls or fewer.
+Completion: each finding is hard or a judgment call, each judgment call passed the user test, and you have five judgment calls or fewer.
 
 ## Excuses
 
@@ -79,6 +89,9 @@ Completion: each finding is hard or a judgment call, and you have five judgment 
 | "A test of a class name is tautological, and I checked it in the browser." | Report the criterion as hard, with the browser evidence. The user decides. |
 | "The code diff reads clean." | Read each changed and new test file before you call the diff clean. |
 | "Check and lint passed earlier in this session." | Run each check again in this verify run. Edits since then can break it. |
+| "It is an edge case, so it is a judgment call." | A user meets edge cases. When the edge state shows a wrong screen or value, the finding is hard. |
+| "The review will catch it." | The review then needs a fix round. A defect that you found is hard now. |
+| "It is the design, not a bug." | A screen that fails with no message or a dialog with no close is a defect. Report it as hard, and the user can override it. |
 
 Add a row only when `/retro` finds a new excuse.
 
@@ -89,8 +102,10 @@ Add a row only when `/retro` finds a new excuse.
 - <file>:<line> · <rule or criterion> · <what is wrong>
 
 ## Judgment calls
-- <file>:<line> · <smell> · <fix in a few words>
+- <file>:<line> · <smell> · <fix in a few words> · user effect: none
 and <n> more
 ```
+
+"user effect: none" records that the finding passed the user test of step 4. When you cannot write it, the finding is hard.
 
 Print this block in each run, before the caller commits. Write "None" under a heading that has no findings. Write each finding on one line. Leave out the "and <n> more" line when you kept every judgment call.
