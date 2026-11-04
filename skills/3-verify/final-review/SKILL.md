@@ -14,7 +14,7 @@ After `EnterWorktree`, run one plain shell command per call, from the worktree r
 
 ## 1. Load
 
-Read the `## Agent skills` block in `AGENTS.md`, then `docs/agents/tracker.md`. When the block is missing, tell the user to run `/setup-skills`, and stop. Read the issue with its comments.
+Read the `## Agent skills` block in `AGENTS.md`, then `docs/agents/tracker.md`. When the block is missing, tell the user to run `/setup-skills`, and stop. After you read `tracker.md`, read the issue with its Read command. `gh` refuses `--comments` together with `--json`.
 
 The **stories in scope** are the numbered user stories of a spec, or the acceptance criteria of a lone ticket, which then count as its stories. Read the plan: the latest comment `### Plan of #<n>` of a spec, or the one phase of a lone ticket.
 

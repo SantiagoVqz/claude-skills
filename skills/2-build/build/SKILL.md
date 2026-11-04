@@ -27,7 +27,7 @@ The orchestrator follows the same rules after `EnterWorktree`.
 
 ## 1. Start
 
-Read the `## Agent skills` block in `AGENTS.md`, then `docs/agents/tracker.md`. When the block is missing, tell the user to run `/setup-skills`, and stop. When the argument is not an issue number or an issue URL, such as a few ideas in words, stop and tell the user to file it with `/issue` first. Read the issue with its comments.
+Read the `## Agent skills` block in `AGENTS.md`, then `docs/agents/tracker.md`. When the block is missing, tell the user to run `/setup-skills`, and stop. When the argument is not an issue number or an issue URL, such as a few ideas in words, stop and tell the user to file it with `/issue` first. After you read `tracker.md`, read the issue with its Read command. `gh` refuses `--comments` together with `--json`.
 
 Find the kind of issue:
 
@@ -51,7 +51,7 @@ Completion: the issue is in progress, assigned to the user, and has no open bloc
 
 Skip this step when the spec has a plan comment and no open ticket from before phases.
 
-Start the planner: a subagent with a fresh context. Its prompt has the spec issue number and this task: read [PLAN.md](PLAN.md) in the folder of this skill, the spec issue with its comments and sub-issues, the glossary and ADRs on the trunk, and the code in the area that the spec touches; then return the full plan in the Format of `PLAN.md`, and its Chat summary. Tell it:
+Start the planner: a subagent with a fresh context. Its prompt has the spec issue number and this task: read [PLAN.md](PLAN.md) in the folder of this skill, the spec issue with its comments and sub-issues, with the Read command of `docs/agents/tracker.md`, the glossary and ADRs on the trunk, and the code in the area that the spec touches; then return the full plan in the Format of `PLAN.md`, and its Chat summary. Tell it:
 
 - A phase that has a commit on `origin/spec/<n>-<slug>` stays as it is. Find them with `git log --format='%(trailers:key=Phase,valueonly)' origin/<trunk>..origin/spec/<n>-<slug>`, when that branch exists.
 - A closed ticket from before phases covers its stories. Each open ticket becomes the input of a phase.

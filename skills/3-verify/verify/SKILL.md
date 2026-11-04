@@ -24,7 +24,7 @@ Use the diff and the criteria that the caller gave: the criteria of a phase, or 
 - **Base**: the ref. With no ref, use `git merge-base origin/<trunk> HEAD`, because a local trunk can be ahead of the branch base.
 - **Diff**: `git diff <base>`. It includes the work that is not committed yet.
 
-Read the issue with its criteria, and the spec with the testing decisions, when there is one. Run `git diff --stat <base>` and `git status --short`. Read each untracked file: `git diff` does not show it.
+Read the issue with its criteria, with the Read command of `docs/agents/tracker.md`, and the spec with the testing decisions, when there is one. Run `git diff --stat <base>` and `git status --short`. Read each untracked file: `git diff` does not show it.
 
 Completion: the base resolves, the diff is not empty, you have the criteria, and you know each untracked file.
 
