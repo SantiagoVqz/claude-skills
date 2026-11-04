@@ -1,6 +1,6 @@
 # Simulator
 
-Read this file when the app is a native iOS app, so a repo with a `.xcodeproj` or a `.xcworkspace` and no web screen. It replaces the server and browser parts of step 2. The rest of `ui-check` stays the same.
+Read this file when the app is a native iOS app: the repo has a `.xcodeproj` or a `.xcworkspace`, and the app has no web screen. It replaces the server and browser parts of step 2. The rest of `ui-check` stays the same.
 
 ## Start
 
