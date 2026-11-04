@@ -40,17 +40,19 @@ Completion: the branch head is the reviewed commit, or the target is a bug that 
 Call `EnterWorktree` with the path of the worktree that has the branch. When the current directory is already that worktree, skip the call. Run `git fetch origin`, then `git rebase origin/<trunk>`.
 
 - **Clean**: go to step 4. The review still counts.
-- **Conflict**: call the Skill tool with `resolve-conflicts`. Then run `verify` in a subagent with a fresh context, with the issue and the diff `origin/<trunk>...HEAD`. A hard finding stops `/ship`. CI runs every check on the resolved code, so the review still counts.
+- **Conflict**: call the Skill tool with `resolve-conflicts`. Then run `verify` in a subagent with a fresh context, with the issue and the diff `origin/<trunk>...HEAD`. A hard finding stops `/ship`. CI or step 4 runs every check on the resolved code, so the review still counts.
 
 Completion: the branch is on the latest trunk, and each conflict is resolved, or `/ship` stopped.
 
 ## 4. Checks without CI
 
-Run `git ls-files .github/workflows`. When the output is not empty, skip this step: CI runs the checks on the PR in step 7.
+A workflow file is no proof that CI runs on this PR. Some repos have workflows that run only on `main` while the trunk is `develop`. Read the `on:` block of each file that `git ls-files .github/workflows` lists. **CI covers the PR** when a workflow has `pull_request` or `pull_request_target`, and its `branches` is missing or matches `<trunk>`, and its `branches-ignore` does not match `<trunk>`.
 
-With no CI, run the full suite, the typecheck, the lint and the build here, because nothing else runs them on the rebased code. When the repo has no script for a check, skip that check and name it in the report. A failure stops `/ship`. Show its output.
+- **CI covers the PR**: skip this step. CI runs the checks on the PR in step 7.
+- **CI does not cover the PR, and the branch head is the reviewed commit**: skip this step. The checks of `final-review` ran on this exact code. Name the gap in the report.
+- **Any other case**: start a subagent to run the full suite, the typecheck, the lint and the build, in the foreground, because nothing else runs them on the rebased code. Wait for its result before step 5, so that no check still runs when the user merges. When the repo has no script for a check, skip that check and name it in the report. A failure stops `/ship`. Show its output.
 
-Completion: the repo has CI, or every check passes.
+Completion: CI covers the PR, or the head is the reviewed commit, or every check passes.
 
 ## 5. Write the body
 
@@ -71,11 +73,14 @@ Completion: the PR is open, ready for review, and `git status` is clean.
 
 ## 7. Watch CI
 
-Run `git ls-files .github/workflows`. Skip this step when the output is empty.
+Skip this step when step 4 found that CI does not cover the PR.
 
-Run `gh pr checks <pr> --watch` in the background, and wait for it to end. When a check fails, show the job name and the end of `gh run view <run> --log-failed`. Fix nothing. A fix is a commit after the review, so the user decides how to fix it.
+Run `gh pr checks <pr> --watch` in the background, and wait for it to end. It can exit non-zero when every check passed, so read the result with `gh pr checks <pr>` each time it ends.
 
-Completion: each check passed, or you showed each failure.
+- **A check failed**: show the job name and the end of `gh run view <run> --log-failed`. Fix nothing. A fix is a commit after the review, so the user decides how to fix it.
+- **No check was reported**: CI did not start, for example because of a `paths` filter. Run the checks of step 4, and name the gap in the report.
+
+Completion: each check passed, or you showed each failure, or the checks of step 4 ran because CI did not start.
 
 ## Report
 
@@ -85,4 +90,4 @@ Start with a short summary, three lines or fewer. Do not show the PR body.
 - <what changed> · because <why, from the spec's problem or the bug's cause>
 ```
 
-Then: PR URL · spec, lone ticket or bug · CI result · next step: merge with rebase and merge, then `/cleanup`.
+Then: PR URL · spec, lone ticket or bug · CI result, or `no CI on PRs to <trunk>` with where the checks ran · next step: merge with rebase and merge, then `/cleanup`.
