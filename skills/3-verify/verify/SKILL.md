@@ -53,6 +53,7 @@ For `approach:refactor` work, the behavior must stay the same. Replace the first
 - Find the written rules: `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `CODING_STANDARDS.md` and the ADRs for the area.
 - Then read `SMELLS.md` in the folder of this skill with the Read tool, and look for its smells. A written rule wins over a smell.
 - Skip what a linter or a formatter already enforces.
+- When the diff adds a dependency, compare its `engines` with the versions in the CI workflow and the deploy target.
 
 Completion: each criterion, each test and each written rule is checked, and you read each changed or new test file.
 
@@ -64,6 +65,7 @@ A finding is hard when it is one of these:
 - A criterion has no code, or no test proves it. A criterion under `Check at review:` needs only the code.
 - A test is at a seam that the spec did not agree, or it is tautological.
 - The diff breaks a written rule of the repo.
+- A new dependency needs a runtime version that CI or the deploy target does not have.
 - The diff causes a defect that a user can see or that stores or sends wrong data, such as a false text, a lost value or a stale screen.
 - The work is not a vertical slice. This does not apply to refactor work.
 - Refactor work changed an expected value in an existing test.
