@@ -9,7 +9,7 @@ Cut the spec's stories into phases. **One phase by default.** Each phase pays a 
 | Boundary | Split when |
 |---|---|
 | Prefactor | A change to the existing code keeps the behavior the same and makes the feature easier. It goes in its own first phase with `approach:refactor`. Make the change easy, then make the easy change. |
-| Context | The work would not fit in one implementer's context: more than about 1500 changed lines. Count added and deleted lines, tests included, and estimate from the files that the stories touch. |
+| Context | The work would not fit in one implementer's context: an estimate over 1500 changed lines. Count added and deleted lines, tests included, and estimate from the files that the stories touch. An estimate close to 1500 stays one phase, because a second phase pays for its own implementer and verify runs. |
 
 Each phase is a **vertical slice**: it goes through every layer that its stories touch, such as schema, API, UI and tests. At a context boundary, cut by stories, not by layers. The first phase that needs a schema change takes all of it, with the first behavior that uses it. Read the spec's `Schema changes` line to find the changes.
 

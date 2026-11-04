@@ -45,10 +45,10 @@ Completion: the interview returned the decisions log, with each decision above s
 
 ## 4. Size
 
-A **spec** is one feature that a user can demo, and one PR that a reviewer reads in one sitting: about 2000 changed lines or fewer, tests included. Estimate the lines from the stories and the files that they touch.
+A **spec** is one feature that a user can demo, and one PR that a reviewer reads in one sitting: about 2000 changed lines or fewer, tests included. Estimate the lines for each story and the files that it touches, with its tests, fixtures and e2e specs. Multiply the sum by 1.5, because a 1900 line estimate shipped 3024 lines.
 
-- **One spec**: the estimate fits. Go to step 5 with one spec.
-- **Project**: the estimate does not fit. Cut the stories into 2 to 5 child specs.
+- **One spec**: the estimate is about 1700 lines or fewer. Go to step 5 with one spec.
+- **Project**: the estimate is over that. Cut the stories into 2 to 5 child specs.
 
 Cut a project by user value, never by layer. Each child spec is a vertical slice that works end to end, and ships alone with its own stories. The first child spec that needs a schema change takes the change, with the first behavior that uses it. A child spec that needs another to merge first is blocked by it. Name only a spec that truly gates it. Two child specs gate each other when both add a migration, or both change one screen: put them in order, because built at the same time they collide at each rebase.
 
