@@ -77,7 +77,7 @@ stamp_ports() {
 APP_DB="myapp"          # the primary's dev database: the template for every fork
 DB_USER="myapp"
 DB_PASSWORD="myapp"
-DB_PORT="5432"          # the published port, shared by every worktree
+DB_PORT="5500"          # the published port, shared by every worktree. PROVISIONING.md: Own port
 DB_SERVICE="db"         # compose service; empty runs psql on the host instead
 
 db_url() { printf 'postgresql+psycopg://%s:%s@127.0.0.1:%s/%s' "$DB_USER" "$DB_PASSWORD" "$DB_PORT" "$1"; }
@@ -136,13 +136,20 @@ clone_db() {         # clone_db <template> <new>
   db_exists "$2" && { say "Database $2 is already there"; return; }
   # TEMPLATE refuses while anything holds a connection to the template, and a
   # running dev server always does. Copying works regardless.
-  if pg_do psql -d postgres -q -v ON_ERROR_STOP=1 -c "CREATE DATABASE \"$2\" TEMPLATE \"$1\";" >/dev/null 2>&1; then
+  local err
+  if err="$(pg_do psql -d postgres -q -v ON_ERROR_STOP=1 -c "CREATE DATABASE \"$2\" TEMPLATE \"$1\";" 2>&1)"; then
     say "Cloned $1 into $2"
-  else
+  elif [[ "$err" == *"is being accessed by other users"* ]]; then
     warn "$1 is in use, copying it instead of cloning (slower)"
     pg_do createdb "$2"
-    pg_do pg_dump "$1" | pg_do psql -q -o /dev/null -d "$2"
+    # A partial copy must not survive: the next run would accept it as "already there".
+    if ! pg_do pg_dump "$1" | pg_do psql -q -v ON_ERROR_STOP=1 -o /dev/null -d "$2"; then
+      pg_do dropdb --if-exists "$2"
+      die "could not copy $1 into $2"
+    fi
     say "Copied $1 into $2"
+  else
+    die "could not clone $1 into $2: $err"
   fi
 }
 

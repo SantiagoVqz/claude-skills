@@ -7,7 +7,7 @@ Install two files so that every linked worktree gets env files, dependencies, fr
 
 ## Existing script
 
-When `scripts/provision.sh` exists and has no ENGINE header, it is the repo's own script, and an ADR can require it. Keep it. Check the contract that `worktree` needs:
+When `scripts/provision.sh` exists, run [upgrade-engine.sh](upgrade-engine.sh) on it. When its last line is `own`, the script is the repo's own, and an ADR can require it. Keep it. Check the contract that `worktree` needs:
 
 - With no argument, it provisions the worktree that it runs in, and the end of its output names the dev and test databases.
 - With `drop`, it removes the databases that the worktree owns.
@@ -20,10 +20,20 @@ Find each value in the repo. Ask the user only for the values that you cannot fi
 
 - `install_deps`: the install command for each lockfile, run from its folder.
 - `FE_PORT_BASE`, `BE_PORT_BASE` and `stamp_ports`: the dev servers and the env vars that carry their ports, from the README and the env files. Leave a base empty for a server that picks its own port.
-- DATABASE block: `APP_DB` is the primary's dev database. Then the user, the password, the port, and the compose service, or empty for Postgres on the host. A compose file must pin its project `name:`, so that every worktree uses the same container. `db_url`, `stamp_database` and `migrate` use the app's own variables and migration tool.
+- DATABASE block: `APP_DB` is the primary's dev database. Then the user, the password, the port, and the compose service, or empty for Postgres on the host. `db_url`, `stamp_database` and `migrate` use the app's own variables and migration tool.
 - No database: delete the DATABASE block, down to the ENGINE header.
 
 Show the filled block in the confirm step.
+
+## Compose rules
+
+Each compose service that publishes a database port follows these rules. Read the result with `docker compose config --format json`.
+
+- **Pinned name.** The file sets the project `name:`, so that every worktree uses the same container. A repo without it uses its folder name, and two repos with a `backend/` folder then share a project. Compose prefixes a volume with the project name, so a new name hides the data. When `docker volume ls` shows a volume of the current project with data, ask the user before you pin the name.
+- **Loopback.** Each published port binds to `127.0.0.1`: `'127.0.0.1:${POSTGRES_PORT:-5432}:5432'`. A port with no address opens on every network that the machine joins.
+- **Own port.** The port is free across the machine, also while the other repo's container is stopped. Pick one from 5500 to 5599. Compare it with the ports in the compose and env files of the sibling repos under the parent of the repo's folder, and with `docker ps -a --format '{{.Names}} {{.Ports}}'`. The range keeps clear of a Postgres on the host at 5432.
+
+A repo whose script is `own` follows these rules too.
 
 ## Install
 
