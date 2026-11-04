@@ -84,14 +84,6 @@ Leave the changes uncommitted. The user commits them.
 
 Completion: both docs files exist, `gh label list` shows every label from the table, `AGENTS.md` has exactly one `## Agent skills` block, `CLAUDE.md` loads `@AGENTS.md`, and the provisioning check in `PROVISIONING.md` passed, or the repo needs no provisioning. An Xcode repo meets the completion of `XCODE.md`.
 
-## Excuses
-
-| Excuse | Answer |
-|---|---|
-| "The choices are related, so I ask them in one call." | One choice for each question tool call. |
-
-Add a row only when `/retro` finds a new excuse.
-
 ## Report
 
 Tracker · files written, changed or kept · labels created or updated · the file that holds the block · provisioning: deps, ports, database, or none · the files left to commit.

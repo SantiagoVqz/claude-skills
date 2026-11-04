@@ -33,16 +33,4 @@ Name the surface too: which app, and which page or flow. When the request does n
    - **Blocked page.** When the link shows a bot check or a sign-in, do not try to get past it. Open the local source files of the frames in the browser, when they render alone.
    - **Still no look.** Send the link, and name each frame and state that you did not see, and why. A failed attempt is the only reason to send an unchecked frame.
    - **Close.** Close each page that you opened, and stop any Chrome that this session started for the check, because a project script can refuse to run next to a second Chrome.
-8. **Capture it when done.** Fold any validated decision into the real code. Record the answer (the verdict and the question it settled) with the artifact link as the context pointer: on the implementation issue when one exists, in the decisions log when `/spec` or `/prd` called the skill, else in the reply to the user. The artifact is the **primary source**, so the repo keeps only the validated decision.
-
-## Excuses
-
-| Excuse | Answer |
-|---|---|
-| "The project rule asks for a local HTML mockup." | This skill serves that rule. Publish the artifact, and give its link where the rule asks for the path. |
-| "The implementer needs the HTML as a spec." | Give the implementer the artifact link and the decisions. The artifact stays the source. |
-| "It is a first pass, and the user will look." | The user sees only checked frames. Try the browser before you send the link. |
-| "Chrome did not respond, so I skip the look." | Use the DevTools tools. Name each unchecked frame only after both failed. |
-| "The pick can go in the plan approval, with the link." | The user has not seen the canvas yet. Send the link with its guide, wait for the reply, then ask for the pick. |
-
-Add a row only when `/retro` finds a new excuse.
+8. **Capture it when done.** Fold any validated decision into the real code. Record the answer (the verdict and the question it settled) with the artifact link as the context pointer: on the implementation issue when one exists, in the decisions log when `/spec` called the skill, else in the reply to the user. The artifact is the **primary source**, so the repo keeps only the validated decision.

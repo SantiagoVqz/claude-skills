@@ -1,129 +1,120 @@
 ---
 name: build
-description: "Plan a spec as phases, then build them in one worktree, with an implementer and a verify subagent per phase, then the final review. Also builds a lone ticket as one phase."
+description: "Plan and build one ticket in this session: read it and the code, check the hard stops, get one approval, pick the approach, and implement. Also takes the next ticket of a spec, or a change in words."
 disable-model-invocation: true
-argument-hint: "<spec | ticket>"
+argument-hint: "<ticket | spec | words>"
 ---
 
 # Build
 
-`/build` plans a spec as phases, gets one approval, and builds every phase in one run. It ends with the spec branch in its own worktree, one commit per phase, pushed, and the user's approval from `final-review`. The user iterates at the review card: each change they ask for gets a fix round before the approval. A **lone ticket** has no parent spec. It is a plan of one phase, with the ticket's criteria, on its own `fix/<n>-<slug>` branch, ready for `/ship`.
+`/build` takes one ticket to one commit on a branch, in this session, ready for `/ship`. The user sees the work as it happens, and can change it at any point. It is **light by default**: a short plan and one approval. A hard stop gets the full plan, in this same session.
 
-This session is the **orchestrator**. It holds the plan, the phase reports and the questions to the user. Subagents do the heavy work, each in a fresh context, so this context stays small across many phases:
+## 1. Read
 
-- The **planner** drafts the plan.
-- The **implementer** builds one phase with the approach skill, and fixes what verify finds.
-- The **verifier** runs `verify` on the diff of one phase.
+Read the `## Agent skills` block in `AGENTS.md`, then `docs/agents/tracker.md`. When the block is missing, read `NO-SETUP.md` in the folder of the `setup-skills` skill, and go on with its sources. Read the issue with its comments and its parent.
 
-The orchestrator reads reports, `git log` and `git status`. It reads no source file and runs no test itself. Each file it reads stays in its context for every later phase.
+Find what the argument is. A label such as `Remissions` changes nothing here.
 
-Run one subagent at a time. Two test suites at once share one test database and can stall for most of an hour.
+- **Spec or project with open sub-issues**: stop. Name each open sub-issue with no open blocker. The next step is `/build <that issue>`.
+- **Idea**: stop. The next step is `/spec <n>`.
+- **Spec with no sub-issues**: one ticket, with its stories as the criteria.
+- **Words with no issue**: one ticket. The plan is the record, so write nothing to the tracker, and the branch is `fix/<slug>`.
+- **Any other issue**: one ticket, also with no criteria yet.
 
-Each subagent prompt names the worktree path and pastes these **shell rules**:
+Stop when an issue in `blockedBy` is open, and name it. When someone else has the issue, ask with the question tool: "Take over" or "Stop". When the branch exists and the issue has a `### Plan of #<n>` comment, switch to the branch, and resume at step 5 from its commits.
+
+Read the code that the ticket touches, and `git log` on that area. Ask whether the ticket is a symptom of a cause one layer down.
+
+Completion: you can name the current behavior or the cause, the fix, and the code that the fix changes.
+
+## 2. Hard stops
+
+A **hard stop** is a change that needs more than a short plan:
+
+- a migration or a backfill
+- auth or permission code
+- a write to production data
+- a new or materially changed user-visible UI element
+- an API contract that another repo or app consumes
+- the third issue on the same symptom: search all issues and `git log` for it
+
+Each item is a class of past incident. Change the list only from `/retro` evidence.
+
+A hard stop that the parent spec already settled stays light. Name it on the verdict line. For any other hard stop, or when the user asks for it, follow [PLAN.md](PLAN.md), then go to step 4. The user can say "stay light", with a reason.
+
+Completion: you have the verdict line: `Hard stops: none`, or `Hard stops: <which> (<settled in #n, or override: reason>)`.
+
+## 3. Plan
+
+Write the plan in your message, in about 15 lines. A plan that needs more goes to [PLAN.md](PLAN.md).
+
+```text
+Issue: two or three sentences in plain terms, with no symbol names.
+Cause: the cause or the current behavior, and your confidence in it.
+Fix: the change, and the code that it touches.
+Done when:
+- each criterion, with the edge cases
+Out of scope: what stays as it is.
+Defaults: each choice that you took without asking.
+Approach: from the table in step 5, with the reason in a few words.
+Hard stops: the verdict line.
+```
+
+When the ticket already has criteria, use them word for word. Ask with the question tool: "Approve", "Change" or "Full plan". When the plan hinges on a real choice, add it as a second question in the same call, with your recommendation first. Two questions is the limit. Take a fact from the code, and take a default when the repo's rules settle the choice.
+
+Completion: the user picked "Approve".
+
+## 4. Set up
+
+With an issue, as `tracker.md` says: add `## Acceptance criteria` at the end of the body when it has none, and keep the text that the person wrote. Post the plan as a comment that starts with `### Plan of #<n>`. Assign the issue to the user.
+
+The branch is `fix/<n>-<slug>` from the trunk. Find the trunk as the `worktree` skill does. Make the branch in the primary checkout when that checkout is clean and on the trunk. Call the Skill tool with `worktree` when the checkout is busy, when the plan has a migration, or when the user asks: only then does the work need its own folder and databases.
+
+When the parent spec has a `Domain changes` section that the trunk does not have yet, write it with [DOCS-FORMAT.md](DOCS-FORMAT.md), and commit: `Record terms and decisions for #<n>`.
+
+Completion: the session is on the branch, and the issue has the plan.
+
+## 5. Build
+
+Pick the approach from the work, and call the Skill tool with its skill. Run nothing that the approach does not need.
+
+| The work | Approach |
+|---|---|
+| Behavior with a clear test seam | `tdd` |
+| A defect whose cause is unknown | `diagnose` |
+| Structure only, and the behavior stays the same | `refactor` |
+| Look, copy or config, with no seam that can test it | Build it directly, then run it and look |
+
+A ticket can mix them, such as `tdd` for the logic and a direct build for the layout.
+
+Work in this session. Delegate to one implementer subagent only when the work is large: over about 800 changed lines, or reads that would flood this context. Give it the shell rules below, the plan word for word, and the approach. A question from it comes to the user, and the answer goes back to the same subagent with `SendMessage`.
+
+When the work shows a hard stop that the plan does not name, stop, and ask: "Stay light", with a reason, or "Full plan".
+
+For a plan with phases, run this step and step 6 for each phase. After a phase of a multi-file migration or refactor, run `verify` in a new subagent on the diff of that phase. Other phases wait for the one cold read at `/ship`.
+
+Completion: each criterion has its code.
+
+## 6. Check and land
+
+Run the typecheck, the lint, and the tests that the diff adds or touches. Leave the full suite to `/ship`. A failure is yours to fix now.
+
+Squash into one commit, with one `-m` flag per paragraph:
+
+- `<title> (#<n>)`
+- one line for each criterion: `<criterion> · <test name, or what you saw>`
+- `Hard stops: <the verdict>`, in the last paragraph, so that `/ship` can read it as a trailer. Any `Co-Authored-By` line goes right below it.
+
+Then write your report, and stop. The user asks for changes in the chat: make each one, run this step again, and squash it into the same commit. Run `ui-check` only when the user asks.
+
+Completion: the checks pass, the branch has one commit, and the report is in the chat.
+
+## Shell rules
+
+These apply in a worktree, and in each subagent prompt:
 
 > Run one plain shell command per call, from the worktree root, on paths in the worktree. For a subfolder, use a flag such as `pnpm --dir` or `uv --directory`, because a `cd` stays in effect for the rest of the session. Change a file with the Edit tool, and make a new file with the Write tool. Quote each argument that holds `*`, `[` or `]`. The guard refuses only some other forms, such as a `&&` chain, `$(...)` or a heredoc, so a command that ran is no proof that its form is safe. Print no value from an env file, because a line such as `PROD_DATABASE_URL` holds a password. To see which variables a file sets, list the names only: `grep -oE '^[A-Z_]+=' <file>`. Run each test command in the foreground, with a timeout of up to 10 minutes. Only a run that needs longer goes in the background with its output in a file: wait for its exit notification, and read the result before you report. Ask before a host install, and stop an install that shows no progress for 5 minutes.
 
-The orchestrator follows the same rules after `EnterWorktree`.
-
-## 1. Start
-
-Read the `## Agent skills` block in `AGENTS.md`, then `docs/agents/tracker.md`. When the block is missing, tell the user to run `/setup-skills`, and stop. When the argument is not an issue number or an issue URL, such as a few ideas in words, ask with the question tool: "File and build" or "Stop". On "File and build", call the Skill tool with `issue` with that text, and go on with the new number. After you read `tracker.md`, read the issue with its Read command. `gh` refuses `--comments` together with `--json`.
-
-Find the kind of issue:
-
-- **Spec**, an issue with the `spec` label. Its plan is the latest comment that starts with `### Plan of #<n>`, or step 2 drafts it.
-- **Lone ticket**, an issue with an `approach:` label and no parent: the plan is one phase. Its title is the ticket title, its approach is the label, and its criteria are the ticket's acceptance criteria. Skip step 2.
-- **Project**, an issue with the `project` label: stop. Name its child specs that have no open blocker. The next step is `/build <spec>` for one of them.
-- **Ticket of a spec**, a sub-issue from before phases: stop. The next step is `/build <spec>`, which takes the open tickets into the plan.
-- **Any other issue**: stop, because it has no agreed criteria to build against. Name the next step from its label: `/spec <n>` for an `idea`, `/diagnose <n>` for a `bug`, and `/issue` to give it a kind when it has no label.
-
-Then check:
-
-- **Blocked**: an issue in `blockedBy` is open. Stop, and name it.
-- **Assigned to someone else**: ask with the question tool: "Take over" or "Stop". On Take over, assign the issue to the user.
-- **Sibling at work**: for a child spec, look for an open `origin/spec/` branch of a sibling spec. When `git diff --name-only origin/<trunk>...<sibling branch>` names a migration or a screen that this spec also changes, tell the user in one line, and go on.
-- **Approach skill missing**: the approach skill has the name of the approach value, so `approach:tdd` runs `tdd`. When the skill of a phase is not installed, stop, and name it.
-
-Set the issue to in progress, as `tracker.md` says.
-
-Completion: the issue is in progress, assigned to the user, and has no open blocker. You know its kind.
-
-## 2. Plan
-
-Skip this step when the spec has a plan comment and no open ticket from before phases.
-
-Start the planner: a subagent with a fresh context. Its prompt has the spec issue number and this task: read [PLAN.md](PLAN.md) in the folder of this skill, the spec issue with its comments and sub-issues, with the Read command of `docs/agents/tracker.md`, the glossary and ADRs on the trunk, and the code in the area that the spec touches; then return the full plan in the Format of `PLAN.md`, and its Chat summary. Tell it:
-
-- A phase that has a commit on `origin/spec/<n>-<slug>` stays as it is. Find them with `git log --format='%(trailers:key=Phase,valueonly)' origin/<trunk>..origin/spec/<n>-<slug>`, when that branch exists.
-- A closed ticket from before phases covers its stories. Each open ticket becomes the input of a phase.
-
-Check the full plan against the rules of `PLAN.md`, and remove any path, test name, extra section or domain change. Then write the Chat summary in your message, before the question. The user approves what they can read. Ask with the question tool: "Approve", "Show full plan" or "Change". On "Show full plan", write the full plan and ask again. On Change, apply the edits, show the summary again and ask again.
-
-On Approve, post the plan as a comment on the spec issue, as `tracker.md` says. Close each open ticket that a phase took over, with the comment `Planned as phase <k>: <comment URL>`.
-
-Completion: the plan comment is on the spec issue, and you have each phase with its approach and criteria.
-
-## 3. Enter the worktree
-
-The branch is `spec/<n>-<slug>` for a spec, and `fix/<n>-<slug>` for a lone ticket. Call the Skill tool with `worktree` for it, made from the trunk. It finds the branch when it exists, also when it is only on the remote, and makes it when it does not.
-
-Find the built phases with `git log --format='%(trailers:key=Phase,valueonly)' origin/<trunk>..HEAD`. Each value, such as `2/3`, names a phase that has its commit. When `git status` shows a rebase in progress, call the Skill tool with `resolve-conflicts` first. Commits or changes after the last phase commit are a phase in progress: its implementer starts from them.
-
-For a spec with a `Domain changes` section, and no commit `Record terms and decisions for #<n>` on the branch, write the terms and ADRs of that section with [DOCS-FORMAT.md](DOCS-FORMAT.md). Add nothing else. Commit: `Record terms and decisions for #<n>`.
-
-Completion: the session is in the worktree, the domain changes are committed or the spec has none, and you know the first phase to build.
-
-## 4. Build each phase
-
-Take each phase with no commit, in the order of the plan. For each phase:
-
-1. **Start.** Record the phase start: `git rev-parse HEAD`. Tell the user what the phase builds, in this form:
-
-   ```text
-   Phase <k>/<total> · <title>
-   <the Builds sentence>
-   Criteria:
-   - <each criterion, cut to its first clause>
-   ```
-2. **Implement.** Start a subagent with a fresh context. Its prompt has the worktree path, the shell rules, the issue number, the phase block from the plan word for word, the phase start, and this task: call the Skill tool with the approach skill for this phase, and return the approach skill's report. Tell it that `/build` started it, so `final-review` runs the full suite. When the approach skill says to ask the user, the subagent stops and returns the question with its recommendation, because a subagent cannot reach the user. Ask that question with the question tool, then send the answer to the same subagent with `SendMessage`, so it resumes with its context.
-3. **Watch.** The user sees nothing of a subagent's work, and an implementer runs for 20 to 45 minutes. So while the implementer runs, watch its commits with the Monitor tool, with `timeout_ms` 600000 and this command:
-
-   ```sh
-   while true; do git -C <worktree> log --reverse --format='%h %s' <phase start>..HEAD; sleep 20; done | awk '!seen[$0]++ { print; fflush() }'
-   ```
-
-   For each new commit, send the user one line: `Phase <k> · <commit subject>`, such as `Phase 1 · Green: an empty list shows the empty state`. When the monitor expires and no commit came in its 10 minutes, run `git -C <worktree> status --short` and `ps -o pid,etime,command -U "$USER"`, and tell the user in one line what runs, such as "No commit for 10 min. The backend suite has run 6 min." Then arm the monitor again. Stop the monitor with TaskStop when the implementer returns. Do the same for each fix in step 5, and for each verifier and checks subagent, where the expiry is the only event. An armed monitor wakes this session at each expiry, so a run cannot stall until the user types.
-
-   A notice that a subagent "is waiting on its own background work" is not its report, so keep the monitor armed. On the second notice, read `git log`, `git status` and `ps`. When no test process runs, send `Report now, with what you have` to the same subagent with `SendMessage`.
-4. **Verify.** Start only when the implementer returned its report and none of its checks still runs. Start a new subagent with a fresh context. Tell it to call the Skill tool with `verify`, with the issue number, the phase's criteria and the diff `<phase start>...HEAD`. Give it no list of checks to skip.
-5. **Fix.** Send each hard finding, word for word, to the implementer with `SendMessage`, and add no seam, tool or install to it. When a fix needs a seam that the spec did not agree, ask the user first with the question tool. It fixes, commits, and after a fix for a word or a name greps `git diff <phase start>...HEAD` for each form of it. Then run a new verifier. Run three verifiers or fewer for each phase. When the third run still has a hard finding, stop. Show the findings. The issue stays in progress and the worktree stays. The user fixes it, or overrides it with a reason.
-6. **Land.** Squash the phase into one commit: `git reset --soft <phase start>`, then `git commit` with one `-m` flag per paragraph:
-   - `<phase title> (#<n>)`
-   - one line for each criterion: `<criterion> · <test name>`, from the implementer's report
-   - `Open judgment calls:`, then one line for each call of the last verify run, as verify gave it
-   - `Override: <reason>`, when the user gave one
-   - `Phase: <k>/<total>`, in the last paragraph, with any `Co-Authored-By` line right below it, so git reads both as trailers
-
-   For a spec, push the branch: `git push -u origin <branch>`. A lone ticket stays local until `/ship`.
-7. **Report.** Send one line to the user: `Phase <k>/<total> · <title> · <criteria count> criteria · <verify runs> verify runs · <short hash>`.
-
-Completion: each phase of the plan has its commit with its `Phase:` trailer. The user had the criteria of each phase before it started, one line for each commit of the implementer, and one line for each phase.
-
-## 5. Review
-
-Call the Skill tool with `final-review`, with the issue number. It runs in this session, because its card and its approval need the user. It runs the checks, proves the stories, fixes each blocking gap and each change the user asks for, and posts the review comment that `/ship` reads.
-
-Completion: `final-review` posted its review comment.
-
-## Excuses
-
-| Excuse | Answer |
-|---|---|
-| "The guard allowed the command." | The guard checks only some forms. Use the Edit tool, the Write tool, and one plain command per call. |
-| "The second verify found the same word, so one more fix is enough." | The implementer greps the diff for each form of the word, then a new verifier runs. Three runs is the limit. |
-
-Add a row only when `/retro` finds a new excuse.
-
 ## Report
 
-Issue · plan comment URL · branch and worktree path · each phase with its commit · override reasons · review comment URL · what this session stopped, and what still runs, such as a database container or a browser · next step: `/ship <n>`.
+Each criterion with its test, or what you saw · the commit · the checks that ran · up to three steps for the user to check · next step: `/ship <n>`.

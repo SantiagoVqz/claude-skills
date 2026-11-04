@@ -9,4 +9,4 @@ A skill reads this file when the `## Agent skills` block is missing from `AGENTS
   - The primary checkout is clean: make the branch there with `git switch -c <branch>`, and commit on it.
   - The primary checkout has changes: work in place, and commit nothing. The report lists each file that you changed.
 
-`/ship` and `/cleanup` need the setup, so the report gives the next step as `/setup-skills`, or as the user's own commit and PR.
+Every skill of the set runs with these fallbacks. `/setup-skills` adds the labels, the docs and the provisioning, and no skill needs them to start.

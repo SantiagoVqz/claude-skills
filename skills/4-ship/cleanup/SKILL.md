@@ -1,8 +1,8 @@
 ---
 name: cleanup
-description: "Tear down a merged spec or fix branch: check the merged PR, close the issues, remove the worktree and branches, and refresh the trunk."
+description: "Tear down a merged branch: check the merged PR, close the issues, remove the worktree and branches, and refresh the trunk."
 disable-model-invocation: true
-argument-hint: "[spec | issue]"
+argument-hint: "[issue]"
 ---
 
 # Cleanup
@@ -13,7 +13,7 @@ Run it from the primary checkout. When the session is in a worktree, call `ExitW
 
 ## 1. Find
 
-The target is the argument, or the branch you just shipped: `spec/<n>-<slug>` or `fix/<n>-<slug>`. Find the trunk as the `worktree` skill does.
+The target is the argument, or the branch you just shipped. Find the trunk as the `worktree` skill does.
 
 Completion: you have the branch, its issue and the trunk.
 
@@ -29,11 +29,10 @@ Completion: the branch has a merged PR.
 
 ## 3. Issues
 
-Read the closing line of the PR body.
+Read the closing line of the PR body. Use `docs/agents/tracker.md`, or `NO-SETUP.md` in the folder of the `setup-skills` skill. A PR with no closing line has no issue to change.
 
-- **`Closes #<n>`**: when the issue is still open, close it as `tracker.md` says. When it is a child spec and every child spec of its project is closed now, close the project too. The keyword fires only on a merge into the default branch, so when the trunk is not the default branch, a close by hand is the normal path.
+- **`Closes #<n>`**: when the issue is still open, close it as `tracker.md` says. When it is a ticket and every ticket of its spec is closed now, close the spec too. The keyword fires only on a merge into the default branch, so when the trunk is not the default branch, a close by hand is the normal path.
 - **`Refs #<n>`**: the fix added instrumentation, and the cause is not confirmed. The issue stays open. Name in the report what confirms the cause.
-- **`Part of #<spec>`**: a partial ship from before phases. The spec and its open tickets stay open.
 
 Completion: each issue is in the state that the closing line gives, and you know which closed by keyword and which by hand.
 
@@ -79,14 +78,6 @@ Find the migration folder in `AGENTS.md`, or in the config of the migration tool
 
 Completion: the trunk dev database has each new migration, or the report names them.
 
-## Excuses
-
-| Excuse | Answer |
-|---|---|
-| "The worktree was made by hand, so I remove it by hand." | Call the `worktree` skill. Its Remove also drops the test database. |
-
-Add a row only when `/retro` finds a new excuse.
-
 ## Report
 
-PR · merge method, when it differs from the merge line of the PR · issues closed by keyword, by hand, or left open for a partial ship · servers stopped · session leftovers cleared · size of the test clones deleted · worktree removed · branches deleted · trunk head · migrations applied.
+PR · merge method, when it differs from the merge line of the PR · issues closed by keyword, by hand, or left open · servers stopped · session leftovers cleared · size of the test clones deleted · worktree removed · branches deleted · trunk head · migrations applied.

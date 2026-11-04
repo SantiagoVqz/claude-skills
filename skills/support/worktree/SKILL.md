@@ -1,28 +1,25 @@
 ---
 name: worktree
-description: "Make, provision or remove the linked worktree for a spec or fix branch, with its databases. Use before code work starts on a branch, before you add a migration, and to tear a worktree down after its merge."
+description: "Make, provision or remove the linked worktree for a branch, with its databases. Use before code work starts on a branch, before you add a migration, and to tear a worktree down after its merge."
 ---
 
 # Worktree
 
-Code work runs in a linked worktree. The primary checkout stays on the trunk. This skill reads git facts only, so a worktree made by this skill, by `git worktree add` or by another tool resolves the same way.
+A linked worktree gives a branch its own folder and databases. `/build` uses one when the primary checkout is busy or the plan has a migration. This skill reads git facts only, so a worktree made by this skill, by `git worktree add` or by another tool resolves the same way.
 
 ## Branches
 
 | Branch | Made from | Dev database |
 |---|---|---|
-| `spec/<n>-<slug>` | the trunk | its own fork |
 | `fix/<n>-<slug>` | the trunk | its own fork |
 
-`/build` makes a `spec/` branch for a spec, and a `fix/` branch for a lone ticket. `/diagnose` makes a `fix/` branch for a bug.
+`/build` and `/diagnose` make `fix/` branches.
 
 Each worktree also has its own test database. `scripts/provision.sh` applies these rules.
 
 The **trunk** is the branch that PRs merge into: the default branch from `git symbolic-ref refs/remotes/origin/HEAD`, or `develop` when the repo has both `main` and `develop`. When `origin/HEAD` is missing, use `gh repo view --json defaultBranchRef`. Do not run `git remote set-head`, because it changes the repo config.
 
 ## Make
-
-When no skill called you and the work has no issue, stop and name `/build` for a change, or `/diagnose` for a bug. `/ship` refuses work that did not pass through them, so the work gets done twice.
 
 1. **Locate.** Read `git worktree list --porcelain`. When you know only the issue number, match any `<type>/<n>-` branch in it and in `git branch -a` before you make a new one. Take the case that matches:
    - A worktree has the branch: use its path, and go on to steps 2 to 4.
@@ -44,15 +41,6 @@ Run this from the primary checkout after the branch is merged into the trunk.
 5. In a repo with a `.xcodeproj` or a `.xcworkspace`, delete each folder of `~/Library/Developer/Xcode/DerivedData` that belongs to the worktree, because Xcode keeps one for each path. Read its path with `plutil -extract WorkspacePath raw <folder>/info.plist`.
 
 Completion: `git worktree list` does not show the path, the branch is gone, and no DerivedData folder names the path.
-
-## Excuses
-
-| Excuse | Answer |
-|---|---|
-| "It is a one-line change, so I start with a worktree." | Run `/build`. It files the issue and makes the worktree. |
-| "The change is frontend only, so I can copy the `.env` files." | A copied `.env` points at the shared dev database, and a browser check later needs the API and the database. Stop, and tell the user to run `/setup-skills`. |
-
-Add a row only when `/retro` finds a new excuse.
 
 ## Report
 
