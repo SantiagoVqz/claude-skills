@@ -120,7 +120,7 @@ Completion: no open issue is the same one, or the user picked what to do with it
 
 Show each draft in your message: the title, the labels, the blockers, and the full body. For several issues, add the order in one line, such as "the bug first, then the idea". Then ask once with the question tool: "File them" or "Change". When the user picks Change, apply the edits, show the drafts again and ask again.
 
-Completion: the user picked "File them".
+Completion: each full draft is in the chat above the question, and the user picked "File them".
 
 ## 5. File
 
@@ -129,6 +129,14 @@ Create the issues in order, blockers first, so that each blocker has a number be
 With no tracker, print the title and body of each issue in the chat, one block for each, in order, that the user can paste.
 
 Completion: each issue exists with its labels, parent and blocking edges, and you have each number, or the user has the text of each issue.
+
+## Excuses
+
+| Excuse | Answer |
+|---|---|
+| "The user asked me to file it and build, so the title is enough." | Write the full body before you ask. The user approves only what the chat shows. |
+
+Add a row only when `/retro` finds a new excuse.
 
 ## Report
 

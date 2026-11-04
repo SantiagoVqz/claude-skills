@@ -165,6 +165,7 @@ Redact each secret in each command, output and artifact that you show: write `<R
 |---|---|
 | "The setup is missing, so I make the worktree by hand." | Call the `worktree` skill. When it reports blocked, follow `NO-SETUP.md`. |
 | "The question options describe the fix." | The user approves the card. Write it in the message first. |
+| "The question sums up the card." | The user approves only what the chat shows. Write the whole card in the message first. |
 | "I only need the local URL, so I grep the .env." | The grep also matches the production line. Print names only. |
 
 Add a row only when `/retro` finds a new excuse.

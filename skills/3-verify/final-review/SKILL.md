@@ -130,6 +130,7 @@ Completion: the comment is on the issue, and no dev server from this review runs
 |---|---|
 | "The failure predates the spec." | Name the cause, the failed test and the rerun on the card. |
 | "The finding is real, so it is blocking." | A real cleanup is still a cleanup. Only a blocking gap gets a fix round. |
+| "The review comment holds the card." | The user approves only what the chat shows. Write the card in the message first. |
 
 Add a row only when `/retro` finds a new excuse.
 

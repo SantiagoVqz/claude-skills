@@ -62,7 +62,7 @@ When the Artifact quickstart offers the Design type, build on it, and follow its
 
 Check each frame as the [SKILL](SKILL.md) says, before the handover. Look for clipped text, duplicate labels, tap targets under 44px, and the empty, loading and error states.
 
-Publish the artifact and send the link with the variant names. The user looks across the frames whenever they get to it. The interesting feedback is usually **"I want the header from B with the sidebar from C"**, which is the actual design they want. Add each iteration as a new frame next to the variant it changes. Name what changed, such as `B2 (B with search fields)`. Keep the old frames, so the user compares the old and the new side by side. Republish to the same link.
+Publish the artifact and send the link with the variant names. Add 2 or 3 lines that say what each row compares and what to pick. End the message there, and ask for the pick only after the user replies. In one session the user approved a variant in a form, then said "I don't understand what I am seeing", and the plan and tickets had to change. The user looks across the frames whenever they get to it. The interesting feedback is usually **"I want the header from B with the sidebar from C"**, which is the actual design they want. Add each iteration as a new frame next to the variant it changes. Name what changed, such as `B2 (B with search fields)`. Keep the old frames, so the user compares the old and the new side by side. Republish to the same link.
 
 ### 5. Capture the answer
 

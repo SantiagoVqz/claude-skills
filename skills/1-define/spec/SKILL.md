@@ -60,7 +60,7 @@ Write the spec from the decisions log with [SPEC-TEMPLATE.md](../prd/SPEC-TEMPLA
 
 For a project, write each child spec with the template, with its own stories, numbered from 1. Put each term and ADR in the `Domain changes` of the first child spec that uses it. The project issue has the `Problem`, `Solution` and `Out of scope` sections of the template, and a `Specs` section in place of the rest: one line per child spec, `<ref>. <title> · blocked by: <refs, or none>`.
 
-This is the one approval of the spec. In the chat, show only what the user approves, one short line each:
+This is the one approval of the spec. Write this list in your message, before the question. The question tool does not show it, and the user approves only what the chat shows above the question. Show only what the user approves, one short line each:
 
 ```markdown
 You approve:
@@ -72,6 +72,7 @@ You approve:
 - Look: <the chosen variant with its link, or plain>
 - Stories: <count>, <a title of a few words for each>
 - Domain: <each new term and ADR, or none>
+- Size: about <lines> changed lines, so <one spec, or a project of <count> child specs>
 ```
 
 For a project, the list has the problem, out of scope and seams once, then one block per child spec:
@@ -85,7 +86,7 @@ The issue has the full text. Ask with the question tool: "Approve" or "Change". 
 
 When the draft needs a term or a decision that is not in the log, ask the user about it before you publish. Add it to the log only when the user agrees.
 
-Completion: the user approved the draft, and each term in the draft is in the log.
+Completion: the list and the size estimate are in the chat above the question, the user approved, and each term in the draft is in the log.
 
 ## 6. Publish
 
@@ -94,6 +95,14 @@ Call the Skill tool with `issue` to create the spec issue with the `spec` label.
 Then delete the decisions log file. The spec issue is now the record.
 
 Completion: each issue exists, you have each number, and the log file is gone.
+
+## Excuses
+
+| Excuse | Answer |
+|---|---|
+| "The draft is in a file, and the question names it." | The user approves only what the chat shows. Write the list in the message first. |
+
+Add a row only when `/retro` finds a new excuse.
 
 ## Report
 

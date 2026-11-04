@@ -36,5 +36,6 @@ Name the surface too: which app, and which page or flow. When the request does n
 | Excuse | Answer |
 |---|---|
 | "The implementer needs the HTML as a spec." | Give the implementer the artifact link and the decisions. The artifact stays the source. |
+| "The pick can go in the plan approval, with the link." | The user has not seen the canvas yet. Send the link with its guide, wait for the reply, then ask for the pick. |
 
 Add a row only when `/retro` finds a new excuse.
