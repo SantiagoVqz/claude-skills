@@ -44,7 +44,11 @@ Completion: you can sort each finding of steps 4 and 5, and of the walk.
 
 ## 4. Run the checks
 
-Start a subagent with a fresh context. Tell it to run the full suite, the typecheck, the lint and the build, one at a time, and to return pass or fail for each, with the output of each failure only. When the repo has no script for a check, it skips the check and names it.
+This is the one full run of the branch: the implementers and `verify` run only the tests near their change.
+
+Run the checks only of the areas that the diff changes. An area is a part of the repo with its own checks, such as `backend/` and `frontend/`. Run `git diff --stat origin/<trunk>...HEAD` to find them. Run every area when the diff changes a shared file, such as a lockfile, a CI workflow, a generated API schema or a file that more than one area reads. Run no check that already passed on this exact commit in this review.
+
+Start a subagent with a fresh context. Tell it to run the full suite, the typecheck, the lint and the build of those areas, one at a time, in the foreground, and to return pass or fail for each, with the output of each failure only. When the repo has no script for a check, it skips the check and names it. Put each area that you skipped on the card.
 
 A failure in the code of the branch is a blocking gap. A failure that comes from the test environment, such as rows left in the test database or an env var from `.env`, may be fixed in the test environment only. Then the subagent runs the whole check again. Put the cause, the failed test and the rerun on the card. When no open issue names the cause, call the Skill tool with `issue` to file it once, and put its number on the card.
 
@@ -65,7 +69,7 @@ Skip this step when no gap is blocking.
 Write the blocking gaps in your message, one line each. Then fix them with no question, as `/build` builds a phase:
 
 1. Record the fix start: `git rev-parse HEAD`.
-2. Start an implementer subagent with a fresh context. Give it the worktree path, the shell rules, the issue number, the fix start and the gaps word for word. Its task: call the Skill tool with `tdd`, with each gap as a criterion, so each fix has a test that failed first. A change that no test can observe, such as a spacing or a color, goes to `tdd` as a `Build:` piece. A question from it goes to the user as in `/build`.
+2. Start an implementer subagent with a fresh context. Give it the worktree path, the shell rules, the issue number, the fix start and the gaps word for word. Tell it that `final-review` started it, so step 4 runs the full suite. Its task: call the Skill tool with `tdd`, with each gap as a criterion, so each fix has a test that failed first. A change that no test can observe, such as a spacing or a color, goes to `tdd` as a `Build:` piece. A question from it goes to the user as in `/build`.
 3. Run `verify` in a new subagent on `<fix start>...HEAD`, and send its hard findings back to the implementer, three verify runs or fewer, as `/build` does.
 4. Squash the fix into one commit, `Fix review gaps (#<n>)`, with one line for each gap: `<gap> · <test name>`. Push it when the branch tracks a remote.
 5. Run again the step that found each gap: the checks, the coverage or the walk step.

@@ -58,9 +58,9 @@ Read `git diff <base>...HEAD` in full. Under `/build` and `final-review`, the ba
 
 Remove duplication, fix names, and move code to where it belongs. Commit each change: `Refactor: <what>`. Run the test files of each change after it. Formatting is the linter's job, so a format change is no refactor.
 
-Then run the repo's formatter and lint on the diff, and commit any change: `Format: <files>`. Then run the full suite once, and wait for its result.
+Then run the repo's formatter and lint on the diff, and commit any change: `Format: <files>`. Then run the tests: the test files that the work adds or changes, and each test file that imports a module that it changes. When `/build` or `final-review` started you, stop there, because `final-review` runs the full suite once on the finished branch. When you run on your own, run the full suite once. Wait for each result.
 
-Completion: the formatter and lint pass, the full suite passed after the last change, and that run has finished. A run in the background counts only when its result is in. You have no more changes to make.
+Completion: the formatter and lint pass, the tests that this step names passed after the last change, and each run has finished. A run in the background counts only when its result is in. You have no more changes to make.
 
 ## Good tests
 
@@ -77,6 +77,7 @@ A good test checks behavior through a public interface. It reads like a line of 
 | "The code reads clean, so no refactor is needed." | Name the diff that you read and the helpers that you searched for. |
 | "The rest of the code writes the literal another way." | The spec is the contract. Ask the user before the green. |
 | "I know the seams, so the list can wait." | Print the seam list before the first red. The user and verify read it. |
+| "I run the full suite to be safe." | Under `/build`, `final-review` runs it. One session ran about 17 full-suite commands on nearly the same code. |
 
 Add a row only when `/retro` finds a new excuse.
 

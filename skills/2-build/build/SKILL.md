@@ -84,7 +84,7 @@ Take each phase with no commit, in the order of the plan. For each phase:
    Criteria:
    - <each criterion, cut to its first clause>
    ```
-2. **Implement.** Start a subagent with a fresh context. Its prompt has the worktree path, the shell rules, the issue number, the phase block from the plan word for word, the phase start, and this task: call the Skill tool with the approach skill for this phase, and return the approach skill's report. When the approach skill says to ask the user, the subagent stops and returns the question with its recommendation, because a subagent cannot reach the user. Ask that question with the question tool, then send the answer to the same subagent with `SendMessage`, so it resumes with its context.
+2. **Implement.** Start a subagent with a fresh context. Its prompt has the worktree path, the shell rules, the issue number, the phase block from the plan word for word, the phase start, and this task: call the Skill tool with the approach skill for this phase, and return the approach skill's report. Tell it that `/build` started it, so `final-review` runs the full suite. When the approach skill says to ask the user, the subagent stops and returns the question with its recommendation, because a subagent cannot reach the user. Ask that question with the question tool, then send the answer to the same subagent with `SendMessage`, so it resumes with its context.
 3. **Watch.** The user sees nothing of a subagent's work, and an implementer runs for 20 to 45 minutes. So while the implementer runs, watch its commits with the Monitor tool, with `timeout_ms` 600000 and this command:
 
    ```sh
