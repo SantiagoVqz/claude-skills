@@ -1,6 +1,6 @@
 ---
 name: prototype
-description: "Build throwaway prototypes as Claude artifacts to explore UI designs and answer design questions. Use when the user asks to prototype, mock up or see options, and before a UI change that the user must see first."
+description: "Build throwaway prototypes as Claude artifacts to explore UI designs and answer design questions. Use when the user asks to prototype, mock up or see options, when a project rule asks for an HTML mockup, and before a UI change that the user must see first."
 ---
 
 # Prototype
@@ -39,6 +39,7 @@ Name the surface too: which app, and which page or flow. When the request does n
 
 | Excuse | Answer |
 |---|---|
+| "The project rule asks for a local HTML mockup." | This skill serves that rule. Publish the artifact, and give its link where the rule asks for the path. |
 | "The implementer needs the HTML as a spec." | Give the implementer the artifact link and the decisions. The artifact stays the source. |
 | "It is a first pass, and the user will look." | The user sees only checked frames. Try the browser before you send the link. |
 | "Chrome did not respond, so I skip the look." | Use the DevTools tools. Name each unchecked frame only after both failed. |
