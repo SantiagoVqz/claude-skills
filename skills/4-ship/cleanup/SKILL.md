@@ -32,6 +32,7 @@ Completion: the branch has a merged PR.
 Read the closing line of the PR body.
 
 - **`Closes #<n>`**: when the issue is still open, close it as `tracker.md` says. When it is a child spec and every child spec of its project is closed now, close the project too. The keyword fires only on a merge into the default branch, so when the trunk is not the default branch, a close by hand is the normal path.
+- **`Refs #<n>`**: the fix added instrumentation, and the cause is not confirmed. The issue stays open. Name in the report what confirms the cause.
 - **`Part of #<spec>`**: a partial ship from before phases. The spec and its open tickets stay open.
 
 Completion: each issue is in the state that the closing line gives, and you know which closed by keyword and which by hand.

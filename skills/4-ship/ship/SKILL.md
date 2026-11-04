@@ -62,7 +62,7 @@ Call the Skill tool with `pr` to write the body. Give it:
 
 - **The title**: the title of the spec or the issue.
 - **The evidence**: for a spec or a lone ticket, the story list and the Verified lines of the review comment, and its link. For a bug, the regression test.
-- **The closing line**: `Closes #<n>`.
+- **The closing line**: `Closes #<n>`, or `Refs #<n>` for a bug whose cause is not confirmed.
 - **The merge line**: `Merge with <merge method>.`
 
 Completion: you have the title and a body with each of these parts.

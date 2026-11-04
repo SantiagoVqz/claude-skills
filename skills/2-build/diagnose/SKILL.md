@@ -57,6 +57,8 @@ When the loop or the suite needs a workaround for a fault outside the bug, such 
 
 When you cannot build a loop, stop. List what you tried. Ask the user for access to an environment that shows the bug, a captured artifact, or approval for temporary instrumentation in production.
 
+When the loop needs production facts, ask for all of them in one message. Write each query against the schema of the deployed branch, and offer temporary instrumentation in the same question.
+
 Completion: you read the glossary and the ADRs for the area. You have one command, and you ran it at least once. It is:
 
 - **Red**: it runs the code path of the bug and asserts the user's exact symptom.
@@ -122,7 +124,9 @@ Completion: `git grep` finds no debug prefix, the loop is green, and no throwawa
 
 Start a subagent with a fresh context. Tell it to call the Skill tool with `verify`, with the bug issue, the base `git merge-base origin/<trunk> HEAD`, and a request for the full suite. The base also covers work that is not committed. Fix only the hard findings, commit, and run `verify` in a new subagent one more time. When a hard finding is still there, stop and show the findings. Each judgment call goes on the card.
 
-Completion: the last `verify` run has no hard finding.
+Each commit after the last `verify` run needs another run.
+
+Completion: the last `verify` run came after the last commit, and has no hard finding.
 
 ## 10. Card (not under `/build`)
 
@@ -149,7 +153,7 @@ Completion: the card is in the chat above the question, and the user approved. S
 
 ## 11. Record
 
-Squash the branch into one commit, except under `/build`, which squashes when it lands the phase, and except for work that `NO-SETUP.md` keeps uncommitted. Run `git merge-base HEAD origin/<trunk>`, then `git reset --soft <base>`. Commit with `-m "Fix <title> (#<n>)"`, then `-m "Cause: <the confirmed hypothesis>"`.
+Squash the branch into one commit, except under `/build`, which squashes when it lands the phase, and except for work that `NO-SETUP.md` keeps uncommitted. Run `git merge-base HEAD origin/<trunk>`, then `git reset --soft <base>`. Commit with `-m "Fix <title> (#<n>)"`, then `-m "Cause: <the confirmed hypothesis>"`. When the cause is not confirmed, the title is `Instrument <symptom> (#<n>)`, and the second paragraph names the check that confirms it.
 
 Comment on the issue, as `tracker.md` says: the cause, the loop command, and the missing seam when there is one. When the loop is a harness, put its text, redacted, in the comment, then delete the harness.
 
@@ -165,6 +169,7 @@ Redact each secret in each command, output and artifact that you show: write `<R
 |---|---|
 | "The setup is missing, so I make the worktree by hand." | Call the `worktree` skill. When it reports blocked, follow `NO-SETUP.md`. |
 | "The question options describe the fix." | The user approves the card. Write it in the message first. |
+| "Diagnosis is done to the point a plan needs." | The loop is the diagnosis. See it red on the symptom before any hand-off, and hand over the loop command and the hypotheses. |
 | "The question sums up the card." | The user approves only what the chat shows. Write the whole card in the message first. |
 | "I only need the local URL, so I grep the .env." | The grep also matches the production line. Print names only. |
 
