@@ -37,7 +37,7 @@ Completion: the session is in the worktree, and the end of the `provision.sh` ou
 
 Run this from the primary checkout after the branch is merged into the trunk.
 
-1. Call `EnterWorktree` with the worktree path, and skip the call when the session is already there. Run `scripts/provision.sh drop`. The script drops the test database and the dev fork. Then call `ExitWorktree` with `keep` to go back to the primary checkout.
+1. Call `EnterWorktree` with the worktree path, and skip the call when the session is already there. Run `scripts/provision.sh drop`. The script drops the test database and the dev fork. Then call `ExitWorktree` with `keep` to go back to the primary checkout. When the drop fails, show the end of its output and stop. When the user drops the databases by hand, list the databases to confirm that each is gone, and remove any container that the failed drop created.
 2. `git worktree remove <path>`. When it refuses because of uncommitted or untracked files, stop and show them. Keep the files: no `--force`. The exception is an `xcuserdata/` folder, which holds only Xcode's window state: delete it, and remove the worktree again.
 3. `git branch -D <branch>`.
 4. `git worktree prune`, for the records of worktrees whose folder is gone.

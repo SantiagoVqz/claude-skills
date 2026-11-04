@@ -42,11 +42,13 @@ Stop each dev server and background task that runs from the worktree. Check the 
 
 In a repo with a `.xcodeproj` or a `.xcworkspace`, also shut down the simulators, because their working directory is not in the worktree. When `pgrep xcodebuild` finds no other build, run `xcrun simctl shutdown all`, then `xcrun simctl --set testing shutdown all`. The second one fails harmlessly when no test clone exists.
 
-Completion: no process has its working directory in the worktree, and no simulator is booted unless another build uses it.
+Leave Claude Code's own processes, which are the session shell, `caffeinate` and the MCP servers. Then clear what this session left: close each browser page that it opened, and delete each partial install and temp file that it made. Name each one in the report.
+
+Completion: no process other than Claude Code's has its working directory in the worktree, and no simulator is booted unless another build uses it.
 
 ## 5. Worktree
 
-Call the Skill tool with `worktree` to remove the worktree of the branch. When the primary checkout has the branch and no worktree has it, run `git switch <trunk>`, then `git branch -D <branch>`, and skip `worktree`.
+Call the Skill tool with `worktree` to remove the worktree of the branch, also when you know its steps. When the primary checkout has the branch and no worktree has it, run `git switch <trunk>`, then `git branch -D <branch>`, and skip `worktree`.
 
 Completion: `git worktree list` does not show the branch, and the local branch is gone.
 
@@ -84,4 +86,4 @@ Add a row only when `/retro` finds a new excuse.
 
 ## Report
 
-PR · merge method, when it differs from the merge line of the PR · issues closed by keyword, by hand, or left open for a partial ship · servers stopped · worktree removed · branches deleted · trunk head · migrations applied.
+PR · merge method, when it differs from the merge line of the PR · issues closed by keyword, by hand, or left open for a partial ship · servers stopped · session leftovers cleared · worktree removed · branches deleted · trunk head · migrations applied.
