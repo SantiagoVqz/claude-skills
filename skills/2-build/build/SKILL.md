@@ -101,7 +101,7 @@ Take each phase with no commit, in the order of the plan. For each phase:
    - one line for each criterion: `<criterion> · <test name>`, from the implementer's report
    - `Open judgment calls:`, then one line for each call of the last verify run, as verify gave it
    - `Override: <reason>`, when the user gave one
-   - `Phase: <k>/<total>`, as the last paragraph, so git reads it as a trailer
+   - `Phase: <k>/<total>`, in the last paragraph, with any `Co-Authored-By` line right below it, so git reads both as trailers
 
    For a spec, push the branch: `git push -u origin <branch>`. A lone ticket stays local until `/ship`.
 7. **Report.** Send one line to the user: `Phase <k>/<total> · <title> · <criteria count> criteria · <verify runs> verify runs · <short hash>`.
