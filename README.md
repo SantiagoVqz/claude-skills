@@ -57,6 +57,8 @@ Run it before you build or integrate something, such as a connection to SAT e-in
 
 Run it once per repo, when you want the tracker docs, labels and worktree provisioning. Every other skill has fallbacks in `NO-SETUP.md`.
 
+Run `/setup-skills --upgrade` in a repo that was set up earlier. It shows each difference from the current rules, then updates the provisioning engine and the compose file on a branch, and moves the database port when it must.
+
 - **Input:** the repo.
 - **Output:** the `## Agent skills` block in `AGENTS.md`, the tracker reference file for GitHub or Linear, the labels, `scripts/provision.sh`, and the session hook that runs it.
 

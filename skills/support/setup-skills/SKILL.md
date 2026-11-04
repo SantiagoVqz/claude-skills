@@ -1,12 +1,15 @@
 ---
 name: setup-skills
-description: "Set up this repo for the skill set: tracker, labels, domain docs, worktree provisioning, and the Agent skills block in AGENTS.md. Run once per repo, and again to repair."
+description: "Set up this repo for the skill set: tracker, labels, domain docs, worktree provisioning, and the Agent skills block in AGENTS.md. Run once per repo, again to repair, and with --upgrade to bring an earlier setup to the current rules."
+argument-hint: "[--upgrade]"
 disable-model-invocation: true
 ---
 
 # Setup skills
 
 Every other skill finds the tracker, the domain docs and the worktree rules through the `## Agent skills` block in `AGENTS.md`. This skill writes that block and the files it points at. A rerun repairs what is missing and keeps what is already correct.
+
+When the arguments hold `--upgrade`, follow [UPGRADE.md](UPGRADE.md) in place of the steps below.
 
 ## 1. Explore
 
@@ -37,7 +40,7 @@ Show the user, in one message:
 - The tracker.
 - The `## Agent skills` block from step 3, and the file that gets it.
 - The files that you will write or change, and the labels that you will create.
-- When the repo needs provisioning: the filled CONFIG block of `provision.sh`, from [PROVISIONING.md](PROVISIONING.md).
+- When the repo needs provisioning: the filled CONFIG block of `provision.sh`, from [PROVISIONING.md](PROVISIONING.md), and each change that its Compose rules need.
 - Each existing file or label that you will keep as it is.
 
 Send that message first. Then ask each choice in its own question tool call: each existing file or label that you could keep or replace. For each file in `docs/agents/` that covers the same job as a file that you write, ask: "Merge", "Keep both" or "Delete". Put your recommendation first. For the old copies as a group, ask: "Delete" or "Keep". An agent picks a copy over the current skill, so recommend Delete. Recommend these:
@@ -82,7 +85,7 @@ Code work runs in a linked worktree under `.claude/worktrees/`. The primary chec
 
 Leave the changes uncommitted. The user commits them.
 
-Completion: both docs files exist, `gh label list` shows every label from the table, `AGENTS.md` has exactly one `## Agent skills` block, `CLAUDE.md` loads `@AGENTS.md`, and the provisioning check in `PROVISIONING.md` passed, or the repo needs no provisioning. An Xcode repo meets the completion of `XCODE.md`.
+Completion: both docs files exist, `gh label list` shows every label from the table, `AGENTS.md` has exactly one `## Agent skills` block, `CLAUDE.md` loads `@AGENTS.md`, and the provisioning check and Compose rules in `PROVISIONING.md` hold, or the repo needs no provisioning. An Xcode repo meets the completion of `XCODE.md`.
 
 ## Report
 
