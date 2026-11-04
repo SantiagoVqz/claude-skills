@@ -35,7 +35,7 @@ Read `WATCH.md` in the run folder, when it exists. Each of its items is one more
 
 For one or two sessions, read each one yourself: run `digest.py <transcript> --from <first>`. The output is a timeline: user messages, commands, skills, subagents, questions and tool errors, each with its transcript line number. Open the transcript at a line when you need the full text. Then find the gaps as step 5 says.
 
-For three sessions or more, start one subagent for each session, all at once. Give each one its row, the path of this `SKILL.md`, the watch items, and this task: read the timeline, read the `SKILL.md` of each skill that ran, find the gaps as step 5 says, and return each gap in the finding format of step 6, with no status. Evidence cites `<session>:<line>`.
+For three sessions or more, group the sessions by project, about 3 or 4 for each subagent, and start the subagents all at once. Give each one its rows, the path of this `SKILL.md`, the watch items, and this task: read the timeline, read the `SKILL.md` of each skill that ran, find the gaps as step 5 says, and return each gap in the finding format of step 6, with no status. Evidence cites `<session>:<line>`.
 
 Completion: you have the gaps of each session.
 
