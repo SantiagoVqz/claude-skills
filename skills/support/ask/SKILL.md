@@ -70,6 +70,7 @@ End of a day of work ───────────────────�
 Edit a skill, AGENTS.md or CLAUDE.md ──────────► writing-for-agents
 Cut AI tells from text ────────────────────────► unslop
 Explain a ticket in plain terms ───────────────► /brief
+A manual step: keys, CI secrets, a cutover ────► /wizard
 ```
 
 When no branch matches, say so, and give the two nearest skills with the difference between them.

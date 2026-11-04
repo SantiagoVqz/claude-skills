@@ -184,6 +184,19 @@ Run it after you merge.
 
 When `/build` calls `diagnose` for an `approach:diagnose` phase or ticket, steps 1, 2, 5, 6 and 7 do not run. `/build` owns them.
 
+### `/wizard [what to set up or migrate]`
+
+Run it when a step needs a human: a key from a dashboard, a CI secret, or a one-off migration. The agent also runs it when work stops on such a step.
+
+- **Input:** the procedure, and the repo: `.env*`, `docker-compose*`, the framework config and the `secrets.*` references in CI.
+- **Process:**
+  1. It lists the stages and the values of each stage. You confirm the list.
+  2. It maps each stage to the exact clicks, from the docs or from you.
+  3. It copies `template.sh` and writes one stage for each step.
+  4. It checks the script with `bash -n` and a static trace. It does not run the script.
+- **Output:** an executable bash script. You run it. It writes each value to `.env`, a GitHub secret or a GitHub variable, and lists what it could not do.
+- **Next:** run the script. Delete it after the run, or commit it as a repeatable setup path.
+
 ## Skills that other skills call
 
 You do not type these. Other skills call them.
@@ -260,7 +273,7 @@ skills/
 ├── 2-build/    build, tdd, refactor, resolve-conflicts, diagnose
 ├── 3-verify/   verify, ui-check, final-review
 ├── 4-ship/     ship, pr, cleanup
-└── support/    ask, issue, research, setup-skills, worktree, retro, writing-for-agents, unslop, brief
+└── support/    ask, issue, research, setup-skills, worktree, retro, writing-for-agents, unslop, brief, wizard
 ```
 
 A skill installs by its folder name only, for example `spec`. The phase folder groups skills and is not part of the name.
