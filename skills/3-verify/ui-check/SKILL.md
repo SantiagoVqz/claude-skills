@@ -28,11 +28,11 @@ Check that the dev database holds the rows that the flow needs. Take the databas
 
 When rows are missing and the database is a worktree fork, with a branch suffix such as `<app>_<branch>`, make the fewest rows that the flow needs, and ask no question, because the fork is disposable. Use the project's seed script or the API. When neither can make the rows, use SQL in the fork: read `\d <table>` first, and give each row the timestamps that the list orders by. Restore each row that you change for one step, such as a role or a module flag. For any other database, ask the user first. The report names the rows that you made and the rows that you restored.
 
-Load the Claude in Chrome tools and `browser_batch` in one ToolSearch call, and open a new tab. When the extension is not connected, use the Chrome DevTools tools, and read [DEVTOOLS.md](DEVTOOLS.md) first.
+Load the Claude in Chrome tools and `browser_batch` in one ToolSearch call, and open a new tab. When the extension is not connected, ask once in this session with the question tool: "Connect the extension" or "Use DevTools". The extension uses the user's Chrome, so it keeps their sign-ins. DevTools starts signed out. On "Connect the extension", load the tools again. On "Use DevTools", or when the extension still does not connect, use the Chrome DevTools tools, and read [DEVTOOLS.md](DEVTOOLS.md) first.
 
 Do each step of the flow in one `browser_batch` call. When a step needs a ref, do one `find` call first, then the batch. End each batch with a read of the page, and compare it with what the step expects. Before you mark a step ✗, read the URL and the console.
 
-When the app goes to a sign-in page, ask the user to sign in in that window, and wait. Type no password yourself. Then do the step again.
+When the app goes to a sign-in page, ask the user in the chat to sign in in that window, and end your turn. Do not poll with `wait_for`: the sign-in can take longer than its timeout. Type no password yourself. When the user replies, do the step again.
 
 Completion: the numbered flow is in the chat above the first tool call, and each step passed or failed. The dev server and the tab stay open.
 
@@ -40,6 +40,7 @@ Completion: the numbered flow is in the chat above the first tool call, and each
 |---|---|
 | "I have the flow in mind." | The user cannot see thinking. Print the numbered flow before the first tool call. |
 | "Another session holds the browser, so I kill it." | Its check runs in that browser. Connect the extension, or skip the browser check. |
+| "The extension is not connected, so I skip the check." | Ask, then use DevTools. Only a failure of both skips the check, and the report says so. |
 
 ## 3. Report
 

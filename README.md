@@ -282,4 +282,4 @@ A plugin and `npx skills add` come later. See issue #3.
 claude mcp add -s user chrome-devtools -- npx -y chrome-devtools-mcp@1.11.0 --isolated
 ```
 
-Each isolated Chrome starts signed out, so you sign in once per check.
+Each isolated Chrome starts signed out, so you sign in once per Chrome. Keep the extension connected to avoid this, because it uses your own sign-ins. A fixed `--userDataDir` keeps a sign-in too, but two sessions then fight for one profile.
