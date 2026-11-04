@@ -7,7 +7,7 @@ argument-hint: "<ticket | spec | words>"
 
 # Build
 
-`/build` takes one ticket to one commit on a branch, in this session, ready for `/ship`. The user sees the work as it happens, and can change it at any point. It is **light by default**: a short plan and one approval. A hard stop gets the full plan, in this same session.
+`/build` takes one ticket to one commit for each phase on a branch, in this session, ready for `/ship`. The user sees the work as it happens, and can change it at any point. It is **light by default**: a short plan and one approval. A hard stop gets the full plan, in this same session.
 
 ## 1. Read
 
@@ -21,7 +21,7 @@ Find what the argument is. A label such as `Remissions` changes nothing here.
 - **Words with no issue**: one ticket. The plan is the record, so write nothing to the tracker, and the branch is `fix/<slug>`.
 - **Any other issue**: one ticket, also with no criteria yet.
 
-Stop when an issue in `blockedBy` is open, and name it. When someone else has the issue, ask with the question tool: "Take over" or "Stop". When the branch exists and the issue has a `### Plan of #<n>` comment, switch to the branch, and resume at step 5 from its commits.
+Stop when an issue in `blockedBy` is open, and name it. When someone else has the issue, ask with the question tool: "Take over" or "Stop". When the branch exists and the issue has a `### Plan of #<n>` comment, switch to the branch, and resume at step 5, after the last phase with a commit that has the subject from `phase-done`. A phase with only `Green:` or `Refactor:` commits is still open.
 
 Read the code that the ticket touches, and `git log` on that area. Ask whether the ticket is a symptom of a cause one layer down.
 
@@ -76,7 +76,7 @@ Completion: the session is on the branch, and the issue has the plan.
 
 ## 5. Build
 
-Pick the approach from the work, and call the Skill tool with its skill. Run nothing that the approach does not need.
+Pick the approach from the work, and call the Skill tool with its skill. Name the **phase base** as its start: the commit of the last phase, or `git merge-base origin/<trunk> HEAD` for the first phase. Run nothing that the approach does not need.
 
 | The work | Approach |
 |---|---|
@@ -87,27 +87,19 @@ Pick the approach from the work, and call the Skill tool with its skill. Run not
 
 A ticket can mix them, such as `tdd` for the logic and a direct build for the layout.
 
-Work in this session. Delegate to one implementer subagent only when the work is large: over about 800 changed lines, or reads that would flood this context. Give it the shell rules below, the plan word for word, and the approach. A question from it comes to the user, and the answer goes back to the same subagent with `SendMessage`.
+Work in this session. Delegate to one implementer subagent only when the work is large: over about 800 changed lines, or reads that would flood this context. Give it the shell rules below, the plan word for word, the approach, the phase base, and step 1 and step 2 of `phase-done`. A question from it comes to the user, and the answer goes back to the same subagent with `SendMessage`.
 
 When the work shows a hard stop that the plan does not name, stop, and ask: "Stay light", with a reason, or "Full plan".
 
-For a plan with phases, run this step and step 6 for each phase. After a phase of a multi-file migration or refactor, run `verify` in a new subagent on the diff of that phase. Other phases wait for the one cold read at `/ship`.
-
 Completion: each criterion has its code.
 
-## 6. Check and land
+## 6. Close the phase
 
-Run the typecheck, the lint, and the tests that the diff adds or touches. Leave the full suite to `/ship`. A failure is yours to fix now.
+Call the Skill tool with `phase-done`, and give it the phase base. When another phase remains, go to step 5 with no question.
 
-Squash into one commit, with one `-m` flag per paragraph:
+After the last phase, write your report, and stop. The user asks for changes in the chat: make each one, and run `phase-done` on the change, with the parent of the commit that `phase-done` made as the phase base, so that the change goes in that commit. Run `ui-check` only when the user asks.
 
-- `<title> (#<n>)`
-- one line for each criterion: `<criterion> · <test name, or what you saw>`
-- `Hard stops: <the verdict>`, in the last paragraph, so that `/ship` can read it as a trailer. Any `Co-Authored-By` line goes right below it.
-
-Then write your report, and stop. The user asks for changes in the chat: make each one, run this step again, and squash it into the same commit. Run `ui-check` only when the user asks.
-
-Completion: the checks pass, the branch has one commit, and the report is in the chat.
+Completion: each phase has its commit, and the report is in the chat.
 
 ## Shell rules
 
@@ -117,4 +109,4 @@ These apply in a worktree, and in each subagent prompt:
 
 ## Report
 
-Each criterion with its test, or what you saw · the commit · the checks that ran · up to three steps for the user to check · next step: `/ship <n>`.
+Each criterion with its test, or what you saw · each commit · the checks that ran · the simplify notes · up to three steps for the user to check · next step: `/ship <n>`.

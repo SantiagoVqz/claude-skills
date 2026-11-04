@@ -1,6 +1,6 @@
 ---
 name: verify
-description: "Review a diff against its ticket and the repo's standards, and report hard findings and judgment calls. Use when /ship or /build asks for a cold read, or the user asks to verify a diff."
+description: "Review a diff against its ticket and the repo's standards, and report hard findings and judgment calls. Use when /ship or /phase-done asks for a cold read, or the user asks to verify a diff."
 argument-hint: "[issue] [ref]"
 metadata:
   credits:
@@ -30,9 +30,9 @@ Completion: the base resolves, the diff is not empty, you have the criteria when
 
 ## 2. Run the checks
 
-Find the test, typecheck, lint and build commands in `package.json`, the README or `AGENTS.md`. Run the typecheck, the lint and the build. Run the test files that the diff adds or changes, and each test file that imports a module that the diff changes. Run the full suite only when the caller asks for it, or when you run on your own. Trust no earlier report.
+Find the test, typecheck, lint and build commands in `package.json`, the README or `AGENTS.md`. Run the typecheck, the lint and the build. Run the test files that the diff adds or changes, and each test file that imports a module that the diff changes. Run the full suite only when the caller asks for it, or when you run on your own. Skip only the checks that the caller says CI runs on this diff, because the caller reads their result. Trust no earlier report.
 
-Completion: each check passed or failed, each run has finished, and you have the output of each failure.
+Completion: each check that CI does not run passed or failed, each run has finished, and you have the output of each failure.
 
 ## 3. Review
 

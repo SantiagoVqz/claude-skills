@@ -15,7 +15,7 @@ Once a week: /retro
 Not sure:    /ask
 ```
 
-`/build` plans and implements one ticket in your session. It is light by default, and it picks the approach from the work: `tdd`, `refactor`, `diagnose`, or a direct build. `/ship` runs the one cold read of the whole diff and the one full check.
+`/build` plans and implements one ticket in your session. It is light by default, and it picks the approach from the work: `tdd`, `refactor`, `diagnose`, or a direct build. `/ship` pushes a draft PR, and runs the one cold read of the whole diff while CI does the one full check.
 
 ## Commands
 
@@ -73,7 +73,7 @@ Run `/setup-skills --upgrade` in a repo that was set up earlier. It shows each d
 
 ### `/build <ticket | spec | words>`
 
-One `/build` takes one ticket to one commit, in your session. You see the work as it happens.
+One `/build` takes one ticket to one commit for each phase, in your session. A ticket has one phase by default. You see the work as it happens.
 
 - **Input:** any issue, with or without labels or criteria, or a change in words. A spec with open tickets names the next ticket and stops. An idea goes to `/spec`.
 - **Process:**
@@ -82,16 +82,16 @@ One `/build` takes one ticket to one commit, in your session. You see the work a
   3. With no hard stop, it shows a plan of about 15 lines, for one approval. With a hard stop, it runs the full plan in `PLAN.md`, in the same session: a problem brief, and decisions in one form of four questions or fewer. A hard stop that the parent spec settled stays light.
   4. It makes the branch `fix/<n>-<slug>`. It uses the primary checkout when that checkout is clean, and a worktree when the checkout is busy or the plan has a migration.
   5. It picks the approach from the work and implements. It delegates to one subagent only for large work.
-  6. It runs the typecheck, the lint and the tests that the diff touches, and squashes into one commit with a `Hard stops:` line. You ask for changes in the chat, and `/ui-check` runs only when you ask.
-- **Output:** one commit on the branch, and the plan comment on the issue.
+  6. It runs `phase-done` for each phase, with no question between phases: simplify, scoped checks, a scope check against the plan, and one commit with a `Hard stops:` line. You ask for changes in the chat, and `/ui-check` runs only when you ask.
+- **Output:** one commit for each phase on the branch, and the plan comment on the issue.
 - **Next:** `/ship`.
 
 ### `/verify [ref]`
 
-`/ship` runs it in a subagent as the cold read. `/build` also runs it after a phase of a multi-file migration or refactor. You can run it on any diff.
+`/ship` runs it in a subagent as the cold read. `phase-done` also runs it after a phase of a multi-file migration or refactor. You can run it on any diff.
 
 - **Input:** a diff, and the criteria of its issue.
-- **Checks:** it runs the typecheck, lint, build and the tests that the diff touches. It runs the full suite when the caller asks, or when you run it. It checks the diff against the criteria and the spec's seams, then against the repo's written rules and a list of code smells.
+- **Checks:** it runs the typecheck, lint, build and the tests that the diff touches. It runs the full suite when the caller asks, or when you run it. It skips the checks that the caller says CI runs. It checks the diff against the criteria and the spec's seams, then against the repo's written rules and a list of code smells.
 - **Output:** findings. A hard finding is a failed check, a criterion with no test, a test at the wrong seam, a broken written rule, a defect a user can see, or work that is not a vertical slice. Everything else is a judgment call, and it reports the top five. It edits nothing.
 
 ### `/ui-check [issue | what to check]`
@@ -109,10 +109,12 @@ It works on any branch with commits.
 - **Process:**
   1. It rebases onto the trunk. On a conflict, it calls `resolve-conflicts`.
   2. It runs `hardstop-check.sh`. The script refuses a diff with a migration, a backfill, or auth or permission code when a commit says `Hard stops: none`. You stop, or you override with a reason.
-  3. It runs one cold read of the whole diff with `/verify` in a subagent. It fixes each hard finding, with three cold reads at most.
-  4. It runs the full suite, typecheck, lint and build once, only when CI does not cover the PR.
-  5. It writes the PR body with `pr`, pushes and opens the PR. You get a short summary of what changed and why, not the body.
-  6. It waits for CI to pass. It reports a failure and fixes nothing.
+  3. It pushes the branch and opens a draft PR, and CI starts.
+  4. It runs one cold read of the whole diff with `/verify` in a subagent, and the cold read skips the checks that CI runs. It fixes each hard finding, with three cold reads at most.
+  5. It runs the full suite once, only when CI runs no tests.
+  6. It writes the PR body with `pr`. You get a short summary of what changed and why, not the body.
+  7. It waits for CI. It reports a failure and fixes nothing.
+  8. It marks the PR ready when the cold read is clean and no check failed. Otherwise a draft stays a draft, and the report names what is open.
 - **Output:** one PR with `Closes #<n>`, when the branch has an issue.
 - **Next:** you merge with the method that `/ship` names. Then `/cleanup`.
 
@@ -159,6 +161,7 @@ You can run each of these alone. Other skills also call them.
 | Skill | Called by | Job |
 |---|---|---|
 | `interview` | `/spec` | Interview in rounds of four questions or fewer on the design tree. Show recommendations and keep a decisions log. |
+| `phase-done` | `/build` | Close a phase: simplify, scoped checks, a scope check against the plan, one commit. A cold read only for a multi-file migration or refactor. |
 | `tdd` | `/build` | One red, green cycle per criterion, at the agreed seams, with a commit per green. One refactor pass at the end. |
 | `refactor` | `/build` | Change the structure and keep the behavior, one named step at a time. |
 | `resolve-conflicts` | `/ship` | Resolve a rebase conflict and keep both intents. Ask you only when both sides change the same behavior. |
@@ -171,7 +174,7 @@ You can run each of these alone. Other skills also call them.
 
 | Thing | Rule |
 |---|---|
-| Branch | One per ticket or bug, `fix/<n>-<slug>`, from the trunk. It is one commit and one PR. |
+| Branch | One per ticket or bug, `fix/<n>-<slug>`, from the trunk. It is one commit for each phase, and one PR. |
 | Primary checkout | `/build` uses it when it is clean and on the trunk. |
 | Worktree | `/build` makes one when the checkout is busy, the plan has a migration, or you ask. It has its own folder, dev database fork and test database. |
 
@@ -201,7 +204,7 @@ Each skill is in the folder of its phase. The number gives the order of the flow
 ```text
 skills/
 ├── 1-define/   spec, interview, prototype
-├── 2-build/    build, tdd, refactor, resolve-conflicts, diagnose
+├── 2-build/    build, phase-done, tdd, refactor, resolve-conflicts, diagnose
 ├── 3-verify/   verify, ui-check
 ├── 4-ship/     ship, pr, cleanup
 └── support/    ask, issue, research, setup-skills, worktree, retro, writing-for-agents, unslop, brief, wizard
