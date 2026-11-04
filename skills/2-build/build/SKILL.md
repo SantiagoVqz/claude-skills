@@ -27,7 +27,7 @@ The orchestrator follows the same rules after `EnterWorktree`.
 
 ## 1. Start
 
-Read the `## Agent skills` block in `AGENTS.md`, then `docs/agents/tracker.md`. When the block is missing, tell the user to run `/setup-skills`, and stop. When the argument is not an issue number or an issue URL, such as a few ideas in words, stop and tell the user to file it with `/issue` first. After you read `tracker.md`, read the issue with its Read command. `gh` refuses `--comments` together with `--json`.
+Read the `## Agent skills` block in `AGENTS.md`, then `docs/agents/tracker.md`. When the block is missing, tell the user to run `/setup-skills`, and stop. When the argument is not an issue number or an issue URL, such as a few ideas in words, ask with the question tool: "File and build" or "Stop". On "File and build", call the Skill tool with `issue` with that text, and go on with the new number. After you read `tracker.md`, read the issue with its Read command. `gh` refuses `--comments` together with `--json`.
 
 Find the kind of issue:
 

@@ -22,6 +22,8 @@ The **trunk** is the branch that PRs merge into: the default branch from `git sy
 
 ## Make
 
+When no skill called you and the work has no issue, stop and name `/build` for a change, or `/diagnose` for a bug. `/ship` refuses work that did not pass through them, so the work gets done twice.
+
 1. **Locate.** Read `git worktree list --porcelain`. When you know only the issue number, match any `<type>/<n>-` branch in it and in `git branch -a` before you make a new one. Take the case that matches:
    - A worktree has the branch: use its path, and go on to steps 2 to 4.
    - No worktree has it: `git fetch origin`, then `git worktree add -b <branch> <primary>/.claude/worktrees/<branch with / as -> <base>`. `<primary>` is the path on the first `worktree` line of `git worktree list --porcelain`. A relative path resolves from the current directory, so a session in another worktree puts the new worktree inside it. Use `origin/<trunk>` as the base. When the branch is only on the remote, run `git branch --track <branch> origin/<branch>` first. Leave out `-b` when the branch exists.
@@ -46,6 +48,7 @@ Completion: `git worktree list` does not show the path, and the branch is gone.
 
 | Excuse | Answer |
 |---|---|
+| "It is a one-line change, so I start with a worktree." | Run `/build`. It files the issue and makes the worktree. |
 | "The change is frontend only, so I can copy the `.env` files." | A copied `.env` points at the shared dev database, and a browser check later needs the API and the database. Stop, and tell the user to run `/setup-skills`. |
 
 Add a row only when `/retro` finds a new excuse.
