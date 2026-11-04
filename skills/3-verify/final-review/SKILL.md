@@ -72,7 +72,7 @@ Write the blocking gaps in your message, one line each. Then fix them with no qu
 2. Start an implementer subagent with a fresh context. Give it the worktree path, the shell rules, the issue number, the fix start and the gaps word for word. Tell it that `final-review` started it, so step 4 runs the full suite. Its task: call the Skill tool with `tdd`, with each gap as a criterion, so each fix has a test that failed first. A change that no test can observe, such as a spacing or a color, goes to `tdd` as a `Build:` piece. A question from it goes to the user as in `/build`.
 3. Run `verify` in a new subagent on `<fix start>...HEAD`, and send its hard findings back to the implementer, three verify runs or fewer, as `/build` does.
 4. Squash the fix into one commit, `Fix review gaps (#<n>)`, with one line for each gap: `<gap> · <test name>`. Push it when the branch tracks a remote.
-5. Run again the step that found each gap: the checks, the coverage or the walk step.
+5. Run again the step that found each gap: the checks, the coverage or the walk step. After any change to code, run the step 4 checks again, also when a walk or the user found the gap, so that the card's Checks line holds for its commit. Name that commit on the line. A walk runs again only when the walk found the gap or the user picks it.
 
 Run two fix rounds or fewer for the gaps that the review found. A change that the user asks for at the card gets its own round each time. When a gap that the review found remains after the second round, stop. Show the gaps. The user fixes them, or moves each one out of scope with a reason.
 
@@ -88,7 +88,7 @@ Write the card in your message, before the question. The question tool does not 
 ### Review of #<n> · <short commit>
 
 Phases: <k> · <short hash of each>
-Checks: <each check from step 4> passed
+Checks: <each check from step 4> passed on <short commit>
 Environment fixes: <cause> · <failed test> · <rerun result> · #<issue>
 
 Stories: <covered> of <in scope> covered
@@ -111,8 +111,8 @@ List under "Stories" only the stories that went out of scope. Leave out "Environ
 
 Ask with the question tool: "Approve", "Change" or "Walk in browser". Offer "Walk in browser" only when a story in scope has a screen and no walk ran on this commit.
 
-- **Walk in browser**: call the Skill tool with `ui-check`. Give it the stories in scope as the flow, one step for each story. It leaves the dev server and the tab open, so the user can look while the question waits. A failed step is a blocking gap: go to step 6. Then show the card again with its Verified lines, and ask again.
-- **Change**: each note from the user is a change to make, such as a design tweak, or a new action for a cleanup. A change goes to step 6. Then show the card again and ask again. When Change comes with no notes, ask in the chat what to change.
+- **Walk in browser**: call the Skill tool with `ui-check`. Give it the stories in scope as the flow, one step for each story. It leaves the dev server and the tab open, so the user can look while the question waits. A failed step is a blocking gap: go to step 6 with no question. Then show the card again with its Verified lines, and ask again.
+- **Change**: each note from the user is a change to make, such as a design tweak, or a new action for a cleanup. A change goes to step 6, with an implementer and `verify`, also when it touches only CI or config. Then show the card again and ask again. When Change comes with no notes, ask in the chat what to change.
 
 A free-text answer that clearly approves counts as Approve. Only for a free-text answer, start the reply with: "Taking that as Approve." When the question returns no answer, ask it again before any other action.
 
