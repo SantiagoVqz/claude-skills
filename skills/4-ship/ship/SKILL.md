@@ -50,7 +50,7 @@ A workflow file is no proof that CI runs on this PR. Some repos have workflows t
 
 - **CI covers the PR**: skip this step. CI runs the checks on the PR in step 7.
 - **CI does not cover the PR, and the branch head is the reviewed commit**: skip this step. The checks of `final-review` ran on this exact code. Name the gap in the report.
-- **Any other case**: start a subagent to run the full suite, the typecheck, the lint and the build, in the foreground, because nothing else runs them on the rebased code. Wait for its result before step 5, so that no check still runs when the user merges. When the repo has no script for a check, skip that check and name it in the report. A failure stops `/ship`. Show its output.
+- **Any other case**: start a subagent to run the full suite, the typecheck, the lint and the build, under the shell rules of `/build`, because nothing else runs them on the rebased code. Wait for its result before step 5, so that no check still runs when the user merges. When the repo has no script for a check, skip that check and name it in the report. A failure stops `/ship`. Show its output.
 
 Completion: CI covers the PR, or the head is the reviewed commit, or every check passes.
 
