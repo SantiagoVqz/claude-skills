@@ -29,7 +29,7 @@ Give each phase one approach. `/build` runs the skill that the approach names, s
 
 ## Criteria
 
-Write the done-when criteria of each phase. They tell when the phase is done, and include the edge cases of its stories, such as an empty list or a value at its limit. Use the spec's words.
+Write the done-when criteria of each phase. They tell when the phase is done, and include the edge cases of its stories, such as an empty list or a value at its limit. Use the spec's words. A criterion that no agreed seam can test, such as a match with a board or a spacing, goes under `Check at review:`.
 
 The plan holds none of these, because they go stale before the work ends or another step owns them:
 
@@ -70,6 +70,8 @@ The plan comment on the spec issue:
 Builds: <one sentence, from the user's point of view>
 Done when:
 - <each criterion>
+Check at review:
+- <each criterion that no agreed seam can test, or leave this out>
 
 #### Phase 2: <title>
 ...

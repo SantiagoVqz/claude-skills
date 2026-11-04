@@ -61,7 +61,7 @@ Completion: each criterion, each test and each written rule is checked, and you 
 A finding is hard when it is one of these:
 
 - A check from step 2 fails.
-- A criterion has no code, or no test proves it.
+- A criterion has no code, or no test proves it. A criterion under `Check at review:` needs only the code.
 - A test is at a seam that the spec did not agree, or it is tautological.
 - The diff breaks a written rule of the repo.
 - The diff causes a defect that a user can see or that stores or sends wrong data, such as a false text, a lost value or a stale screen.

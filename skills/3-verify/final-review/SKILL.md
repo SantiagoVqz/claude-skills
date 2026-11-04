@@ -56,7 +56,7 @@ Completion: each check passed or is a blocking gap, and each environment fix is 
 
 ## 5. Coverage
 
-For each story in scope, find the phase that covers it in the plan, and the tests in that phase's commit lines. A story with no code or no test is a blocking gap.
+For each story in scope, find the phase that covers it in the plan, and the tests in that phase's commit lines. A story with no code or no test is a blocking gap. Each criterion under `Check at review:` goes in the walk when one runs, and under "Check yourself" on the card.
 
 Each open judgment call in a phase commit is a gap. Sort it as blocking or cleanup.
 
