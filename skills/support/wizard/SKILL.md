@@ -47,8 +47,7 @@ Completion: each stage has concrete instructions, each with a known source.
 
 1. Copy `template.sh` to the target path. A one-off wizard goes to the scratchpad or `scripts/`. A setup path that the next person needs goes to `scripts/`.
 2. Replace the example stage with one `stage` for each step, in dependency order.
-3. Set `TOTAL_STAGES` to the number of stages.
-4. Set the `banner` title.
+3. Set `TOTAL_STAGES` to the number of stages, and set the `banner` title.
 
 Use the library helpers: `stage`, `say`, `step`, `note`, `warn`, `open_url`, `ask`, `ask_secret`, `write_env`, `set_secret`, `set_var`, `pause` and `confirm`.
 
@@ -60,6 +59,7 @@ Each stage follows these rules:
 - It calls `write_env` for each value that `.env` keeps.
 - It calls `set_secret` only for the values that CI reads.
 - It puts `confirm` before each irreversible action.
+- A stage that captures a credential ends with a read-only call that proves it, such as a list of the apps that the key can see.
 
 Keep every stage inside `run_wizard`, and keep the last line of the file as it is. Bash then parses the whole file before the first prompt.
 
@@ -72,6 +72,6 @@ Completion: each value from step 1 has a capture call and a write call to its de
 3. Trace the script statically. Do not run it, because it opens browsers and waits for human input. Check that each value lands at its destination from step 1. Check that each `set_secret` name matches a `secrets.*` reference in CI.
 4. Give the user the command to run it. Tell the user that Ctrl-C and a re-run is safe, because `ask` offers each saved `.env` value as the default.
 
-A wizard is for one run by default. Delete it after the run. Commit it only when the user wants a repeatable setup path, and link it from the README.
+Commit a wizard only when the user wants a repeatable setup path, and link it from the README.
 
-Completion: the script passes `bash -n`, the trace finds no gap, and the user has the run command.
+Completion: the script passes `bash -n`, the trace finds no gap, and the user has the run command. After the user reports the run, a one-off script is deleted.
