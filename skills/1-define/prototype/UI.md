@@ -18,7 +18,7 @@ A UI prototype is much easier to judge when it's **butting up against the rest o
 - **Host page.** When the variants belong inside an existing page, or would naturally live inside one (a new section of the dashboard, a new card on the settings screen, a new step in an existing flow), read that page's code and rebuild its chrome (header, sidebar, neighbouring sections) around each variant. Use a bare page only when the thing has no plausible home in the app.
 - **Styling.** Build to the fidelity bar in the [SKILL](SKILL.md), so each variant passes for a shipped screen. When the project's design system is synced to claude.ai/design, build with it.
 - **Content.** Fill every variant with realistic sample data at the real page's density, since an empty artifact flatters every layout. Read the real counts from the dev database or the user's screenshots, and show the busiest realistic case, such as the busiest day.
-- **Served data.** Show only the data and the actions that the backend serves. Label each one that it does not serve yet as "Not served yet" on the frame.
+- **Served data.** Show only the data and the actions that the backend serves. Label each one that it does not serve yet as "Not served yet" on the frame. Each status in the copy matches the value that the backend writes.
 
 ## Process
 
@@ -62,7 +62,7 @@ When the Artifact quickstart offers the Design type, build on it, and follow its
 
 Check each frame as rule 7 of the [SKILL](SKILL.md) says, after the last publish and before the handover. Look for clipped text, duplicate labels, tap targets under 44px, and the empty, loading and error states.
 
-Publish the artifact and send the link with the variant names. Add 2 or 3 lines that say what each row compares and what to pick. End the message there, and ask for the pick only after the user replies. In one session the user approved a variant in a form, then said "I don't understand what I am seeing", and the plan and tickets had to change. The user looks across the frames whenever they get to it. The interesting feedback is usually **"I want the header from B with the sidebar from C"**, which is the actual design they want. Add each iteration as a new frame next to the variant it changes. Name what changed, such as `B2 (B with search fields)`. A polish or a redesign is also a new frame, such as `F2b`. Replace a frame only when it was built on a misread request, and say so on the frame. Keep the old frames, so the user compares the old and the new side by side. Republish to the same link.
+Publish the artifact and send the link with the variant names, in a message of its own, before any other work. Add 2 or 3 lines that say what each row compares and what to pick. End the turn there. No question carries the pick, a caller's approval included: ask for it after the user replies. The user looks across the frames whenever they get to it. The interesting feedback is usually **"I want the header from B with the sidebar from C"**, which is the actual design they want. Add each iteration as a new frame next to the variant it changes. Name what changed, such as `B2 (B with search fields)`. A polish or a redesign is also a new frame, such as `F2b`. Edit frames in place only for a misread request or a change to every variant, and say so in the handover. Keep the old frames, so the user compares the old and the new side by side. Republish to the same link.
 
 ### 5. Capture the answer
 
