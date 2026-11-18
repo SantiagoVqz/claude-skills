@@ -49,14 +49,15 @@ You approve:
 - Schema: <each migration, or none>
 - Look: <the chosen variant with its link, or plain>
 - Domain: <each new term and ADR, or none>
+- Defaults: <each choice that is not in the log, or none>
 - Size: about <lines> changed lines
 - Tickets:
   1. <title> · <what it delivers> · blocked by: <refs, or none>
 ```
 
-Ask with the question tool: "Approve" or "Change". On Change, apply the edits, show the list again and ask again. A term or a decision that is not in the log goes to the user before you publish.
+Ask with the question tool: "Approve" or "Change". On Change, apply the edits, show the list again and ask again.
 
-Completion: the list is in the chat above the question, and the user approved.
+Completion: the list is a text block in the chat above the question, and the user approved. A file, a comment or your thinking does not count.
 
 ## 4. Publish
 

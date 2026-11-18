@@ -16,7 +16,7 @@ An issue from this skill is a **handoff**: the next skill, such as `/diagnose <n
 |---|---|---|---|
 | Idea | `idea` | The idea template below. | `/spec <n>` |
 | Bug | `bug` | The bug template below. | `/diagnose <n>` |
-| Task | none | The `Lone ticket` section of [TICKETS.md](../../1-define/spec/TICKETS.md). | `/build <n>` |
+| Task | none | The `Lone ticket` section of `TICKETS.md` in the folder of the `spec` skill. | `/build <n>` |
 | Spec | `spec` | The caller writes it. | the caller's |
 | Ticket | none, and the parent spec | The caller writes it. | the caller's |
 
@@ -120,7 +120,7 @@ Completion: no open issue is the same one, or the user picked what to do with it
 
 Show each draft in your message: the title, the labels, the blockers, and the full body. For several issues, add the order in one line, such as "the bug first, then the idea". Then ask once with the question tool: "File them" or "Change". When the user picks Change, apply the edits, show the drafts again and ask again.
 
-Completion: each full draft is in the chat above the question, and the user picked "File them".
+Completion: each full draft is a text block in the chat above the question, and the user picked "File them". A file, a comment or your thinking does not count.
 
 ## 5. File
 

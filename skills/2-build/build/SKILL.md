@@ -7,13 +7,13 @@ argument-hint: "<ticket | spec | words>"
 
 # Build
 
-`/build` takes one ticket to one commit on a branch, in this session, ready for `/ship`. The user sees the work as it happens, and can change it at any point. It is **light by default**: a short plan and one approval. A hard stop gets the full plan, in this same session.
+`/build` takes one ticket to one commit for each phase on a branch, in this session, ready for `/ship`. The user sees the work as it happens, and can change it at any point. It is **light by default**: a short plan and one approval. A hard stop gets the full plan, in this same session.
 
 ## 1. Read
 
-Read the `## Agent skills` block in `AGENTS.md`, then `docs/agents/tracker.md`. When the block is missing, read `NO-SETUP.md` in the folder of the `setup-skills` skill, and go on with its sources. Read the issue with its comments and its parent.
+Read the `## Agent skills` block in `AGENTS.md`, then `docs/agents/tracker.md`. When the block is missing, read `NO-SETUP.md` in the folder of the `setup-skills` skill, and go on with its sources. Read the issue with its comments and its parent, with the Read command of `tracker.md`.
 
-Find what the argument is. A label such as `Remissions` changes nothing here.
+Find what the argument is.
 
 - **Spec or project with open sub-issues**: stop. Name each open sub-issue with no open blocker. The next step is `/build <that issue>`.
 - **Idea**: stop. The next step is `/spec <n>`.
@@ -21,9 +21,9 @@ Find what the argument is. A label such as `Remissions` changes nothing here.
 - **Words with no issue**: one ticket. The plan is the record, so write nothing to the tracker, and the branch is `fix/<slug>`.
 - **Any other issue**: one ticket, also with no criteria yet.
 
-Stop when an issue in `blockedBy` is open, and name it. When someone else has the issue, ask with the question tool: "Take over" or "Stop". When the branch exists and the issue has a `### Plan of #<n>` comment, switch to the branch, and resume at step 5 from its commits.
+Stop when an issue in `blockedBy` is open, and name it. When someone else has the issue, ask with the question tool: "Take over" or "Stop". When the branch exists and the issue has a `### Plan of #<n>` comment, switch to the branch, and resume at step 5, after the last phase with a commit that has the subject from `phase-done`. A phase with only `Green:` or `Refactor:` commits is still open.
 
-Read the code that the ticket touches, and `git log` on that area. Ask whether the ticket is a symptom of a cause one layer down.
+Read the code that the ticket touches, and `git log` on that area. Ask whether the ticket is a symptom of a cause one layer down. When a criterion rests on an outside rule, such as a store spec or an API limit, read its primary source.
 
 Completion: you can name the current behavior or the cause, the fix, and the code that the fix changes.
 
@@ -60,9 +60,9 @@ Approach: from the table in step 5, with the reason in a few words.
 Hard stops: the verdict line.
 ```
 
-When the ticket already has criteria, use them word for word. Ask with the question tool: "Approve", "Change" or "Full plan". When the plan hinges on a real choice, add it as a second question in the same call, with your recommendation first. Two questions is the limit. Take a fact from the code, and take a default when the repo's rules settle the choice.
+When the ticket already has criteria, write `Done when: the <n> criteria of #<n>`, and list only the criteria that you add or change. Ask with the question tool: "Approve", "Change" or "Full plan". When the plan hinges on a real choice, add it as a second question in the same call, with your recommendation first. Two questions is the limit. Take a fact from the code, and take a default when the repo's rules settle the choice.
 
-Completion: the user picked "Approve".
+Completion: the plan is a text block in the chat above the question, and the user picked "Approve". A file, a comment or your thinking does not count.
 
 ## 4. Set up
 
@@ -76,45 +76,37 @@ Completion: the session is on the branch, and the issue has the plan.
 
 ## 5. Build
 
-Pick the approach from the work, and call the Skill tool with its skill. Run nothing that the approach does not need.
+Pick the approach from the work, and call the Skill tool with its skill. Pass it the Done when list word for word, and the **phase base**: the commit of the last phase, or `git merge-base origin/<trunk> HEAD` for the first phase. Run nothing that the approach does not need.
 
 | The work | Approach |
 |---|---|
 | Behavior with a clear test seam | `tdd` |
 | A defect whose cause is unknown | `diagnose` |
 | Structure only, and the behavior stays the same | `refactor` |
-| Look, copy or config, with no seam that can test it | Build it directly, then run it and look |
+| Look, copy or config, with no seam that can test it | Build it directly, then run it on its real runtime or a preview, and look |
 
 A ticket can mix them, such as `tdd` for the logic and a direct build for the layout.
 
-Work in this session. Delegate to one implementer subagent only when the work is large: over about 800 changed lines, or reads that would flood this context. Give it the shell rules below, the plan word for word, and the approach. A question from it comes to the user, and the answer goes back to the same subagent with `SendMessage`.
+Work in this session. Delegate to one implementer subagent only when the work is large: over about 800 changed lines, or reads that would flood this context. Give it the shell rules below, the plan word for word, the approach, the phase base, and step 1 and step 2 of `phase-done`. A question from it comes to the user, and the answer goes back to the same subagent with `SendMessage`.
 
 When the work shows a hard stop that the plan does not name, stop, and ask: "Stay light", with a reason, or "Full plan".
 
-For a plan with phases, run this step and step 6 for each phase. After a phase of a multi-file migration or refactor, run `verify` in a new subagent on the diff of that phase. Other phases wait for the one cold read at `/ship`.
+Completion: each criterion has its code, and you saw each direct-build piece run, or the report says "not seen" and why.
 
-Completion: each criterion has its code.
+## 6. Close the phase
 
-## 6. Check and land
+Call the Skill tool with `phase-done`, and give it the phase base. When another phase remains, go to step 5 with no question.
 
-Run the typecheck, the lint, and the tests that the diff adds or touches. Leave the full suite to `/ship`. A failure is yours to fix now.
+After the last phase, write your report, and stop. The user asks for changes in the chat: make each one, and call `phase-done` on it, with the parent of the commit that `phase-done` made as the phase base, so that the change goes in that commit. A change that takes another issue's scope reads that issue with its comments first. Run `ui-check` when the verdict names a UI hard stop, or the user asks.
 
-Squash into one commit, with one `-m` flag per paragraph:
-
-- `<title> (#<n>)`
-- one line for each criterion: `<criterion> · <test name, or what you saw>`
-- `Hard stops: <the verdict>`, in the last paragraph, so that `/ship` can read it as a trailer. Any `Co-Authored-By` line goes right below it.
-
-Then write your report, and stop. The user asks for changes in the chat: make each one, run this step again, and squash it into the same commit. Run `ui-check` only when the user asks.
-
-Completion: the checks pass, the branch has one commit, and the report is in the chat.
+Completion: each phase has its commit, and the report is in the chat.
 
 ## Shell rules
 
-These apply in a worktree, and in each subagent prompt:
+These apply in each build, in a worktree or not, and in each subagent prompt:
 
-> Run one plain shell command per call, from the worktree root, on paths in the worktree. For a subfolder, use a flag such as `pnpm --dir` or `uv --directory`, because a `cd` stays in effect for the rest of the session. Change a file with the Edit tool, and make a new file with the Write tool. Quote each argument that holds `*`, `[` or `]`. The guard refuses only some other forms, such as a `&&` chain, `$(...)` or a heredoc, so a command that ran is no proof that its form is safe. Print no value from an env file, because a line such as `PROD_DATABASE_URL` holds a password. To see which variables a file sets, list the names only: `grep -oE '^[A-Z_]+=' <file>`. Run each test command in the foreground, with a timeout of up to 10 minutes. Only a run that needs longer goes in the background with its output in a file: wait for its exit notification, and read the result before you report. Ask before a host install, and stop an install that shows no progress for 5 minutes.
+> Run one plain shell command per call, from the worktree root, on paths in the worktree. For a subfolder, use a flag such as `pnpm --dir` or `uv --directory`, because a `cd` stays in effect for the rest of the session. Change a file with the Edit tool, and make a new file with the Write tool. Quote each argument that holds `*`, `[`, `]`, `(` or `)`. Run a check alone, with no pipe and no chain, so that its exit status is the check's, and write long output to a file. Name each failing test before a rerun. A command that ran is no proof that its form is safe. Print no value from an env file, because a line such as `PROD_DATABASE_URL` holds a password. To see which variables a file sets, list the names only: `grep -oE '^[A-Z_]+=' <file>`. Run each test command in the foreground, with a timeout of up to 10 minutes. Only a run that needs longer goes in the background with its output in a file: wait for its exit notification, and read the result before you report. Ask before you install or start a host app, and stop an install that shows no progress for 5 minutes.
 
 ## Report
 
-Each criterion with its test, or what you saw · the commit · the checks that ran · up to three steps for the user to check · next step: `/ship <n>`.
+Each criterion with its test, or what you saw · each commit · the checks that ran · the simplify notes · up to three steps for the user to check · next step: `/ship <n>`.

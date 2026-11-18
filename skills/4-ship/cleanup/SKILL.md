@@ -21,7 +21,7 @@ Completion: you have the branch, its issue and the trunk.
 
 Run `gh pr list --head <branch> --state all --json number,url,state,body`.
 
-- **A merged PR**: go on. Read its merge commit with `gh pr view <pr> --json mergeCommit`. When that commit has two parents (`git cat-file -p <commit>` after a fetch), the PR merged with a merge commit. When the merge line of the PR body names another method, name the difference in the report, and name the repo setting that blocks it, `gh repo edit --enable-merge-commit=false`.
+- **A merged PR**: go on. Read its merge commit with `gh pr view <pr> --json mergeCommit`. When that commit has two parents (`git cat-file -p <commit>` after a fetch), the PR merged with a merge commit. When the merge line of the PR body names another method, name the difference in the report.
 - **An open PR**: stop, and give its URL.
 - **No PR**: stop. The next step is `/ship`.
 
@@ -38,11 +38,9 @@ Completion: each issue is in the state that the closing line gives, and you know
 
 ## 4. Servers
 
-Stop each dev server and background task that runs from the worktree. Check the background tasks of this session, and each process whose working directory is in the worktree: `lsof -d cwd` lists them. A task can survive a `/clear`, so look also when you think this session started none.
+Stop each dev server and background task that runs from the worktree. Check the background tasks of this session, and each process whose working directory is in the worktree: `lsof -a -d cwd +D <worktree>` lists them. A task can survive a `/clear`, so look also when you think this session started none.
 
-In a repo with a `.xcodeproj` or a `.xcworkspace`, also shut down the simulators, because their working directory is not in the worktree. When `pgrep xcodebuild` finds no other build, run `xcrun simctl shutdown all`, then `xcrun simctl --set testing shutdown all`. The second one fails harmlessly when no test clone exists.
-
-Then delete the test clones, which are disposable: Xcode leaves them on disk, and one session found 5 clone folders with one booted. Record the size with `du -sh ~/Library/Developer/XCTestDevices`, then run `xcrun simctl --set testing delete all`.
+In a repo with a `.xcodeproj` or a `.xcworkspace`, also shut down the simulators, because their working directory is not in the worktree. When `pgrep xcodebuild` finds no other build, run `xcrun simctl shutdown all`. When `~/Library/Developer/XCTestDevices` exists, Xcode left disposable test clones: record its size with `du -sh`, then run `xcrun simctl --set testing shutdown all` and `xcrun simctl --set testing delete all`.
 
 Leave Claude Code's own processes, which are the session shell, `caffeinate` and the MCP servers. Then clear what this session left: close each browser page that it opened, and delete each partial install and temp file that it made. Name each one in the report.
 
@@ -62,7 +60,7 @@ Completion: origin does not have the branch.
 
 ## 7. Trunk
 
-Record the trunk head with `git rev-parse HEAD`. Run `git pull --ff-only`.
+Record the trunk head with `git rev-parse HEAD`. Run `git pull --ff-only`, then `git clean -nd`, because a folder move leaves empty folders. Name each one in the report.
 
 When it does not fast-forward, list the local-only commits with `git log --oneline origin/<trunk>..<trunk>`. Ask with the question tool:
 

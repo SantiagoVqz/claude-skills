@@ -30,7 +30,7 @@ Then ask the round in one question tool call. For each question:
 - Give two to four options, with your recommendation first, and the cost of each other option in its description.
 - Use text in place of the tool only for an open question, and ask it alone.
 
-A question earns its place only when the answer changes the plan. `<k>` is your estimate: answers can open new branches, so the count can go up.
+A question earns its place only when the answer changes the plan. Give a multi-select question a "None" option, because an empty pick reads as no answer.
 
 - When the caller names required decisions, each one gets its own question. Ask about decisions, such as what a user can do, and never about the wording of content, such as user story text. The caller writes the content from the log.
 - When the user asks to file a follow-up, call the Skill tool with `issue` for it. Then ask the open questions again.

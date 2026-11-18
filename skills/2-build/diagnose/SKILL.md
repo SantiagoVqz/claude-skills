@@ -14,7 +14,7 @@ metadata:
 
 `/diagnose` takes a bug from a symptom to one fix commit. The **loop** is the skill: one command that goes **red** on this bug and green when it is fixed. With a **tight** loop, the cause falls out of the steps that follow. With no loop, reading code gives only a guess.
 
-When `/build` runs this skill, skip the steps marked "(not under `/build`)". `/build` owns them.
+When another skill runs this one, such as `/build` or a planner, skip the steps marked "(not under `/build`)". The caller owns them. A caller that asks for the cause only stops after step 6, and prints the Report line with the cause and the loop command.
 
 When you stop, put the symptom and the path of each attachment in the stop message, so that the next run needs no new input from the user.
 
@@ -108,7 +108,7 @@ With a correct seam:
 4. Run the test, and see it pass.
 5. Run the loop from step 3 on the original scenario.
 
-With no correct seam, fix the cause and record the missing seam. The architecture keeps this bug from a regression test, and the team needs to know.
+When only the user can apply the fix, such as a production config with their keys, call the Skill tool with `wizard`. With no correct seam, fix the cause and record the missing seam. The architecture keeps this bug from a regression test, and the team needs to know.
 
 Completion: the loop is green, and the regression test passes, or the missing seam is recorded.
 
@@ -140,11 +140,11 @@ Check yourself: `<run command>`
 1. <a step and what the user sees>
 ```
 
-Keep "Check yourself" to three steps or fewer. The card has only these parts. A finding outside the fix goes in the report, as an issue filed with `issue`.
+Keep "Check yourself" to three steps or fewer. The card has only these parts. A finding outside the fix goes in the report, as an issue filed with `issue` after it fails again on the trunk.
 
 Ask with the question tool: "Approve", "Change" or "Run ui-check". Leave out "Run ui-check" when it already ran on the fix. On Run ui-check, call the Skill tool with `ui-check` for this bug, then ask again with "Approve" or "Change". On Change, make the edits, commit, run the checks of step 9, and show the card again. When Change comes with no notes, ask in the chat what to change. A free-text answer that clearly approves counts as Approve. Only for a free-text answer, start the reply with: "Taking that as Approve." When the question returns no answer, ask it again before any other action.
 
-Completion: the card is in the chat above the question, and the user approved. Stop the dev server, and close the tab as `ui-check` says, when `ui-check` started them.
+Completion: the message right before the question starts with `### #<n>`, and the user approved. Stop the dev server, and close the tab as `ui-check` says, when `ui-check` started them.
 
 ## 11. Record
 
@@ -152,7 +152,7 @@ Squash the branch into one commit, except under `/build`, which squashes when it
 
 Comment on the issue, as `tracker.md` says: the cause, the loop command, and the missing seam when there is one. When the loop is a harness, put its text, redacted, in the comment, then delete the harness.
 
-Completion: the branch has one commit over the trunk, or `/build` runs this skill, or the work is uncommitted as `NO-SETUP.md` says. The issue has the cause, or the report has it when the repo has no tracker.
+Completion: the branch has one commit over the trunk, or `/build` runs this skill, or the work is uncommitted as `NO-SETUP.md` says. The issue has the cause and the fix, also when the fix is outside the repo, or the report has them when the repo has no tracker. Each fault that is still open has its own issue.
 
 ## Redact
 
