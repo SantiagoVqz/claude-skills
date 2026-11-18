@@ -23,6 +23,7 @@ Use the diff and the criteria that the caller gave. When you run on your own:
 - **Issue**: the argument, or the number in the branch name.
 - **Base**: the ref. With no ref, use `git merge-base origin/<trunk> HEAD`, because a local trunk can be ahead of the branch base.
 - **Diff**: `git diff <base>`. It includes the work that is not committed yet.
+- **PR**: the base is `origin/<baseRefName>`. Check out its head with the `worktree` skill.
 
 Read the issue with its criteria, with the Read command of `docs/agents/tracker.md`, or as `NO-SETUP.md` in the folder of the `setup-skills` skill says, and the spec with the testing decisions, when there is one. Run `git diff --stat <base>` and `git status --short`. Read each untracked file: `git diff` does not show it.
 
@@ -30,7 +31,7 @@ Completion: the base resolves, the diff is not empty, you have the criteria when
 
 ## 2. Run the checks
 
-Find the test, typecheck, lint and build commands in `package.json`, the README or `AGENTS.md`. Run the typecheck, the lint and the build. Run the test files that the diff adds or changes, and each test file that imports a module that the diff changes. Run the full suite only when the caller asks for it, or when you run on your own. Skip only the checks that the caller says CI runs on this diff, because the caller reads their result. Trust no earlier report.
+Find the test, typecheck, lint and build commands in `package.json`, the README or `AGENTS.md`. Run the typecheck, the lint and the build. Run the test files that the diff adds or changes, and each test file that imports a module that the diff changes. Run the full suite only when the caller asks for it, or when you run on your own. Skip only the checks that the caller says CI runs on this diff, because the caller reads their result. Trust no earlier report, except a gate receipt that names the digest of the current tree.
 
 Completion: each check that CI does not run passed or failed, each run has finished, and you have the output of each failure.
 
@@ -45,6 +46,7 @@ Read the diff once for each heading. Keep the two headings apart, so that one do
 - Each expected value comes from a literal, a worked example or the spec, not from the code's own logic.
 - The result can be checked from outside: through the UI, an API or a command. A ticket that changes one layer only, such as storage with no UI, is not a vertical slice.
 - Behavior that the ticket did not ask for is a judgment call.
+- Docs, store assets and CI that describe the changed behavior still match it: grep `docs/` for the old behavior, and compare what a changed CI step runs with the files that exist.
 
 For refactor work, the behavior must stay the same. Replace the first item and the vertical slice item with these: no expected value in an existing test changed, each test change follows a rename or a move, and each criterion is met in the structure of the code.
 
@@ -52,7 +54,6 @@ For refactor work, the behavior must stay the same. Replace the first item and t
 
 - Find the written rules: `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `CODING_STANDARDS.md` and the ADRs for the area.
 - Then read `SMELLS.md` in the folder of this skill with the Read tool, and look for its smells. A written rule wins over a smell.
-- Skip what a linter or a formatter already enforces.
 - When the diff adds a dependency, compare its `engines` with the versions in the CI workflow and the deploy target.
 
 Completion: each criterion, each test and each written rule is checked, and you read each changed or new test file.
@@ -61,7 +62,7 @@ Completion: each criterion, each test and each written rule is checked, and you 
 
 A finding is hard when it is one of these:
 
-- A check from step 2 fails.
+- A check from step 2 fails. Run a failing check once on the base. When it fails the same way there, it is no finding: name it and its issue in one line under the report.
 - A criterion has no code, or no test proves it. A criterion that no agreed seam can test needs only the code.
 - A test is at a seam that the spec did not agree, or it is tautological.
 - The diff breaks a written rule of the repo.
@@ -70,7 +71,7 @@ A finding is hard when it is one of these:
 - The work is not a vertical slice. This does not apply to refactor work.
 - Refactor work changed an expected value in an existing test.
 
-Defects that a user can see were filed as judgment calls in 7 sessions of one retro. So before you file a judgment call, answer the **user test** for it. When any answer is yes, the finding is hard:
+Before you file a judgment call, answer the **user test** for it. When any answer is yes, the finding is hard, also when it is rare, needs an exact order, or the spec allows it:
 
 - Can a user see or hear it, in any state of the story: empty, at a limit, after an error, after a stop, pause or retry?
 - Does it store, show, export or send a wrong value, such as a wrong currency, total or count?
@@ -80,9 +81,9 @@ Defects that a user can see were filed as judgment calls in 7 sessions of one re
 
 To answer, walk each story of the criteria through its edge states in the code: empty, one, at the limit, error, and an action in the middle of another one. A finding that only one edge state shows is still hard.
 
-Everything else is a judgment call. Keep the five that matter most.
+Everything else is a judgment call. Keep the five that matter most. Mark a finding that you inferred, and did not run or see, as `unseen`. The caller checks it first.
 
-Completion: each finding is hard or a judgment call, each judgment call passed the user test, and you have five judgment calls or fewer.
+Completion: each finding is hard or a judgment call, each judgment call passed the user test, you have five judgment calls or fewer, and the Report block is in the chat. Print it in each run and each rerun, before any file changes, yours or the caller's. Claim no result without a run.
 
 ## Report
 
@@ -95,6 +96,4 @@ Completion: each finding is hard or a judgment call, each judgment call passed t
 and <n> more
 ```
 
-"user effect: none" records that the finding passed the user test of step 4. When you cannot write it, the finding is hard.
-
-Print this block in each run, before the caller commits. Write "None" under a heading that has no findings. Write each finding on one line. Leave out the "and <n> more" line when you kept every judgment call.
+Write `user effect:` before you sort. Any value but `none` makes the finding hard. Write "None" under a heading that has no findings. Write each finding on one line. Leave out the "and <n> more" line when you kept every judgment call.
