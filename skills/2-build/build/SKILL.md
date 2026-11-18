@@ -19,6 +19,7 @@ Find what the argument is.
 - **Idea**: stop. The next step is `/spec <n>`.
 - **Spec with no sub-issues**: one ticket, with its stories as the criteria.
 - **Words with no issue**: one ticket. The plan is the record, so write nothing to the tracker, and the branch is `fix/<slug>`.
+- **Release work**: work that only publishes the app, such as store images, listing text or deploy docs. It gets no branch, worktree or PR: commit to the trunk in the primary checkout. A change to app code is code work, even when a release needs it.
 - **Any other issue**: one ticket, also with no criteria yet.
 
 Stop when an issue in `blockedBy` is open, and name it. When someone else has the issue, ask with the question tool: "Take over" or "Stop". When the branch exists and the issue has a `### Plan of #<n>` comment, switch to the branch, and resume at step 5, after the last phase with a commit that has the subject from `phase-done`. A phase with only `Green:` or `Refactor:` commits is still open.
@@ -46,21 +47,22 @@ Completion: you have the verdict line: `Hard stops: none`, or `Hard stops: <whic
 
 ## 3. Plan
 
-Write the plan in your message, in about 15 lines. A plan that needs more goes to [PLAN.md](PLAN.md).
+Write the plan in your message as this Markdown list, in about 15 lines, with no code fence. A plan that needs more goes to [PLAN.md](PLAN.md).
 
-```text
-Issue: two or three sentences in plain terms, with no symbol names.
-Cause: the cause or the current behavior, and your confidence in it.
-Fix: the change, and the code that it touches.
-Done when:
-- each criterion, with the edge cases
-Out of scope: what stays as it is.
-Defaults: each choice that you took without asking.
-Approach: from the table in step 5, with the reason in a few words.
-Hard stops: the verdict line.
+```markdown
+### Plan of #<n> · <title>
+- **Issue.** Two or three sentences in plain terms, with no symbol names.
+- **Cause.** The cause or the current behavior, and your confidence in it.
+- **Fix.** The change, and the code that it touches.
+- **Done when.** The <n> criteria of #<n>, plus:
+  - each criterion that you add or change, with its edge cases
+- **Out of scope.** What stays as it is.
+- **Defaults.** Each choice that you took without asking.
+- **Approach.** From the table in step 5, with the reason in a few words.
+- **Hard stops.** The verdict line.
 ```
 
-When the ticket already has criteria, write `Done when: the <n> criteria of #<n>`, and list only the criteria that you add or change. Ask with the question tool: "Approve", "Change" or "Full plan". When the plan hinges on a real choice, add it as a second question in the same call, with your recommendation first. Two questions is the limit. Take a fact from the code, and take a default when the repo's rules settle the choice.
+With no criteria on the ticket, list each one under **Done when**. Ask with the question tool: "Approve", "Change" or "Full plan". When the plan hinges on a real choice, add it as a second question in the same call, with your recommendation first. Two questions is the limit. Take a fact from the code, and take a default when the repo's rules settle the choice.
 
 Completion: the plan is a text block in the chat above the question, and the user picked "Approve". A file, a comment or your thinking does not count.
 
@@ -68,11 +70,11 @@ Completion: the plan is a text block in the chat above the question, and the use
 
 With an issue, as `tracker.md` says: add `## Acceptance criteria` at the end of the body when it has none, and keep the text that the person wrote. Post the plan as a comment that starts with `### Plan of #<n>`. Assign the issue to the user.
 
-The branch is `fix/<n>-<slug>` from the trunk. Find the trunk as the `worktree` skill does. Make the branch in the primary checkout when that checkout is clean and on the trunk. Call the Skill tool with `worktree` when the checkout is busy, when the plan has a migration, or when the user asks: only then does the work need its own folder and databases.
+Release work skips the rest of this step. The branch is `fix/<n>-<slug>` from the trunk. Find the trunk as the `worktree` skill does. Make the branch in the primary checkout when that checkout is clean and on the trunk. Call the Skill tool with `worktree` when the checkout is busy, when the plan has a migration, or when the user asks: only then does the work need its own folder and databases.
 
 When the parent spec has a `Domain changes` section that the trunk does not have yet, write it with [DOCS-FORMAT.md](DOCS-FORMAT.md), and commit: `Record terms and decisions for #<n>`.
 
-Completion: the session is on the branch, and the issue has the plan.
+Completion: the session is on the branch, or on the trunk for release work, and the issue has the plan.
 
 ## 5. Build
 
@@ -109,4 +111,4 @@ These apply in each build, in a worktree or not, and in each subagent prompt:
 
 ## Report
 
-Each criterion with its test, or what you saw · each commit · the checks that ran · the simplify notes · up to three steps for the user to check · next step: `/ship <n>`.
+Each criterion with its test, or what you saw · each commit · the checks that ran · the simplify notes · up to three steps for the user to check · next step: `/ship <n>`, or `git push` for release work.
