@@ -16,7 +16,7 @@ In a worktree, follow the shell rules of the `build` skill.
 
 ## 1. Simplify
 
-Read `git diff <phase base>` and each untracked file. Find what to cut: code that the work no longer needs, an old pattern kept as a fallback next to its replacement, a helper with one caller, a parameter or a branch that no criterion asks for. After `tdd` or `refactor`, duplication and names are already done, so look only for cuts.
+Read `git diff <phase base>` and each untracked file. Find what to cut: code that the work no longer needs, an old pattern kept as a fallback next to its replacement, a helper with one caller, a parameter or a branch that no criterion asks for. A defect found here gets a red test first, as `tdd` says. Name only the cuts of this step.
 
 The best result of a finding is less code. Keep each trust-boundary check, each caveat, and each test that proves a criterion. A cut keeps the behavior. In a change round after the report, look only at the change.
 
@@ -50,7 +50,7 @@ Stage the files of the phase. Run `git reset --soft <phase base>`, and make one 
 
 - `<title> (#<n>)`. In a plan with phases: `<title>: <phase title> (#<n>)`.
 - one line for each criterion of the phase: `<criterion> · <test name, or what you saw>`
-- `Hard stops: <the verdict>`, in the last paragraph, so that `/ship` can read it as a trailer. Any `Co-Authored-By` line goes right below it.
+- `Hard stops: <the verdict>`, in the last paragraph, where `hardstop-check.sh` of `/ship` reads it. Any `Co-Authored-By` line goes right below it.
 
 Work that `NO-SETUP.md`, in the folder of the `setup-skills` skill, keeps uncommitted skips this step.
 
@@ -58,4 +58,4 @@ Completion: the phase has one commit over its base and `git status` is clean, or
 
 ## Report
 
-What the phase delivered · the simplify note · the last line of each check · the commit · each change outside the plan · the cold read result, or "cold read: at /ship".
+One labeled line each, in this order: `Delivered:` what the phase delivered · `Simplify:` the note of step 1 · `Checks:` the last line of each check · `Scope:` each change outside the plan with its reason, or none · `Cold read:` the result, or "at /ship" · `Commit:` hash and subject.

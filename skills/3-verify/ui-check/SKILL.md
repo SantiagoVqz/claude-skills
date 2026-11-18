@@ -1,6 +1,6 @@
 ---
 name: ui-check
-description: "Drive the app in a browser or an iOS simulator to check a change, then give the user a short list of what passed and what to check by hand. Use when the user runs /ui-check, or asks for a browser check of a change."
+description: "Drive the app in a browser or an iOS simulator to check a change, then give the user a short list of what passed and what to check by hand. Use when the user runs /ui-check, or asks to test a change or a PR in a browser."
 argument-hint: "[issue | what to check]"
 ---
 
@@ -14,7 +14,7 @@ Read the target: the issue and its criteria, or the text the user gave. With no 
 
 Write the flow as a short list of steps, the way a user does the feature from start to end. Cover the criteria that a browser can show. A criterion that a browser cannot show stays out. A screen width, such as 390px, is a parameter of a step, not a new step.
 
-Completion: you have the flow, five steps or fewer.
+Completion: the numbered flow, five steps or fewer, is in the chat.
 
 ## 2. Run
 
@@ -38,7 +38,6 @@ Completion: the numbered flow is in the chat above the first tool call, and each
 
 | Excuse | Answer |
 |---|---|
-| "I have the flow in mind." | The user cannot see thinking. Print the numbered flow before the first tool call. |
 | "Another session holds the browser, so I kill it." | Its check runs in that browser. Connect the extension, or skip the browser check. |
 | "The extension is not connected, so I skip the check." | Ask, then use DevTools. Only a failure of both skips the check, and the report says so. |
 
@@ -59,4 +58,4 @@ Check yourself at <URL>:
 
 "Check yourself" has three steps or fewer: what a browser check cannot judge, such as the look and the feel.
 
-Completion: the lists are in the chat. When the user ran you, they answered, and you stopped the dev server and closed the tab.
+Completion: the lists are in the chat, and any question follows them in the same message. When the user ran you, they answered, and you stopped the dev server and closed the tab.

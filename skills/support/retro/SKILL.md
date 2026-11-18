@@ -63,9 +63,9 @@ Merge the gaps of all sessions. The same gap in more than one session is one fin
 
 Completion: each finding has a skill and step, evidence with `<session>:<line>`, and a fix or the `project` tag.
 
-## 6. Confirm and write
+## 6. Write
 
-Show the findings to the user, ordered by how many sessions and runs saw them, then by cost to the user. Give each finding its own line in the chat, with its ID, skill and title, so the user can drop or change each one without opening the file. A count in place of the lines is not a list. Then write `<run folder>/<date>-<projects>-<skills>.md` in this format:
+Order the findings by how many sessions and runs saw them, then by cost to the user. Write `<run folder>/<date>-<projects>-<skills>.md` in this format. The file is for the agent that applies the fixes, so it keeps the full evidence:
 
 ```markdown
 # <date> · <projects> · <skills that ran>
@@ -95,8 +95,15 @@ The Sessions list is the coverage record: the next `/retro` starts each transcri
 
 A finding's ID is its file name and number, for example `2026-10-15-habits-spec#F1`. The commit that applies a fix names that ID in its message and sets `Status: applied` in the same change. `git log --grep <ID>` then finds the fix. When we decide against a fix, set `Status: rejected: <reason>`.
 
-Completion: the run file exists, its Sessions list has each row from step 2, and the user approved its findings.
+Completion: the run file exists, and its Sessions list has each row from step 2.
 
-## Report
+## 7. Summarize
 
-Run file path · sessions read · findings: new, repeated, project · each watch item, with what the sessions showed or "not seen" · the finding to fix first.
+The chat is a **brief** for the user. The run file holds the detail. Show:
+
+- The run file path and the number of sessions read.
+- One line per skill with findings: the suggested change in plain words, with the finding IDs in brackets. Merge the findings of one skill into that line.
+- The finding to fix first, and why.
+- Watch items that the sessions settled, one line each. Leave out the items that no session showed.
+
+Ask the user which changes to drop or alter, and set `Status: rejected: <reason>` on each one they drop.

@@ -24,7 +24,7 @@ Completion: the user picked Approve.
 
 ## 3. Apply
 
-Make a linked worktree from the trunk on the branch `fix/upgrade-skills`, and make each change to a tracked file there. Run `upgrade-engine.sh scripts/provision.sh --apply` there. Leave the changes uncommitted. The user commits them.
+Make a linked worktree from the trunk on the branch `fix/upgrade-skills`, and make each change to a tracked file there. Run `upgrade-engine.sh scripts/provision.sh --apply` there. Commit the changes there. The next step is `/ship`.
 
 **Port move.** Change the port in the compose file or `DB_PORT`, whichever holds it. Then change each gitignored env file that holds the old port, in the primary and in each linked worktree. Run `git worktree list` to find them. Change only the port, and print no value from an env file. Stamped database URLs hold the port too.
 
@@ -34,10 +34,10 @@ Completion: `upgrade-engine.sh` prints `current` or `own`, each rule under Compo
 
 ## 4. Check
 
-The check in `PROVISIONING.md` starts from the trunk, which lacks these changes, so check the upgrade worktree itself. Run `scripts/provision.sh` in it. The end of the output names its dev and test databases. Then run `scripts/provision.sh drop`. Keep the worktree: it holds the uncommitted changes.
+The check in `PROVISIONING.md` starts from the trunk, which lacks these changes, so check the upgrade worktree itself. Run `scripts/provision.sh` in it. The end of the output names its dev and test databases. Then run `scripts/provision.sh drop`. Keep the worktree: it holds the branch.
 
 Completion: the check passed, or the report names the step that failed, with the end of its output.
 
 ## Report
 
-Each item · current, changed or kept · the engine state · the port before and after · the check result · the branch and the files left to commit · the step that remains until the merge: worktrees made from the trunk before the merge still get the old `provision.sh`.
+Each item · current, changed or kept · the engine state · the port before and after · the check result · the branch and its commit · the step that remains until the merge: worktrees made from the trunk before the merge still get the old `provision.sh`.

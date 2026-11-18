@@ -17,7 +17,7 @@ A linked worktree gives a branch its own folder and databases. `/build` uses one
 
 Each worktree also has its own test database. `scripts/provision.sh` applies these rules.
 
-The **trunk** is the branch that PRs merge into: the default branch from `git symbolic-ref refs/remotes/origin/HEAD`, or `develop` when the repo has both `main` and `develop`. When `origin/HEAD` is missing, use `gh repo view --json defaultBranchRef`. Do not run `git remote set-head`, because it changes the repo config.
+The **trunk** is the branch that PRs merge into: the base of most of the last 10 merged PRs (`gh pr list --state merged --limit 10 --json baseRefName`). With no merged PR, use `gh repo view --json defaultBranchRef`, because a local `origin/HEAD` can be stale.
 
 ## Make
 
@@ -25,8 +25,8 @@ The **trunk** is the branch that PRs merge into: the default branch from `git sy
    - A worktree has the branch: use its path, and go on to steps 2 to 4.
    - No worktree has it: `git fetch origin`, then `git worktree add -b <branch> <primary>/.claude/worktrees/<branch with / as -> <base>`. `<primary>` is the path on the first `worktree` line of `git worktree list --porcelain`. A relative path resolves from the current directory, so a session in another worktree puts the new worktree inside it. Use `origin/<trunk>` as the base. When the branch is only on the remote, run `git branch --track <branch> origin/<branch>` first. Leave out `-b` when the branch exists.
    - The primary checkout has the branch: stop and say so. A branch is checked out in one place only.
-2. **Enter.** `EnterWorktree` on the worktree path. Only `EnterWorktree` puts the guard on the session, so never enter with `cd`. After this, the harness refuses commands that it cannot prove stay in the worktree. This covers every shell command, not only git. Run one plain command per call, from the worktree root, on paths in the worktree. For a subfolder, use a flag such as `pnpm --dir` or `uv --directory`, because a `cd` stays in effect for the rest of the session. Change a file with the Edit tool, and make a new file with the Write tool. Quote each argument that holds `*`, `[` or `]`. The guard refuses only some other forms, such as a `&&` chain, `$(...)` or a heredoc, so a command that ran is no proof that its form is safe. Pass a commit message with one `-m` flag per paragraph. A message file in the worktree can get committed.
-3. **Provision.** When `scripts/provision.sh` exists, run it in the worktree. When it fails, show the end of its output and stop. When it does not exist and the repo has gitignored `.env` files, a lockfile or a database URL, the worktree is not ready. Copy no `.env` file by hand. Tell the user to run `/setup-skills`, and stop.
+2. **Enter.** `EnterWorktree` on the worktree path. Only `EnterWorktree` puts the guard on the session, so never enter with `cd`. After this, the harness refuses commands that it cannot prove stay in the worktree. This covers every shell command, not only git, so follow the shell rules of the `build` skill. Pass a commit message with one `-m` flag per paragraph. A message file in the worktree can get committed.
+3. **Provision.** When `scripts/provision.sh` exists, run it in the worktree. When it fails because a local service such as Docker is down, ask once to start it, then start it and run the script again. On any other failure, show the end of its output and stop. When it does not exist and the repo has gitignored `.env` files, a lockfile or a database URL, the worktree is not ready. Copy no `.env` file by hand. Tell the user to run `/setup-skills`, and stop.
 
 Completion: the session is in the worktree, and the end of the `provision.sh` output names the expected dev and test databases, or the repo needs no provisioning. Otherwise the report says `blocked: run /setup-skills`.
 
