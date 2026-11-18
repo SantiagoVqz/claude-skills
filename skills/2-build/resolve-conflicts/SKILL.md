@@ -1,6 +1,6 @@
 ---
 name: resolve-conflicts
-description: "Resolve a git merge or rebase conflict that is in progress, and keep the intent of both sides. Use when a rebase or merge stops on a conflict."
+description: "Resolve a git merge or rebase conflict, and keep the intent of both sides. Use when a rebase or merge stops on a conflict, or an open PR conflicts with its trunk, before you ask the user how to resolve it."
 metadata:
   credits:
     skill: resolving-merge-conflicts
@@ -15,7 +15,7 @@ A conflict has two **intents**, one for each side. Each side was made for a reas
 
 ## 1. See the state
 
-Run `git status` to get the conflicted files, and to see whether a rebase or a merge is in progress. Read the commits of each side with `git log`.
+Run `git status` to get the conflicted files, and to see whether a rebase or a merge is in progress. With none in progress, run `git merge origin/<trunk>` on the branch of the PR, because a merge keeps the reviewed history. Read the commits of each side with `git log`.
 
 Completion: you know each conflicted file and the commits on each side.
 
