@@ -28,7 +28,7 @@ Then ask the round in one question tool call. For each question:
 
 - Write the question in one sentence that stands on its own text. Add one line of context only when the user cannot answer without it.
 - Give two to four options, with your recommendation first, and the cost of each other option in its description.
-- Use text in place of the tool only for an open question, and ask it alone.
+- Use text in place of the tool only for an open question, and ask it alone. The user types words only through "Other", so name "Other" when you invite them, never notes.
 
 A question earns its place only when the answer changes the plan. Give a multi-select question a "None" option, because an empty pick reads as no answer.
 
