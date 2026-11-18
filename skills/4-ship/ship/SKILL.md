@@ -1,7 +1,6 @@
 ---
 name: ship
-description: "Open the PR for a built branch: rebase on the trunk, check the hard stops, push a draft PR, run one cold read of the whole diff while CI runs, write the body, and mark the PR ready."
-disable-model-invocation: true
+description: "Open the PR for a built branch: rebase on the trunk, check the hard stops, push a draft PR, run one cold read of the whole diff while CI runs, write the body, and mark the PR ready. Use when the user runs /ship, or asks to push fixes to a PR."
 argument-hint: "[issue]"
 ---
 
@@ -15,9 +14,9 @@ In a worktree, follow the shell rules of the `build` skill.
 
 Read the `## Agent skills` block in `AGENTS.md`, then `docs/agents/tracker.md`. When the block is missing, read `NO-SETUP.md` in the folder of the `setup-skills` skill, and go on with its sources.
 
-The target is the argument, or the number in the current branch name. A branch with no number has no issue. Go to the worktree that has the branch, when one does. When `git status` shows changes, stop and ask whether they belong in this PR.
+The target is the argument, or the number in the current branch name. A branch with no number has no issue. Go to the worktree that has the branch, when one does. When `git status` shows changes, stop and ask whether they belong in this PR. When the PR of the branch is merged or closed, push nothing: make a new branch from the trunk for the new commits.
 
-Find the **merge method**. Search `docs/adr/` for "merge commit", and read `gh repo view --json rebaseMergeAllowed,mergeCommitAllowed`. An ADR that needs merge commits wins. Otherwise use rebase and merge when the repo allows it, and a merge commit when it does not.
+Find the **merge method**. Search `docs/adr/` for "merge commit", and read `gh repo view --json rebaseMergeAllowed,mergeCommitAllowed`. An ADR that needs merge commits wins. Otherwise use the method of the recent PR merges: a merge commit when `git log --merges -5 --first-parent origin/<trunk>` shows them, else rebase and merge.
 
 Completion: you have the branch, its issue when it has one, the trunk, as the `worktree` skill finds it, and the merge method.
 
@@ -45,7 +44,7 @@ Completion: you know whether CI covers the PR, which checks it runs, and whether
 
 ## 5. Open a draft
 
-Run `git push --force-with-lease origin <branch>`. When the branch has no open PR, write a short body to a file in the worktree root, with the closing line and the merge line of step 8. Run `gh pr create --draft --base <trunk> --head <branch> --title "<title>" --body-file <file>`. When CI skips drafts, or GitHub refuses a draft on this repo, run the command with no `--draft`. Then delete the file. When CI covers the PR, run `gh pr checks <pr> --watch` in the background.
+Run `git push --force-with-lease origin <branch>`. When the branch has no open PR, write a short body to a file in the worktree root, with the closing line and the merge line of step 7. Run `gh pr create --draft --base <trunk> --head <branch> --title "<title>" --body-file <file>`. When CI skips drafts, or GitHub refuses a draft on this repo, run the command with no `--draft`. Then delete the file. When CI covers the PR, run `gh pr checks <pr> --watch` in the background.
 
 Completion: the PR is open with the latest commit, and the watch runs when CI covers the PR.
 
@@ -53,17 +52,13 @@ Completion: the PR is open with the latest commit, and the watch runs when CI co
 
 Start a subagent with a fresh context. Tell it to call the Skill tool with `verify`, with the issue, its criteria, the diff `origin/<trunk>...HEAD`, and the checks that CI runs. Give it the shell rules. It needs only the conclusions, so keep the diff out of this context.
 
-Fix each hard finding in this session, squash the fix into the last commit, push as in step 5, start a new watch, and run a new subagent. Run three cold reads or fewer. When a hard finding remains, stop and show it with the PR URL. The user fixes it, and you push and run one more cold read, or the user overrides it with a reason that goes in the PR body. Judgment calls go in the report, and change nothing.
+When CI does not run the tests, the same subagent also runs each suite that has a script, e2e included, once, so that one agent holds the simulator. Skip that run when the suite passed on this tree (`git rev-parse HEAD^{tree}`) in this session. Wait for the result, so that no check still runs when the user merges. A failure in the code of the branch is a hard finding. Name each check with no script in the report.
 
-Completion: the last cold read has no hard finding, or the user gave each override reason.
+Fix each hard finding in this session, squash the fix into the last commit, push as in step 5, start a new watch, and run a new subagent. Run three cold reads or fewer. When a hard finding remains after the last read, fix nothing, and show it with the PR URL. The user fixes it, and you push and run one more cold read, or the user overrides it with the question tool and a reason that goes in the PR body. An earlier approval is no override. Judgment calls go in the report as the read lists them, with its "and n more" line, and change nothing.
 
-## 7. Full checks
+Completion: the last cold read has no hard finding, or the user gave each override reason, and CI runs the tests or each suite passed.
 
-Skip this step when CI runs the tests. Otherwise start a subagent to run the full suite once, under the shell rules. The last cold read already ran each other check that CI does not run. Wait for its result, so that no check still runs when the user merges. When the repo has no script for a check, skip that check and name it in the report. A failure in the code of the branch stops `/ship`. Show its output.
-
-Completion: CI runs the tests, or the full suite passed.
-
-## 8. Write the body
+## 7. Write the body
 
 Call the Skill tool with `pr` to write the body. Give it:
 
@@ -76,7 +71,7 @@ Write the body to a file in the worktree root. Run `gh pr edit <pr> --body-file 
 
 Completion: the PR has a body with each of these parts, and `git status` is clean.
 
-## 9. Wait for CI
+## 8. Wait for CI
 
 Skip this step when step 4 found that CI does not cover the PR.
 
@@ -87,7 +82,7 @@ Wait for the last watch to end. It can exit non-zero when every check passed, so
 
 Completion: each check passed, or you showed each failure, or the local checks ran because CI did not start.
 
-## 10. Mark ready
+## 9. Mark ready
 
 Run `gh pr ready <pr>` when the PR is a draft, step 6 has no open hard finding, and no check failed. When a check failed or a hard finding is open, a draft stays a draft, and the report names each failure and finding, also on a PR that was never a draft.
 
